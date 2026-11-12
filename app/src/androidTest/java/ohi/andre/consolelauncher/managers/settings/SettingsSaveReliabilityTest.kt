@@ -33,11 +33,11 @@ class SettingsSaveReliabilityTest {
         old.listFiles().orEmpty().filter { it.isFile && it.extension == "xml" }.forEach { it.copyTo(File(temporary, it.name)) }
         val field = Tuils::class.java.getDeclaredField("folder").apply { isAccessible = true }
         field.set(null, temporary)
-        val clearFrames = ohi.andre.consolelauncher.tuils.FrameManager::class.java.getDeclaredMethod("clearCache").apply { isAccessible = true }
-        clearFrames.invoke(ohi.andre.consolelauncher.tuils.FrameManager)
+        val clearFrames = ohi.andre.consolelauncher.tuils.frame.FrameManager::class.java.getDeclaredMethod("clearCache").apply { isAccessible = true }
+        clearFrames.invoke(ohi.andre.consolelauncher.tuils.frame.FrameManager)
         try { reload(); run() } finally {
             temporary.walkTopDown().forEach { it.setWritable(true, true) }
-            field.set(null, old); clearFrames.invoke(ohi.andre.consolelauncher.tuils.FrameManager); reload(); temporary.deleteRecursively()
+            field.set(null, old); clearFrames.invoke(ohi.andre.consolelauncher.tuils.frame.FrameManager); reload(); temporary.deleteRecursively()
         }
     }
     private fun adapter(item: XMLPrefsSave): Pair<TuixtAdapter, EditText> {

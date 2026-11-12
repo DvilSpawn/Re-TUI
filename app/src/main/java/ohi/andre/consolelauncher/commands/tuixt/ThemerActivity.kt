@@ -39,6 +39,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.core.app.ActivityCompat
+import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ohi.andre.consolelauncher.R
@@ -66,11 +67,11 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePaneScreen
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleToggle
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
-import ohi.andre.consolelauncher.managers.BackupManager
-import ohi.andre.consolelauncher.managers.FocusFrictionStyle
-import ohi.andre.consolelauncher.managers.LockdownManager
+import ohi.andre.consolelauncher.managers.backup.BackupManager
+import ohi.andre.consolelauncher.managers.apps.FocusFrictionStyle
+import ohi.andre.consolelauncher.managers.apps.LockdownManager
 import ohi.andre.consolelauncher.managers.KeyboardShortcutManager
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.IconChoice
@@ -90,14 +91,14 @@ import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.LocalizedArgumentException
-import ohi.andre.consolelauncher.tuils.FrameManager
-import ohi.andre.consolelauncher.tuils.FrameSpec
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
+import ohi.andre.consolelauncher.tuils.frame.FrameSpec
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
 import java.lang.ref.WeakReference
 import java.util.concurrent.CancellationException
-import ohi.andre.consolelauncher.managers.FileOperationCancellation
+import ohi.andre.consolelauncher.managers.file.FileOperationCancellation
 import java.io.FileOutputStream
 import java.io.FilenameFilter
 import java.util.Arrays
@@ -226,7 +227,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         TuixtTheme.stylePaneHeader(this, header!!)
         viewport.addView(surface, FrameLayout.LayoutParams(-1, -1))
         ohi.andre.consolelauncher.help.PanelBackdrop.install(viewport)
-        ohi.andre.consolelauncher.tuils.TerminalBorderRuntime.bind(root, header)
+        ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime.bind(root, header)
         window.setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN or
             android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
 
@@ -369,7 +370,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             for (index in 0 until footer.childCount) {
                 val button = footer.getChildAt(index) as? ImageButton ?: continue
                 styleIconButton(this, button)
-                button.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
+                tintSupportIcon(button)
             }
         }
     }
@@ -458,9 +459,11 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
 
     private fun savePreset(name: String?) {
         try {
-            PresetManager.save(this, name ?: return)
+            val saved = PresetManager.save(this, name ?: return)
             Toast.makeText(this@ThemerActivity, getString(R.string.themer_preset_saved_bb391), Toast.LENGTH_SHORT)
                 .show()
+            if (saved == ohi.andre.consolelauncher.managers.preset.PresetWallpaper.Saved.UNKNOWN)
+                ohi.andre.consolelauncher.managers.preset.PresetWallpaperPickerActivity.ask(this, name.trim())
         } catch (e: Exception) {
             Toast.makeText(this@ThemerActivity, e.displayMessage(this@ThemerActivity), Toast.LENGTH_SHORT).show()
         }
@@ -469,6 +472,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     private fun applyPreset(name: String?) {
         try {
             PresetManager.apply(name ?: return)
+            runCatching { PresetManager.applyWallpaper(this@ThemerActivity, name) }
 
             Toast.makeText(this@ThemerActivity, getString(R.string.themer_preset_applied_reloading_5539d), Toast.LENGTH_SHORT)
                 .show()
@@ -484,6 +488,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         APPEARANCE(R.string.hub_appearance),
         BEHAVIOR(R.string.hub_behavior),
         SOUNDS(R.string.hub_sounds),
+        EDGE_SIDEBAR(R.string.hub_edge_sidebar),
         PERSONALIZATION(R.string.hub_personalization),
         ASCII_SETTINGS(R.string.hub_ascii_settings),
         INTEGRATIONS(R.string.hub_integrations),
@@ -581,6 +586,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                 val place = when {
                     XMLPrefsManager.isAsciiArtSetting(save) -> ascii
                     save is Behavior && sectionName == sounds -> groups[SECTION_BEHAVIOR] + " › " + sounds
+                    save is Behavior && sectionName == ohi.andre.consolelauncher.sidebar.EdgeSidebar.SECTION -> groups[SECTION_BEHAVIOR] + " › " + getString(R.string.hub_edge_sidebar)
                     else -> "$group › $file › $sectionName"
                 }
                 out += SettingsSearch.Entry(settingDisplayLabel(this, save), place, save.info(this).orEmpty(), save.label().orEmpty(), save)
@@ -606,8 +612,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
                     val root = XMLPrefsManager.XMLPrefsRoot.entries.firstOrNull { target in it.enums } ?: return
                     intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), root.path()).absolutePath)
                     if (target is Behavior) {
-                        if (XMLPrefsManager.sectionFor(target) == sounds) intent.putExtra(TuixtActivity.ONLY_SECTION, sounds)
-                        else intent.putExtra(TuixtActivity.EXCLUDE_SECTION, sounds)
+                        val own = XMLPrefsManager.sectionFor(target)
+                        if (own in behaviorPages()) intent.putExtra(TuixtActivity.ONLY_SECTION, own)
+                        else intent.putStringArrayListExtra(TuixtActivity.EXCLUDE_SECTION, ArrayList(behaviorPages()))
                     }
                 }
                 intent.putExtra(TuixtActivity.FOCUS, target.label())
@@ -632,6 +639,8 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
             openSection(SECTION_BEHAVIOR)
         } else if (fileName == HubAction.SOUNDS.name) {
             openSoundsSettings()
+        } else if (fileName == HubAction.EDGE_SIDEBAR.name) {
+            openBehaviorPage(ohi.andre.consolelauncher.sidebar.EdgeSidebar.SECTION)
         } else if (fileName == HubAction.PERSONALIZATION.name) {
             openSection(SECTION_PERSONALIZATION)
         } else if (fileName == HubAction.ASCII_SETTINGS.name) {
@@ -778,6 +787,7 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         } else if (SECTION_BEHAVIOR == section) {
             return mutableListOf(
                 HubAction.SOUNDS.name,
+                HubAction.EDGE_SIDEBAR.name,
                 "behavior.xml",
                 "apps.xml",
                 "notifications.xml",
@@ -1764,12 +1774,29 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         styleIconButton(this, button)
         button.setScaleType(android.widget.ImageView.ScaleType.CENTER_INSIDE)
         button.setPadding(dp(this, 10f), dp(this, 10f), dp(this, 10f), dp(this, 10f))
-        button.setColorFilter(accentColor(), PorterDuff.Mode.SRC_IN)
+        button.tag = imageRes
+        tintSupportIcon(button)
         button.setOnClickListener { onClick() }
 
         val params = LinearLayout.LayoutParams(0, dp(this, 52f), 1f)
         params.marginEnd = dp(this, 8f)
         container.addView(button, params)
+    }
+
+    private fun tintSupportIcon(button: ImageButton) {
+        // Brand logos keep their official colours rather than the theme accent.
+        val color = when (button.tag) {
+            R.drawable.ic_tuixt_reddit_24 -> {
+                button.clearColorFilter()
+                return
+            }
+            R.drawable.ic_tuixt_github_24, R.drawable.ic_tuixt_discord_24 -> {
+                val background = TuixtTheme.iconButtonBackgroundColor()
+                if (ColorUtils.calculateLuminance(background) > 0.179) Color.BLACK else Color.WHITE
+            }
+            else -> accentColor()
+        }
+        button.setColorFilter(color, PorterDuff.Mode.SRC_IN)
     }
 
     private fun updateSupportFooter() {
@@ -1834,15 +1861,20 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), fileName).getAbsolutePath())
         if (fileName == "behavior.xml") {
-            intent.putExtra(TuixtActivity.EXCLUDE_SECTION, getString(R.string.themer_sounds_fb1c3))
+            intent.putStringArrayListExtra(TuixtActivity.EXCLUDE_SECTION, ArrayList(behaviorPages()))
         }
         openSettingsChild(intent)
     }
 
-    private fun openSoundsSettings() {
+    private fun openSoundsSettings() = openBehaviorPage(getString(R.string.themer_sounds_fb1c3))
+
+    /** Behavior sections with their own hub entry; the Behavior settings page leaves them out. */
+    private fun behaviorPages() = listOf(getString(R.string.themer_sounds_fb1c3), ohi.andre.consolelauncher.sidebar.EdgeSidebar.SECTION)
+
+    private fun openBehaviorPage(section: String) {
         val intent = Intent(this@ThemerActivity, TuixtActivity::class.java)
         intent.putExtra(TuixtActivity.PATH, File(Tuils.getFolder(), "behavior.xml").getAbsolutePath())
-        intent.putExtra(TuixtActivity.ONLY_SECTION, getString(R.string.themer_sounds_fb1c3))
+        intent.putExtra(TuixtActivity.ONLY_SECTION, section)
         openSettingsChild(intent)
     }
 

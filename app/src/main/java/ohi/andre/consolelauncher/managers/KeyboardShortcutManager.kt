@@ -17,7 +17,7 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import org.json.JSONArray
 import org.json.JSONObject
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
+import ohi.andre.consolelauncher.managers.apps.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.tuils.GenericFileProvider
 
 object KeyboardShortcutManager {

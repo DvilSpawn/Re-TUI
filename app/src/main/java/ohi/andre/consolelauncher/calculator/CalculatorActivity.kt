@@ -24,6 +24,8 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import java.util.concurrent.Executors
 
 class CalculatorActivity : LocalizedActivity() {

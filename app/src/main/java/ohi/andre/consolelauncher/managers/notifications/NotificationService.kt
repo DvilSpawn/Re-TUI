@@ -13,7 +13,7 @@ import android.text.TextUtils
 import android.util.Log
 import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.UIManager
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import java.util.Collections
 import java.util.Queue
@@ -43,7 +43,7 @@ import java.util.Iterator
 import java.util.Map
 import java.util.Comparator
 import java.util.regex.Matcher
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.managers.music.MusicService
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
@@ -212,7 +212,7 @@ class NotificationService : NotificationListenerService() {
             }
             activeControllers.clear()
             if (controllers != null) {
-                activeControllers.addAll(controllers.filterNotNull())
+                activeControllers.addAll(controllers.filterNotNull().filterNot(::isOwnMusicSession))
                 for (controller in activeControllers) {
                     controller.registerCallback(mediaCallback)
                     Log.d("TUI-Music", "Registered callback for: " + controller.getPackageName())
@@ -686,7 +686,7 @@ class NotificationService : NotificationListenerService() {
                             n.preview = buildNotificationPreview(bundle, text)
                             n.title = extractNotificationTitle(bundle)
                             n.body = extractNotificationBody(bundle)
-                            if (currentSbn.isGroup) n.group = currentSbn.groupKey
+                            if (android.os.Build.VERSION.SDK_INT >= 24 && currentSbn.isGroup) n.group = currentSbn.groupKey
                             n.groupSummary = notification.flags and android.app.Notification.FLAG_GROUP_SUMMARY != 0
                             pushOverlayNotification(n)
 
@@ -909,6 +909,13 @@ class NotificationService : NotificationListenerService() {
         notifyNotificationWorker()
     }
 
+    /**
+     * MusicService reports the launcher's music and podcasts itself. Treating its session as an outside player would
+     * mark them external and stop their progress updates. The video player has no other route, so it stays visible.
+     */
+    private fun isOwnMusicSession(controller: MediaController): Boolean =
+        controller.packageName == packageName && controller.tag?.endsWith(".video") != true
+
     private fun handleMediaSessionToken(token: MediaSession.Token, packageName: String?) {
         synchronized(activeControllers) {
             var exists = false
@@ -925,6 +932,7 @@ class NotificationService : NotificationListenerService() {
                         "Creating new MediaController from notification token for " + packageName
                     )
                     val controller = MediaController(this, token)
+                    if (isOwnMusicSession(controller)) return
                     activeControllers.add(controller)
                     controller.registerCallback(mediaCallback)
                     broadcastMediaMetadata()

@@ -6,7 +6,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
-import ohi.andre.consolelauncher.managers.RegexManager
+import ohi.andre.consolelauncher.managers.terminal.RegexManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class regex : ParamCommand() {

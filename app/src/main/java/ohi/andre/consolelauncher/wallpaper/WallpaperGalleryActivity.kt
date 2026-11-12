@@ -190,7 +190,7 @@ class WallpaperGalleryActivity : LocalizedActivity() {
 
     private fun label(value: String) = TextView(this).apply {
         text = value; setTextColor(TuixtTheme.textColor()); typeface = Tuils.getTypeface(this@WallpaperGalleryActivity)
-        textSize = 14f; setPadding(0, dp(8), 0, dp(8))
+        textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(14f); setPadding(0, dp(8), 0, dp(8))
     }
     private fun action(value: String, onClick: () -> Unit) = Button(this).apply {
         text = value; TuixtTheme.styleButton(this@WallpaperGalleryActivity, this, false)

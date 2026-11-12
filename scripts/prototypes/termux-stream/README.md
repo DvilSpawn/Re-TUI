@@ -20,8 +20,8 @@ editor. Only the temporary server is killed at cleanup.
 
 ```sh
 PYTHONDONTWRITEBYTECODE=1 python3 scripts/prototypes/termux-stream/probe.py \
-  --cache /Users/mako/Downloads/retui-termux-stream-prototype \
-  --output /Users/mako/Downloads/retui-termux-stream-prototype/results.json
+  --cache /tmp/retui-termux-stream-prototype \
+  --output /tmp/retui-termux-stream-prototype/results.json
 ```
 
 For another machine, change the output/cache paths. `--android-jar` can select an

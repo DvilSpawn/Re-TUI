@@ -80,7 +80,7 @@ class LauncherNotesIntegrationTest {
         var activity: RememberActivity? = null
         try {
             val monitor = instrumentation.addMonitor(RememberActivity::class.java.name, null, false)
-            instrumentation.runOnMainSync { LauncherNotes.open(launcher, note.id) }
+            instrumentation.runOnMainSync { LauncherNotes.openArchive(launcher, note.id) }
             activity = instrumentation.waitForMonitorWithTimeout(monitor, 10000) as RememberActivity
             instrumentation.removeMonitor(monitor)
             val notes = activity
@@ -121,7 +121,7 @@ class LauncherNotesIntegrationTest {
             siblingId = sibling.id
             changed.notes.add(sibling)
             store.save(changed)
-            instrumentation.runOnMainSync { LauncherNotes.open(context, note.id) }
+            instrumentation.runOnMainSync { LauncherNotes.openArchive(context, note.id) }
             instrumentation.waitForIdleSync()
             assertEquals(task, notes.taskId)
             val recreated = instrumentation.addMonitor(RememberActivity::class.java.name, null, false)
@@ -131,7 +131,7 @@ class LauncherNotesIntegrationTest {
             instrumentation.waitForIdleSync()
             instrumentation.runOnMainSync {
                 assertTrue(findEditor(activity!!.window.decorView)!!.markdown().contains("Edited full file"))
-                LauncherNotes.open(context)
+                LauncherNotes.openArchive(context)
             }
             instrumentation.waitForIdleSync()
             awaitUi { findEditor(activity!!.window.decorView) == null }
@@ -286,7 +286,7 @@ class LauncherNotesIntegrationTest {
         ohi.andre.consolelauncher.tuils.Tuils.init(context)
         ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.loadCommons(context)
         val monitor = instrumentation.addMonitor(RememberActivity::class.java.name, null, false)
-        instrumentation.runOnMainSync { LauncherNotes.open(context) }
+        instrumentation.runOnMainSync { LauncherNotes.openArchive(context) }
         val notes = instrumentation.waitForMonitorWithTimeout(monitor, 10000) as RememberActivity
         instrumentation.removeMonitor(monitor)
         try {

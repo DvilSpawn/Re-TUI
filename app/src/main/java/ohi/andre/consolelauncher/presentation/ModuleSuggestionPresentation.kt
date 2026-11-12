@@ -12,6 +12,8 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 
 /** Module command labels only: providers and command listeners never enter this factory. */
 internal object ModuleSuggestionPresentation {

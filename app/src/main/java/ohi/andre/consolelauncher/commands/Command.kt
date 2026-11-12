@@ -19,6 +19,7 @@ class Command {
         val currentArgs = mArgs
         if (command is ParamCommand) {
             if (indexNotFound == 0) {
+                if (currentArgs!![0]?.toString().isNullOrBlank()) return command.onNotArgEnough(info, 0)
                 return info.context.getString(R.string.output_invalid_param) + Tuils.SPACE + currentArgs!![0]
             }
 

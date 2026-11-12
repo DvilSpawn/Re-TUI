@@ -47,7 +47,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionChipStyler
-import ohi.andre.consolelauncher.managers.SpaceManager
+import ohi.andre.consolelauncher.managers.preset.SpaceManager
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.cyberdeckMode
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders
@@ -60,8 +60,8 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.json.JSONArray
 import org.json.JSONObject

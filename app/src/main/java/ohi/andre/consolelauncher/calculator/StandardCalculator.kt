@@ -31,7 +31,6 @@ class StandardCalculator {
     }
 
     fun beginEdit() { completed = false; waiting = false }
-    fun startsNewEntry() = completed || waiting || error != null
 
     fun clear() {
         operand = "0"; context = ""; completed = false; waiting = false

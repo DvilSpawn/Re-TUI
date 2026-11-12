@@ -12,6 +12,7 @@ import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.*
 import ohi.andre.consolelauncher.presentation.*
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderDrawable
 import org.junit.Assert.*
 import org.junit.Assume.assumeTrue
 import org.junit.Test

@@ -197,6 +197,21 @@ enum class Behavior : XMLPrefsSave {
 
         override fun type(): String? = XMLPrefsSave.TEXT
     },
+    mono_ink_color {
+        override fun defaultValue(): String = "#FFF2F0E6"
+        override fun infoRes(): Int = R.string.setting_behavior_mono_ink_color_description
+        override fun type(): String = XMLPrefsSave.COLOR
+    },
+    mono_paper_color {
+        override fun defaultValue(): String = "#FF0A0A0A"
+        override fun infoRes(): Int = R.string.setting_behavior_mono_paper_color_description
+        override fun type(): String = XMLPrefsSave.COLOR
+    },
+    dot_apps {
+        override fun defaultValue(): String = ""
+        override fun infoRes(): Int = R.string.setting_behavior_dot_apps_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
     search_category_tabs {
         override fun defaultValue(): String = "true"
         override fun infoRes(): Int = R.string.setting_behavior_search_category_tabs_description
@@ -1436,6 +1451,58 @@ enum class Behavior : XMLPrefsSave {
 
         override fun type(): String? {
             return XMLPrefsSave.BOOLEAN
+        }
+    },
+    edge_sidebar {
+        override fun defaultValue(): String? {
+            return "false"
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_edge_sidebar_description
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.BOOLEAN
+        }
+    },
+    edge_sidebar_quick_app {
+        override fun defaultValue(): String? {
+            return ""
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_edge_sidebar_quick_app_description
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.TEXT
+        }
+    },
+    edge_pill_width {
+        override fun defaultValue(): String? {
+            return "100"
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_edge_pill_width_description
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
+        }
+    },
+    edge_pill_length {
+        override fun defaultValue(): String? {
+            return "100"
+        }
+
+        override fun infoRes(): Int {
+            return R.string.setting_behavior_edge_pill_length_description
+        }
+
+        override fun type(): String? {
+            return XMLPrefsSave.INTEGER
         }
     },
     events_lookahead_days {

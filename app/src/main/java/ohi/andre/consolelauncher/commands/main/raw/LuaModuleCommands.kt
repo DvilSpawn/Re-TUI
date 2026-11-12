@@ -107,7 +107,7 @@ internal object LuaModuleCommands {
         if ("-preview" == option) {
             if (args.size < 2) return pack.context.getString(R.string.help_module)
             val id = LuaWidgetManager.normalizeId(args[1])
-            if (!LuaWidgetManager.exists(id)) return "Unknown Lua module: $id"
+            if (!LuaWidgetManager.exists(id)) return pack.context.getString(R.string.command_luamodulecommands_unknown_lua_module_ef4ca, id)
             ohi.andre.consolelauncher.managers.lua.LuaWidgetPreview.show(pack.context, id, LuaWidgetManager.readScript(id).orEmpty())
             return null
         }
@@ -154,7 +154,7 @@ internal object LuaModuleCommands {
                 )
             ), LuaWidgetManager.describeRequiredPermissions(
                 LuaWidgetManager.readScript(id)
-            ), (if (trust.trusted) "approved" else pack.context.getString(R.string.command_luamodulecommands_needs_approval_e0c3e)), LuaWidgetManager.apiVersion(id), (if (LuaWidgetManager.isEnabled(id)) "enabled" else "disabled"), valueOr(meta.get("description"), "none"), valueOr(meta.get("author"), "unknown"), valueOr(meta.get("version"), "none")))
+            ), (if (trust.trusted) pack.context.getString(R.string.lua_detail_lua_approved_c9560) else pack.context.getString(R.string.command_luamodulecommands_needs_approval_e0c3e)), LuaWidgetManager.apiVersion(id), (if (LuaWidgetManager.isEnabled(id)) pack.context.getString(R.string.lua_detail_lua_enabled_3ea3f) else pack.context.getString(R.string.lua_detail_lua_disabled_07596)), valueOr(meta.get("description"), pack.context.getString(R.string.lua_detail_luamodulecommands_none_71f8e)), valueOr(meta.get("author"), pack.context.getString(R.string.lua_detail_lua_unknown_50d8b)), valueOr(meta.get("version"), pack.context.getString(R.string.lua_detail_luamodulecommands_none_71f8e))))
         }
 
         if ("-approve" == option || "-trust" == option) {

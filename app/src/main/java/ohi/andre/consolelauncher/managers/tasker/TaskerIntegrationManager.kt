@@ -13,10 +13,9 @@ import android.os.Looper
 import android.os.PatternMatcher
 import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.UIManager
-import ohi.andre.consolelauncher.managers.PresetManager
-import ohi.andre.consolelauncher.managers.SpaceManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
+import ohi.andre.consolelauncher.managers.preset.SpaceManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
@@ -213,6 +212,7 @@ object TaskerIntegrationManager {
     private fun applyPreset(context: Context, preset: String?): Result {
         val name = required(preset, context.getString(R.string.manager_taskerintegrationmanager_preset_name_is_required_4417a))
         PresetManager.apply(name)
+        runCatching { PresetManager.applyWallpaper(context, name) }
         return Result(true, context.getString(R.string.manager_taskerintegrationmanager_preset_applied_71a47, name))
     }
 
@@ -275,11 +275,6 @@ object TaskerIntegrationManager {
                 .putExtra(UIManager.EXTRA_MODULE_COMMAND, command)
                 .putExtra(UIManager.EXTRA_MODULE_NAME, module)
         )
-    }
-
-    private fun refreshLauncher() {
-        val launcher = LauncherActivity.instance ?: return
-        launcher.runOnUiThread { if (!launcher.isFinishing) launcher.reload() }
     }
 
     private fun required(value: String?, message: String): String =

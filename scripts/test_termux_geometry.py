@@ -50,7 +50,7 @@ import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceFrame
 import java.net.*
 import java.util.concurrent.*
 import java.lang.ref.WeakReference
-open class View { var background: Any? = null; interface OnAttachStateChangeListener { fun onViewAttachedToWindow(v:View); fun onViewDetachedFromWindow(v:View) } }
+open class View { var background: Any? = null; var foreground: Any? = null; interface OnAttachStateChangeListener { fun onViewAttachedToWindow(v:View); fun onViewDetachedFromWindow(v:View) } }
 class OneShotPreDrawListener(val owner:Tiles,val action:()->Unit) { fun removeListener(){owner.draws.remove(this)} }
 open class Activity { open fun onPause(){}; open fun onResume(){} }
 class Screen { fun setActive(v:Boolean){} }
@@ -61,7 +61,7 @@ object UIManager { val ACTION_TERMUX_RESULT="result" }
 class TextView { var typeface: Any? = null; var textSize=0f; var background: Any?=null; fun setTextColor(v:Int){} }
 class Input { var typeface:Any?=null; var textSize=0f; val text="editor draft"; val selectionStart=2; val selectionEnd=5; fun setTextColor(v:Int){} }
 class Root { val border=View(); val pageControls=(6..8).associateWith{TextView()}; @Suppress("UNCHECKED_CAST") fun <T> findViewById(id:Int):T=(pageControls[id] ?: border) as T }
-class Grid { var width=800; var height=480; var size=12f; var frame="retained frame"; fun setFrame(body:String?,cols:Int,rows:Int,x:Int?,y:Int?){frame=body.orEmpty()}; fun characterWidth()=size*5/6; fun lineHeight()=(size*5/3).toInt(); fun setTerminalTypeface(v:Any?){}; fun setTerminalTextSizeSp(v:Float){size=v}; fun updateThemeColors(a:Int,b:Int,c:Int){} }
+class Grid { var width=800; var height=480; var size=12f; var frame="retained frame"; fun setFrame(body:String?,cols:Int,rows:Int,x:Int?,y:Int?){frame=body.orEmpty()}; fun characterWidth()=size*5/6; fun lineHeight()=(size*5/3).toInt(); fun setTerminalTypeface(v:Any?){}; fun setEmulatorFrame(e:Any){}; fun setTerminalTextSizeSp(v:Float){size=v}; fun updateThemeColors(a:Int,b:Int,c:Int){} }
 // Match AndroidX OneShot: detach removes pending listeners WITHOUT running their actions.
 class Tiles : View() {
  var isAttachedToWindow=true; val draws=mutableListOf<OneShotPreDrawListener>(); val listeners=mutableListOf<View.OnAttachStateChangeListener>()
@@ -71,6 +71,10 @@ class Tiles : View() {
  fun attach(){isAttachedToWindow=true;listeners.toList().forEach{it.onViewAttachedToWindow(this)}}
  fun draw(){if(!isAttachedToWindow)return;val pending=draws.toList();pending.forEach{it.removeListener();it.action()}}
 }
+// SSH transport stays off here: these checks cover the socket bridge, which is still the fallback.
+class TermuxWorkspaceTerminal(frame:TermuxWorkspaceFrame, grid:Grid) { val emulator=Any(); fun resize(cols:Int,rows:Int,grid:Grid){} }
+class SshStub { fun resize(tile:Int,cols:Int,rows:Int){}; fun close(){} }
+object TermuxBridgeManager { class Status(val runCommandGranted:Boolean=false); fun status(c:Any)=Status() }
 object Tuils { fun getTypeface(c:Any)="font" }
 object LauncherFontScale { var size=12f; fun terminalTextSizeSp()=size }
 object AppearanceSettings { fun outputHeaderTextSize()=11 }
@@ -90,7 +94,10 @@ class Harness(val clients:Array<TermuxWorkspaceSocketClient?>) : Activity() {
  val root=Root(); val title=TextView(); val input=Input(); val tiles=Tiles(); val panels=arrayOf(View(),View()); val grids=arrayOf(Grid(),Grid()); val labels=arrayOf(TextView(),TextView()); val selection=Selection()
  val creating=BooleanArray(2); val creationSeeds=arrayOfNulls<String>(2); var visible=true; val lastGeometry=arrayOfNulls<Pair<Int,Int>>(2); var geometryCapturePending=false
  val localDraft="retained 😀 draft"; val pendingCommand="launch must-not-replay"; val modifiers=setOf("C")
- fun color(t:Theme)=t.ordinal; fun panelDrawable(t:Theme)=color(t); fun updateLabels(){}; fun bindKeys(){}; fun refreshBreathOutSettings(){}
+ fun color(t:Theme)=t.ordinal; fun panelDrawable(t:Any)=if(t is Theme) color(t) else 0;
+ val sshEnabled=false; val sshAttachments=BooleanArray(2); val terminals=arrayOfNulls<TermuxWorkspaceTerminal>(2); var ssh:SshStub?=null
+ var pendingColon:Any?=null; var sshSetupPending=false; var sshConnecting=false; var sshAttempts=0; var sshInstallAfterPermission=false
+ val pendingBytes=java.util.concurrent.atomic.AtomicInteger(); fun startSshSetup(v:Boolean){}; fun renderTerminal(tile:Int,c:Any){} fun updateLabels(){}; fun bindKeys(){}; fun refreshBreathOutSettings(){}
  fun bindChrome(id:Int,d:Int,s:Int,a:()->Unit){}; fun finish(){}; fun newShell(t:Int){}; fun focusInput(v:Boolean){}; fun showLayoutChooser(){}
  fun status(s:String){check(s=="ready"){s}}; fun getString(id:Int)=if(id==6)"ready" else "input not sent"
 ''' + bodies + r'''
@@ -188,6 +195,9 @@ fun creationCompletion(){Peer("@1").use { peer ->
 class LocalSocket { var soTimeout=0; val inputStream:java.io.InputStream get()=error("host"); val outputStream:java.io.OutputStream get()=error("host"); fun connect(a:LocalSocketAddress){throw java.io.IOException("Use host TCP")}; fun close(){} }
 class LocalSocketAddress(val name:String,val namespace:Namespace) { enum class Namespace { ABSTRACT } }
 '''
+    graphics = '''package android.graphics
+object Color { const val TRANSPARENT=0 }
+'''
     b64 = '''package android.util
 object Base64 { const val NO_WRAP=2; const val DEFAULT=0; fun encodeToString(v:ByteArray,flags:Int)=java.util.Base64.getEncoder().encodeToString(v); fun decode(v:String,flags:Int)=java.util.Base64.getDecoder().decode(v) }
 '''
@@ -204,13 +214,13 @@ object Base64 { const val NO_WRAP=2; const val DEFAULT=0; fun encodeToString(v:B
     with tempfile.TemporaryDirectory(prefix='termux-geometry-') as directory:
         out = Path(directory)
         files = []
-        for name, text in (('GeometrySlice.kt', code), ('Net.kt', net), ('Base64.kt', b64)):
+        for name, text in (('GeometrySlice.kt', code), ('Net.kt', net), ('Graphics.kt', graphics), ('Base64.kt', b64)):
             path = out / name
             path.write_text(text)
             files.append(str(path))
         client = ROOT / 'app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceSocketClient.kt'
         frame = SOURCE.with_name('TermuxWorkspaceFrame.kt')
-        subprocess.run([java, '-cp', cp, 'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler', '-no-stdlib', '-no-reflect', '-nowarn', '-classpath', cp, '-d', str(out / 'classes'), *files, str(client), str(frame)], check=True)
+        subprocess.run([java, '-cp', cp, 'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler', '-no-stdlib', '-no-reflect', '-nowarn', '-classpath', cp, '-d', str(out / 'classes'), *files, str(client), str(frame), str(SOURCE.with_name('TermuxWorkspaceOutput.kt'))], check=True)
         subprocess.run([java, '-cp', str(out / 'classes') + os.pathsep + cp, 'GeometrySliceKt'], check=True)
 
 

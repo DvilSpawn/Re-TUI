@@ -4,8 +4,8 @@ import ohi.andre.consolelauncher.tuils.displayMessage
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout
 import ohi.andre.consolelauncher.help.HelpWindowPanel
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -465,12 +465,6 @@ class RememberActivity : ohi.andre.consolelauncher.localization.LocalizedCompone
         toolbar.addView(status(this@RememberActivity.getString(R.string.notes_rememberactivity_delete_16fad, selectedName())), LinearLayout.LayoutParams(0, -1, 1f))
         fixedTool(R.drawable.remember_ic_tree_close, this@RememberActivity.getString(R.string.notes_rememberactivity_cancel_77dfd)) { mode = BarMode.SELECT; renderToolbar() }
         fixedTool(R.drawable.remember_ic_tree_confirm, this@RememberActivity.getString(R.string.notes_rememberactivity_confirm_delete_c9f28)) { confirmDelete() }
-    }
-
-    private fun centeredTool(icon: Int, description: String, action: () -> Unit) {
-        toolbar.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
-        fixedTool(icon, description, action)
-        toolbar.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
     }
 
     private fun weightedTool(icon: Int, description: String, action: () -> Unit) {

@@ -16,7 +16,7 @@ import android.widget.ListView
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.ui.AppDrawerPaneManager
 import org.junit.Assert.*
 import org.junit.Test

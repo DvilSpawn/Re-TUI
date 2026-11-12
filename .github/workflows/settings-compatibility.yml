@@ -12,7 +12,7 @@ on:
       - 'gradle/**'
       - '.github/workflows/settings-compatibility.yml'
   push:
-    branches: [master]
+    branches: [master, 'dvil/**']
     paths:
       - 'app/**'
       - 'scripts/**'

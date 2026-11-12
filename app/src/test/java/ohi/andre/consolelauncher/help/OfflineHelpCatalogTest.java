@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.help;
 
+import ohi.andre.consolelauncher.SourceFiles;
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -13,14 +14,11 @@ import static org.junit.Assert.*;
 
 public class OfflineHelpCatalogTest {
     @Test public void packagedManualHasTaskCoverageAndReadableResources() throws Exception {
-        File main = new File("src/main");
-        if (!main.isDirectory()) main = new File("app/src/main");
-        String catalog = new String(Files.readAllBytes(new File(main,
-                "java/ohi/andre/consolelauncher/help/OfflineHelpCatalog.kt").toPath()), StandardCharsets.UTF_8);
+        String catalog = new String(Files.readAllBytes(SourceFiles.kotlin("OfflineHelpCatalog.kt").toPath()), StandardCharsets.UTF_8);
         Map<String, String> resources = new HashMap<>();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        for (File file : Objects.requireNonNull(new File(main, "res/values").listFiles())) {
+        for (File file : Objects.requireNonNull(SourceFiles.repo("app/src/main/res/values").listFiles())) {
             if (!file.getName().endsWith(".xml")) continue;
             NodeList nodes = factory.newDocumentBuilder().parse(file).getElementsByTagName("string");
             for (int i = 0; i < nodes.getLength(); i++) {

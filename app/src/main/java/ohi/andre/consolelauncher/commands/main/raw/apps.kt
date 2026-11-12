@@ -10,8 +10,8 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
+import ohi.andre.consolelauncher.managers.apps.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Apps

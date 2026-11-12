@@ -80,11 +80,14 @@ class NotesManager(var mContext: Context, noteView: TextView?,
 
     private fun load(context: Context?, loadClasses: Boolean) {
         try {
-            val library = NoteStore(mContext).load()
+            // The status pane shows quick notes: pinned first, open lines, then lines ticked off.
             notes.clear()
-            notes.addAll(library.notes.map { Note(it.createdAt, it.preview(), it.locked).apply { id = it.id } })
-            Collections.sort(notes)
-            observedRevision = NoteStore.revision
+            notes.addAll(QuickNoteStore(mContext).load().ordered().map { quick ->
+                Note(quick.createdAt, RedactionFormat.hide(quick.text), quick.pinned).apply {
+                    id = quick.id; done = quick.done; hidden = quick.hidden
+                }
+            })
+            observedRevision = QuickNoteStore.revision
             invalidateNotes()
         } catch (e: Exception) {
             Tuils.log(e)
@@ -94,7 +97,7 @@ class NotesManager(var mContext: Context, noteView: TextView?,
 
     private var observedRevision = -1L
     fun refresh() {
-        if (observedRevision != NoteStore.revision) load(mContext, false)
+        if (observedRevision != QuickNoteStore.revision) load(mContext, false)
     }
 
     var colorPattern: Pattern = Pattern.compile("(\\d+|#[\\da-zA-Z]{6,8})\\(([^)]*)\\)")
@@ -149,7 +152,7 @@ class NotesManager(var mContext: Context, noteView: TextView?,
 
                 if (intent.action == ACTION_OPEN) {
                     val index = findNote(intent.getStringExtra(TEXT).orEmpty())
-                    if (index >= 0) LauncherNotes.open(mContext, notes[index].id)
+                    if (index >= 0) LauncherNotes.open(mContext)
                     else Tuils.sendOutput(mContext, R.string.note_not_found)
                     return
                 }
@@ -225,12 +228,18 @@ class NotesManager(var mContext: Context, noteView: TextView?,
         for (j in notes.indices) {
             val n: Note = notes.get(j)
 
-            val t = SpannableString(n.text)
+            // ★ marks a pinned line; a tap ticks a line off (struck through) or back on.
+            val shown = (if (n.lock) "★ " else Tuils.EMPTYSTRING) + if (n.hidden) "▓▓▓▓" else n.text
+            val t = SpannableString(shown)
             t.setSpan(object : ClickableSpan() {
-                override fun onClick(widget: View) { LauncherNotes.open(widget.context, n.id) }
+                override fun onClick(widget: View) {
+                    mutate { list -> list.firstOrNull { it.id == n.id }?.let { it.done = !it.done } }
+                }
                 override fun updateDrawState(ds: TextPaint) {
-                    ds.color = if (n.lock) lockedColor else color
+                    ds.color = if (n.done) androidx.core.graphics.ColorUtils.setAlphaComponent(color, 130)
+                        else if (n.lock) lockedColor else color
                     ds.isUnderlineText = false
+                    ds.isStrikeThruText = n.done
                 }
             }, 0, t.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 
@@ -263,13 +272,9 @@ class NotesManager(var mContext: Context, noteView: TextView?,
         return oldNotes!!
     }
 
-    private fun mutate(action: (NoteStore, NoteLibrary) -> Unit) {
+    private fun mutate(action: (MutableList<QuickNote>) -> Unit) {
         try {
-            synchronized(NoteStore.lock) {
-                val store = NoteStore(mContext)
-                val library = store.load()
-                action(store, library)
-            }
+            QuickNoteStore(mContext).mutate(action)
             load(mContext, false)
         } catch (e: Exception) {
             Tuils.log(e)
@@ -277,20 +282,16 @@ class NotesManager(var mContext: Context, noteView: TextView?,
         }
     }
 
-    private fun addNote(s: String, lock: Boolean) = mutate { store, library ->
-        library.notes.add(ohi.andre.consolelauncher.notes.Note(
-            title = LauncherNotes.legacyTitle(s), markdown = s, locked = lock,
-            folderId = library.ensureDefaultFolder().id
-        ))
-        store.save(library)
+    private fun addNote(s: String, lock: Boolean) {
+        if (QuickNoteFormat.clean(s).isEmpty()) return
+        mutate { it.add(QuickNote(text = QuickNoteFormat.clean(s), pinned = lock)) }
     }
 
     private fun rmNote(s: String) {
         val index = findNote(s)
         if (index < 0) { Tuils.sendOutput(mContext, R.string.note_not_found); return }
-        mutate { store, library ->
-            library.notes.firstOrNull { it.id == notes[index].id }?.let { store.delete(it, library) }
-        }
+        val id = notes[index].id
+        mutate { list -> list.removeAll { it.id == id } }
     }
 
     private fun cpNote(s: String) {
@@ -300,15 +301,7 @@ class NotesManager(var mContext: Context, noteView: TextView?,
             return
         }
 
-        val text = try {
-            NoteStore(mContext).load().notes.first { it.id == notes[index].id }.let {
-                RedactionFormat.hide(it.markdown)
-            }
-        } catch (e: Exception) {
-            Tuils.sendOutput(mContext, R.string.output_error)
-            return
-        }
-
+        val text = notes[index].text
         (mContext as Activity).runOnUiThread(Runnable {
             val clipboard = mContext.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip: ClipData = ClipData.newPlainText("note", text)
@@ -317,9 +310,8 @@ class NotesManager(var mContext: Context, noteView: TextView?,
         })
     }
 
-    private fun clearNotes(context: Context?) = mutate { store, library ->
-        library.notes.filter { !it.locked }.toList().forEach { store.delete(it, library) }
-    }
+    // Pinned lines stay; everything else is cleared.
+    private fun clearNotes(context: Context?) = mutate { list -> list.removeAll { !it.pinned } }
 
     private fun lsNotes(c: Context?) {
         val builder = StringBuilder()
@@ -341,10 +333,8 @@ class NotesManager(var mContext: Context, noteView: TextView?,
             return
         }
 
-        mutate { store, library ->
-            library.notes.firstOrNull { it.id == notes[index].id }?.locked = lock
-            store.save(library)
-        }
+        val id = notes[index].id
+        mutate { list -> list.firstOrNull { it.id == id }?.pinned = lock }
     }
 
     private fun findNote(s: String): Int {
@@ -352,16 +342,6 @@ class NotesManager(var mContext: Context, noteView: TextView?,
         val prefix = s.trim()
         if (prefix.isEmpty()) return -1
         return notes.indexOfFirst { it.text.startsWith(prefix, ignoreCase = true) }
-    }
-
-    private fun findClass(id: Int): Class? {
-        val classIterator = classes.iterator()
-        while (classIterator.hasNext()) {
-            val cl = classIterator.next()
-            if (cl.id == id) return cl
-        }
-
-        return null
     }
 
     fun dispose(context: Context) {
@@ -374,6 +354,8 @@ class NotesManager(var mContext: Context, noteView: TextView?,
     class Note(var creationTime: Long, var text: String, var lock: Boolean) :
         Comparable<Note> {
         var id: String = ""
+        var done = false
+        var hidden = false
 
         override fun compareTo(o: Note): Int {
             when (sorting) {

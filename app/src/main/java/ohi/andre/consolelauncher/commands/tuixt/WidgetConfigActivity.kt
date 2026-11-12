@@ -196,7 +196,7 @@ class WidgetConfigActivity : ohi.andre.consolelauncher.localization.LocalizedAct
             empty.text = getString(R.string.editor_widgetconfigactivity_no_editable_fields_97e29)
             empty.setTextColor(textColor())
             empty.typeface = Tuils.getTypeface(this)
-            empty.textSize = 14f
+            empty.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(14f)
             empty.setPadding(dp(this, 10f), dp(this, 12f), dp(this, 10f), dp(this, 12f))
             fieldsContainer!!.addView(empty, rowParams())
             return
@@ -219,7 +219,7 @@ class WidgetConfigActivity : ohi.andre.consolelauncher.localization.LocalizedAct
             labelView.text = label.uppercase(Locale.getDefault())
             labelView.setTextColor(textColor())
             labelView.typeface = Tuils.getTypeface(this)
-            labelView.textSize = 12f
+            labelView.textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(12f)
             labelView.setPadding(0, 0, 0, dp(this, 5f))
             wrapper.addView(
                 labelView,

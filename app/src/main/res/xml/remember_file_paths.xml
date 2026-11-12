@@ -1,1 +1,1 @@
-<paths xmlns:android="http://schemas.android.com/apk/res/android"><cache-path name="notes_exports" path="notes-exports/" /></paths>
+<paths xmlns:android="http://schemas.android.com/apk/res/android"><cache-path name="notes_exports" path="notes-exports/" /><cache-path name="journal_camera" path="journal-camera/" /><files-path name="journal_assets" path="journal/assets/" /><files-path name="library_assets" path="notes-library/.assets/" /><files-path name="library_images" path="images/" /></paths>

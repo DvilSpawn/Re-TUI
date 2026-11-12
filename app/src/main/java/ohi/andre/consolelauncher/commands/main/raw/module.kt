@@ -223,7 +223,7 @@ class module : CommandAbstraction {
 
     private fun formatDock(pack: ExecutePack): String? {
         val dock = ModuleManager.getDock(pack.context)
-        return if (dock.isEmpty()) "<empty>" else TextUtils.join(", ", dock)
+        return if (dock.isEmpty()) pack.context.getString(R.string.command_module_dock_empty) else TextUtils.join(", ", dock)
     }
 
     private fun createLuaModule(pack: ExecutePack, input: String): String? {

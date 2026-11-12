@@ -3,7 +3,6 @@ package ohi.andre.consolelauncher.managers.termux
 import android.app.AlertDialog
 import android.content.*
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import android.view.*
@@ -15,8 +14,8 @@ import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.Tuils
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -58,6 +57,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     private var editing: String? = null
     private val editor by lazy { TileEditor().apply { visibility = GONE } }
     private var creating: String? = null
+    private val reconnectAsked = mutableSetOf<String>()
     private var connection: TermuxWorkspaceSshConnection? = null
     private var nextChannel = 0
     private val syncRunnable = Runnable { syncTiles() }
@@ -262,6 +262,10 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         client = TermuxWorkspaceSshConnection(info, object : TermuxWorkspaceSshConnection.Listener {
             override fun onReady(windows: List<Pair<String, String>>) {
                 if (!valid()) return
+                // A tile the user tapped whose window died with Termux gets a fresh shell instead of "Session ended".
+                runtimes.values.filter { it.tile.id in reconnectAsked && it.target != null && windows.none { w -> w.first == it.target } }
+                    .forEach { it.target = null; it.ended = false }
+                reconnectAsked.clear()
                 runtimes.values.filter { it.target == null }.forEach { r ->
                     windows.firstOrNull { it.second.substringAfter(':') == r.sessionName }?.first?.let {
                         r.target = it; r.ended = false
@@ -464,7 +468,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     }
 
     private fun styleTile(r: TileRuntime) {
-        r.heading.text = r.title; r.heading.setTextColor(fg); r.heading.typeface = Typeface.MONOSPACE
+        r.heading.text = r.title; r.heading.setTextColor(fg); r.heading.typeface = Tuils.getTypeface(context)
         r.heading.setPadding(dp(6), 0, dp(6), 0)
         r.panel.background = android.graphics.drawable.GradientDrawable().apply {
             setColor(bg); cornerRadius = dp(6).toFloat()
@@ -484,11 +488,11 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         runtimes[r.tile.id] = r
         styleTile(r)
         r.panel.addView(r.heading, LayoutParams(-1, dp(30))); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
-        fun bindGesture(view: View, tap: () -> Unit) {
+        fun bindGesture(view: View, editOnLongPress: Boolean, tap: () -> Unit) {
             val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDown(e: MotionEvent) = true
                 override fun onSingleTapUp(e: MotionEvent): Boolean { tap(); return true }
-                override fun onLongPress(e: MotionEvent) { edit(r) }
+                override fun onLongPress(e: MotionEvent) { if (editOnLongPress) edit(r) }
             })
             view.setOnTouchListener { _, event ->
                 detector.onTouchEvent(event)
@@ -496,8 +500,10 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
                 true
             }
         }
-        bindGesture(r.heading) { }
-        bindGesture(r.grid) { activate(r) }
+        // A long press on the terminal selects text; the tile menu stays on its heading.
+        bindGesture(r.heading, true) { if (r.ended || connection == null) reconnect(r) }
+        bindGesture(r.grid, false) { activate(r) }
+        r.grid.onPasteText = { text -> r.terminal?.paste(text) }
         r.grid.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             val geometry = cols(r) to rows(r)
             if (geometry != r.lastGeometry) {
@@ -511,10 +517,17 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         AlertDialog.Builder(context).setTitle(r.title).setItems(arrayOf(context.getString(R.string.terminal_home_move_resize), context.getString(R.string.terminal_home_reconnect), context.getString(R.string.terminal_home_remove))) { _, index ->
             when (index) {
                 0 -> arrange(r)
-                1 -> { editing = null; if (r.target !in windows.map { it.first }) { r.target = null; r.ended = false }; pause(); resume() }
+                1 -> reconnect(r)
                 2 -> { if (active === r) releaseInput(); detach(r); if (creating == r.tile.id) creating = null; runtimes.remove(r.tile.id); layout.tiles.remove(r.tile); board.removeView(r.panel); editing = null; save(); placeTiles(); scheduleSync() }
             }
         }.setNegativeButton(android.R.string.cancel) { _, _ -> editing = null }.show()
+    }
+    private fun reconnect(r: TileRuntime) {
+        editing = null
+        if (r.target !in windows.map { it.first }) { r.target = null; r.ended = false }
+        // While disconnected the window list is stale; the fresh one decides in onReady whether this tile needs a new shell.
+        reconnectAsked += r.tile.id
+        pause(); resume()
     }
     private fun arrange(r: TileRuntime) {
         releaseInput(); editing = r.tile.id

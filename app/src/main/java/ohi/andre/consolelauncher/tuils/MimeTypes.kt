@@ -2,7 +2,6 @@ package ohi.andre.consolelauncher.tuils
 
 import android.webkit.MimeTypeMap
 import java.util.Locale
-import java.util.regex.Pattern
 import java.util.HashMap
 
 object MimeTypes {
@@ -109,10 +108,6 @@ object MimeTypes {
         }
         return type
     }
-
-    @JvmStatic
-    fun mimeTypeMatch(mime: String, input: String): Boolean =
-        Pattern.matches(mime.replace("*", ".*"), input)
 
     @JvmStatic
     fun getExtension(path: String): String =

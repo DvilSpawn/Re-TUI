@@ -21,13 +21,13 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
 import androidx.viewpager2.widget.ViewPager2
-import ohi.andre.consolelauncher.tuils.FrameTarget
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 
 /** View layout only; Home keeps ownership of navigation, providers and command execution. */
 internal object HomeLayoutPresentation {
     fun isSearch(appearance: HomeAppearance)=LauncherMode.resolve(appearance.raw(Behavior.launcher_mode),
-        appearance.bool(Behavior.search_only_mode))==LauncherMode.SEARCH
+        appearance.bool(Behavior.search_only_mode)) in listOf(LauncherMode.SEARCH, LauncherMode.DOT)
 
     fun inflateModulesPage(context:Context,parent:ViewGroup?,landscapeVariant:Boolean?=null):View {
         val pageContext=if(landscapeVariant==null) context else android.view.ContextThemeWrapper(
@@ -264,6 +264,19 @@ internal object HomeLayoutPresentation {
             root.findViewById<View>(id)?.visibility=View.GONE
         }
         root.findViewById<View>(R.id.search_mode_results_scroll)?.visibility=View.VISIBLE
+        styleSearchInput(root,appearance)
+        styleSearchClock(root,appearance)
+        (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
+            params.width=ViewGroup.LayoutParams.MATCH_PARENT
+            params.height=ViewGroup.LayoutParams.MATCH_PARENT
+            params.gravity=Gravity.BOTTOM
+            tray.layoutParams=params
+        }
+        root.findViewById<TextView>(R.id.input_view)?.setHint(R.string.search_mode_hint)
+    }
+
+    /** The Search mode input panel; also used by search opened from the edge sidebar. */
+    fun styleSearchInput(root: View,appearance: HomeAppearance) {
         root.findViewById<View>(R.id.input_group)?.let { input ->
             val radius=ohi.andre.consolelauncher.tuils.Tuils.dpToPx(root.context,appearance.radius(Ui.dashed_border_corner_radius)).toFloat()
             val border=SurfaceBorder.resolveColor(appearance.raw(SurfaceBorder.INPUT.color),appearance.color(Theme.terminal_border_color))
@@ -275,14 +288,6 @@ internal object HomeLayoutPresentation {
                 borderEnabled=appearance.bool(Behavior.enable_cyberdeck_mode) || (dashed && appearance.bool(SurfaceBorder.INPUT.enabled)),
                 target=FrameTarget.INPUT,style=appearance.borderStyle())
         }
-        styleSearchClock(root,appearance)
-        (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
-            params.width=ViewGroup.LayoutParams.MATCH_PARENT
-            params.height=ViewGroup.LayoutParams.MATCH_PARENT
-            params.gravity=Gravity.BOTTOM
-            tray.layoutParams=params
-        }
-        root.findViewById<TextView>(R.id.input_view)?.setHint(R.string.search_mode_hint)
     }
 
     fun styleSearchClock(root: View,appearance: HomeAppearance) {

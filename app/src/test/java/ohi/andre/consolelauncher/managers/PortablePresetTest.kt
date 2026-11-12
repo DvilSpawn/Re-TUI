@@ -8,6 +8,8 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import org.junit.Assert.*
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.backup.BackupManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 
 class PortablePresetTest {
     private fun archive(manifest: String, extras: Map<String, String> = emptyMap()): ByteArray {

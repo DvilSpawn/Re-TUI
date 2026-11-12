@@ -17,12 +17,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ContentFactory
-import ohi.andre.consolelauncher.managers.BreachManager
-import ohi.andre.consolelauncher.managers.FocusFrictionStyle
+import ohi.andre.consolelauncher.managers.net.BreachManager
+import ohi.andre.consolelauncher.managers.apps.FocusFrictionStyle
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Locale
 import kotlin.math.max

@@ -15,7 +15,7 @@ import android.widget.TextView
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.Tuils
 
 /** Geometry is relative to the safe, fold-aware host, never the physical display. */
@@ -176,7 +176,7 @@ internal class HelpWindowPanel(private val host: FrameLayout, private val conten
             control.background = if (index < 2) android.graphics.drawable.InsetDrawable(
                 TerminalBorderRuntime.tabDrawable(context,
                     ThemeColorResolver.color(Theme.workspace_header_background_color),
-                    ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS), 0, 0, 0, dp(28)) else null
+                    ohi.andre.consolelauncher.tuils.frame.FrameTarget.OVERLAYS), 0, 0, 0, dp(28)) else null
             control.setPadding(0, 0, 0, 0)
             if (index < 2) ohi.andre.consolelauncher.tuils.TerminalPaneIcon.apply(control,
                 if (index == 0) toggleIcon() else R.drawable.ic_toolbar_refresh_24)

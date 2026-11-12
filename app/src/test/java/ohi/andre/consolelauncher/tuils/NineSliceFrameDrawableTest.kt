@@ -3,6 +3,7 @@ package ohi.andre.consolelauncher.tuils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
+import ohi.andre.consolelauncher.tuils.frame.NineSliceFrameDrawable
 
 class NineSliceFrameDrawableTest {
     @Test fun destinationBoundariesSnapToWholePixels() {

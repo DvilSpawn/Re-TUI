@@ -9,7 +9,7 @@ import android.content.SharedPreferences
 import android.text.TextUtils
 import androidx.core.content.ContextCompat
 import ohi.andre.consolelauncher.UIManager
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior

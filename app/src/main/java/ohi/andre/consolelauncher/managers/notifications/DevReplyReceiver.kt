@@ -9,7 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.RemoteInput
 import java.util.ArrayList
 import java.util.Collections
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class DevReplyReceiver : BroadcastReceiver() {

@@ -1,7 +1,7 @@
 -- name = "Bookmarks"
 -- type = "module"
 -- retui = "1"
--- version = "1.0.1"
+-- version = "1.0.2"
 -- author = "Re:TUI"
 -- description = "Keep named HTTPS links together and open them in your browser."
 -- license = "MIT"
@@ -26,16 +26,18 @@ local function valid_url(url)
 end
 local function render()
     ui:set_title("Bookmarks")
-    local lines = {}
+    local rows = {}
     for line in (prefs.links or "Re:TUI | https://github.com/DvilSpawn/Re-TUI"):gmatch("[^\r\n]+") do
         local name, url = line:match("^%s*(.-)%s*|%s*(%S+)%s*$")
         url = valid_url(url)
+        if #rows > 0 then rows[#rows+1]={type="spacer",size=12} end
         if name and name ~= "" and url then
-            lines[#lines+1]=name .. "\n" .. url
-            ui:suggest_command(name,intents:view(url))
-        else lines[#lines+1]="Invalid link: " .. line end
+            local open = intents:view(url)
+            rows[#rows+1]={type="text",text=name .. "\n" .. url,command=open}
+            ui:suggest_command(name,open)
+        else rows[#rows+1]={type="text",text="Invalid link: " .. line} end
     end
-    ui:show_text(#lines == 0 and "Use Edit to add links." or table.concat(lines,"\n\n"))
+    if #rows == 0 then ui:show_text("Use Edit to add links.") else ui:render({type="column",children=rows}) end
 end
 function on_load() render() end
 function on_resume() render() end

@@ -3,6 +3,7 @@ package ohi.andre.consolelauncher.managers
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 
 class AppsManagerPrivateSpaceTest {
     @Test

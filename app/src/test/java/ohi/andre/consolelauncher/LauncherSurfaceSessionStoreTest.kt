@@ -12,10 +12,7 @@ class LauncherSurfaceSessionStoreTest {
     }
 
     @Test
-    fun keepsPodcastAndTermuxStateTogether() {
-        LauncherSurfaceSessionStore.savePodcast(
-            PodcastSurfaceSession(2, "science", "android", 480)
-        )
+    fun keepsTermuxState() {
         LauncherSurfaceSessionStore.saveTermux(
             TermuxSurfaceSession(
                 consoleBuffer = "output",
@@ -31,7 +28,6 @@ class LauncherSurfaceSessionStoreTest {
 
         val session = LauncherSurfaceSessionStore.snapshot()
 
-        assertEquals(PodcastSurfaceSession(2, "science", "android", 480), session.podcast)
         assertEquals("output", session.termux.consoleBuffer)
         assertEquals("curl ", session.termux.inputDraft)
         assertEquals("retui", session.termux.appId)
@@ -39,26 +35,12 @@ class LauncherSurfaceSessionStoreTest {
     }
 
     @Test
-    fun explicitPodcastResetDoesNotDiscardTermuxSession() {
-        LauncherSurfaceSessionStore.savePodcast(PodcastSurfaceSession(3, "news", "daily", 90))
-        LauncherSurfaceSessionStore.saveTermux(TermuxSurfaceSession(appId = "radio"))
-
-        LauncherSurfaceSessionStore.resetPodcast()
-
-        val session = LauncherSurfaceSessionStore.snapshot()
-        assertEquals(PodcastSurfaceSession(), session.podcast)
-        assertEquals("radio", session.termux.appId)
-    }
-
-    @Test
     fun resetClearsProcessLocalState() {
-        LauncherSurfaceSessionStore.savePodcast(PodcastSurfaceSession(1, "tech", "", 30))
         LauncherSurfaceSessionStore.saveTermux(TermuxSurfaceSession(appId = "shell"))
 
         LauncherSurfaceSessionStore.resetForTests()
 
         val session = LauncherSurfaceSessionStore.snapshot()
-        assertEquals(PodcastSurfaceSession(), session.podcast)
         assertEquals("", session.termux.consoleBuffer)
         assertNull(session.termux.appId)
     }

@@ -8,13 +8,13 @@ import okhttp3.OkHttpClient
 import ohi.andre.consolelauncher.commands.CommandGroup
 import ohi.andre.consolelauncher.commands.CommandsPreferences
 import ohi.andre.consolelauncher.commands.ExecutePack
-import ohi.andre.consolelauncher.managers.AliasManager
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.terminal.AliasManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.ContactManager
-import ohi.andre.consolelauncher.managers.HistoryManager
-import ohi.andre.consolelauncher.managers.RssManager
-import ohi.andre.consolelauncher.managers.TerminalManager
-import ohi.andre.consolelauncher.managers.WebhookManager
+import ohi.andre.consolelauncher.managers.terminal.HistoryManager
+import ohi.andre.consolelauncher.managers.net.RssManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
+import ohi.andre.consolelauncher.managers.net.WebhookManager
 import ohi.andre.consolelauncher.managers.flashlight.TorchManager
 import ohi.andre.consolelauncher.managers.file.RetuiFilesContract
 import ohi.andre.consolelauncher.managers.music.MusicManager2
@@ -73,7 +73,7 @@ class MainPack(
     }
 
     fun destroy() {
-        player?.destroy()
+        player?.release()
         podcastManager.destroy()
         appsManager.onDestroy()
         rssManager?.dispose()

@@ -69,8 +69,8 @@ import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import ohi.andre.consolelauncher.managers.ClockManager
-import ohi.andre.consolelauncher.managers.PomodoroManager
+import ohi.andre.consolelauncher.managers.time.ClockManager
+import ohi.andre.consolelauncher.managers.time.PomodoroManager
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.tuils.Tuils
 

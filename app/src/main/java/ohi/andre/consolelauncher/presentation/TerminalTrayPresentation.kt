@@ -47,21 +47,34 @@ internal object TerminalTrayPresentation {
 
     /** Output room between the top section's content (header, dock, open module) and the bottom chrome;
      *  -1 when the sections are not stacked in portrait or margins place the output above the top section. */
-    fun roomBelowTopContent(root:View,rootHeight:Int,bottomChrome:Int):Int {
-        val main=root.findViewById<View>(R.id.main_container)?:return -1
-        val header=root.findViewById<View>(R.id.header_container)?:return -1
-        val tray=root.findViewById<View>(R.id.terminal_tray_container)?:return -1
-        if(rootHeight<=0 || header.parent!==main || tray.parent!==main.parent) return -1
+    fun roomBelowTopContent(root:View,rootHeight:Int,bottomChrome:Int):Int =
+        spaceBelowTopContent(root,rootHeight,bottomChrome)?.let { max(0,it) }?:-1
+
+    /** How far the top section must move up for an output pane of [outputHeight] to clear the open module. */
+    fun topSectionOverlap(root:View,rootHeight:Int,bottomChrome:Int,outputHeight:Int):Int {
+        val space=spaceBelowTopContent(root,rootHeight,bottomChrome)?:return 0
+        return overlapToMove(outputHeight,space,root.findViewById<View>(R.id.header_container)?.measuredHeight?:0)
+    }
+
+    /** The top section can only give up its own height. */
+    fun overlapToMove(outputHeight:Int,space:Int,topSectionHeight:Int):Int = (outputHeight-space).coerceIn(0,max(0,topSectionHeight))
+
+    /** Negative when the top section and open module already reach past the input; null when the layout is not stacked. */
+    private fun spaceBelowTopContent(root:View,rootHeight:Int,bottomChrome:Int):Int? {
+        val main=root.findViewById<View>(R.id.main_container)?:return null
+        val header=root.findViewById<View>(R.id.header_container)?:return null
+        val tray=root.findViewById<View>(R.id.terminal_tray_container)?:return null
+        if(rootHeight<=0 || header.parent!==main || tray.parent!==main.parent) return null
         val mainTop=(main.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin?:0
         val trayBottom=rootHeight-root.paddingBottom-((tray.layoutParams as? ViewGroup.MarginLayoutParams)?.bottomMargin?:0)
-        if(trayBottom<=mainTop) return -1
+        if(trayBottom<=mainTop) return null
         val page=root.findViewById<ViewGroup>(R.id.home_modules_root)
         // The page fills its viewport, so measure the dock and open module rather than the page itself.
         val content=page?.getChildAt(0) as? ViewGroup
         val used=content?.let { c -> (0 until c.childCount).map(c::getChildAt).filter { it.visibility!=View.GONE }.sumOf { it.measuredHeight } }?:0
         val top=mainTop+header.measuredHeight+(page?.paddingTop?:0)+used
         // The output header sits 10dp above the pane; keep a small gap below the dock or module.
-        return max(0,trayBottom-bottomChrome-top-Tuils.dpToPx(root.context,16))
+        return trayBottom-bottomChrome-top-Tuils.dpToPx(root.context,16)
     }
 
     /** Fit the output in [room]: native and auto fill it up to [fillHeight]; other modes only shrink. */
@@ -72,8 +85,8 @@ internal object TerminalTrayPresentation {
         return max(max(header,min(room,if(fill) fillHeight else requested)),min(requested,minimum))
     }
 
-    /** The pane's frame plus three lines of output. */
-    fun minimumOpen(chrome:Int,lineHeight:Int):Int = chrome+3*lineHeight
+    /** The pane's frame plus three lines of output; an open module may take that space too, down to the header tab. */
+    fun minimumOpen(chrome:Int,lineHeight:Int,moduleOpen:Boolean=false):Int = if(moduleOpen) 0 else chrome+3*lineHeight
 
     fun chromeHeight(root:View):Int {
         val fallback=Tuils.dpToPx(root.context,38)
@@ -187,7 +200,7 @@ internal object TerminalTrayPresentation {
             val room=roomBelowTopContent(root,viewportHeight,inputHeight+consoleHeight)
             val cap=if(maxDp>0) min(room,Tuils.dpToPx(root.context,maxDp)) else room
             val fitted=fitRoom(requested,cap,room,header,(native || auto) && !autoHide,
-                minimumOpen(chrome,max(lineMinimum,text?.lineHeight?:0)))
+                minimumOpen(chrome,max(lineMinimum,text?.lineHeight?:0),state.hasActiveModule))
             params?.height=constrain(fitted,viewportHeight,state.imeBottom,state.systemBottom,inputHeight+consoleHeight,state.imeVisible || state.imeBottom>0)
         }
         if(params!=null) container.layoutParams=params

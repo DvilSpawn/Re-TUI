@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.help;
 
+import ohi.andre.consolelauncher.SourceFiles;
 import org.junit.Test;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -17,8 +18,7 @@ import static org.junit.Assert.assertTrue;
 /** Static contracts for the same resources used by runtime help and the offline reader. */
 public class CommandQuickReferenceTest {
     @Test public void quickReferencesKeepSupportedSyntaxAndSafetyWarnings() throws Exception {
-        File file = new File("src/main/res/values/strings.xml");
-        if (!file.isFile()) file = new File("app/src/main/res/values/strings.xml");
+        File file = SourceFiles.repo("app/src/main/res/values/strings.xml");
         assertTrue("Run from the app module or repository root", file.isFile());
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -60,18 +60,17 @@ public class CommandQuickReferenceTest {
     }
 
     @Test public void workspaceHelpDocumentsBothLocalAndHomeWindowSelection() throws Exception {
-        File root = new File("src/main").isDirectory() ? new File(".") : new File("app");
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         NodeList nodes = factory.newDocumentBuilder().parse(
-                new File(root, "src/main/res/values/strings_surfaces.xml")).getElementsByTagName("string");
+                SourceFiles.repo("app/src/main/res/values/strings_surfaces.xml")).getElementsByTagName("string");
         Map<String, String> resources = new HashMap<>();
         for (int i = 0; i < nodes.getLength(); i++) {
             Element node = (Element) nodes.item(i);
             resources.put(node.getAttribute("name"), node.getTextContent().replaceAll("^\"|\"$", ""));
         }
         org.json.JSONObject catalog = new org.json.JSONObject(new String(java.nio.file.Files.readAllBytes(
-                new File(root, "src/main/assets/localization/catalog.json").toPath()),
+                SourceFiles.repo("app/src/main/assets/localization/catalog.json").toPath()),
                 java.nio.charset.StandardCharsets.UTF_8));
         List<String> failures = new ArrayList<>();
         for (String key : new String[] {

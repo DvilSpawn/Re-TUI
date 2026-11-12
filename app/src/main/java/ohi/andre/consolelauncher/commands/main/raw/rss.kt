@@ -8,8 +8,8 @@ import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormField
-import ohi.andre.consolelauncher.managers.RssManager
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.net.RssManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Rss
 import ohi.andre.consolelauncher.tuils.Tuils

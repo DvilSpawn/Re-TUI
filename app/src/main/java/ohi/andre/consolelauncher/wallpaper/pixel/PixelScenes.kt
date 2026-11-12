@@ -252,7 +252,8 @@ class DoomFireView(context: Context) : PixelWallpaperView(context, 110f) {
     companion object {
         const val SCENE = "doom fire"
         const val CLASSIC = "classic"
-        val LOOKS = listOf(CLASSIC) + PixelLook.entries.map { it.id }
+        const val CUSTOM = "custom"
+        val LOOKS = listOf(CLASSIC) + PixelLook.entries.map { it.id } + CUSTOM
         // The original 37-step fire palette, black to white through red and yellow.
         private val FIRE = intArrayOf(
             0x070707, 0x1F0707, 0x2F0F07, 0x470F07, 0x571707, 0x671F07, 0x771F07, 0x8F2707, 0x9F2F07, 0xAF3F07,
@@ -261,12 +262,41 @@ class DoomFireView(context: Context) : PixelWallpaperView(context, 110f) {
             0xB7AF2F, 0xB7B72F, 0xB7B737, 0xCFCF6F, 0xDFDF9F, 0xEFEFC7, 0xFFFFFF
         ).map { it or 0xFF000000.toInt() }.toIntArray()
         private const val SIM_STEP = 1f / 27f
+        // Where the four colour buttons sit on the heat scale: background, embers, flame, tips.
+        private val STOPS = intArrayOf(0, 12, 24, 36)
+        val CLASSIC_COLORS: IntArray get() = IntArray(STOPS.size) { FIRE[STOPS[it]] }
+
+        /** The full heat scale blended through four colours, like the classic palette. */
+        fun ramp(colors: IntArray): IntArray = IntArray(FIRE.size) { i ->
+            val segment = (i / 12).coerceAtMost(2)
+            PixelDither.mix(colors[segment], colors[segment + 1], (i - segment * 12) / 12f)
+        }
     }
+    private var custom = RetuiWallpaperSettings.doomFireColors(context) ?: CLASSIC_COLORS
     var styleName = RetuiWallpaperSettings.pixelLook(context, SCENE) ?: CLASSIC
-        set(value) { field = value; palette = if (value == CLASSIC) null else PixelLook.of(value).colors(PixelLook.themeInk()); invalidate() }
-    private var palette: IntArray? = if (styleName == CLASSIC) null else PixelLook.of(styleName).colors(PixelLook.themeInk())
+        set(value) { field = value; refreshPalette(); invalidate() }
+    // Classic and custom colour each heat level directly; the other looks dither to their palette.
+    private var table: IntArray? = null
+    private var palette: IntArray? = null
+    init { refreshPalette() }
     private var heat = ByteArray(0)
     private val rng = Random(System.nanoTime())
+
+    private fun refreshPalette() {
+        table = when (styleName) { CLASSIC -> FIRE; CUSTOM -> ramp(custom); else -> null }
+        palette = if (table == null) PixelLook.of(styleName).colors(PixelLook.themeInk()) else null
+    }
+
+    /** Colour button [index] as the fire shows it now. */
+    fun color(index: Int): Int = table?.let { it[STOPS[index]] } ?: palette!!.let { it[index * (it.size - 1) / 3] }
+
+    fun customColors(): IntArray = custom.copyOf()
+
+    /** Changing one colour starts a custom fire from the colours on screen. */
+    fun setCustomColor(index: Int, value: Int) {
+        custom = IntArray(STOPS.size) { if (it == index) value or 0xFF000000.toInt() else color(it) }
+        styleName = CUSTOM
+    }
     private var pending = 0f
 
     override fun onGrid(width: Int, height: Int) {
@@ -295,17 +325,21 @@ class DoomFireView(context: Context) : PixelWallpaperView(context, 110f) {
     }
 
     override fun render() {
+        val t = table
         val p = palette
         for (y in 0 until gh) for (x in 0 until gw) {
             val v = heat[y * gw + x].toInt()
-            px[y * gw + x] = if (p == null) FIRE[v] else PixelDither.pick(v / 36f, x, y, p)
+            px[y * gw + x] = if (t != null) t[v] else PixelDither.pick(v / 36f, x, y, p!!)
         }
     }
 
     override fun frameDelayMs() = 37L
 
-    override fun loadSettings() { styleName = RetuiWallpaperSettings.pixelLook(context, SCENE) ?: CLASSIC }
+    override fun loadSettings() {
+        custom = RetuiWallpaperSettings.doomFireColors(context) ?: CLASSIC_COLORS
+        styleName = RetuiWallpaperSettings.pixelLook(context, SCENE) ?: CLASSIC
+    }
 
-    override fun signatureColors() = palette?.let { intArrayOf(it.last(), it[it.size / 2], it.first()) }
-        ?: intArrayOf(FIRE[30], FIRE[12], FIRE[0])
+    override fun signatureColors() = table?.let { intArrayOf(it[30], it[12], it[0]) }
+        ?: palette!!.let { intArrayOf(it.last(), it[it.size / 2], it.first()) }
 }

@@ -1,6 +1,6 @@
 package ohi.andre.consolelauncher.managers.settings
 
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.*
 import org.junit.Assert.*

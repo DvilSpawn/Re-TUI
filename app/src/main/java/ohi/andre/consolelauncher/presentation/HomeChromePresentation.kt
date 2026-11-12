@@ -13,7 +13,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
+import ohi.andre.consolelauncher.tuils.frame.CyberpunkBackdropDrawable
 import ohi.andre.consolelauncher.tuils.OutlineTextView
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -57,9 +57,9 @@ internal object HomeChromePresentation {
 
     fun styleToolbarButton(view: ImageView,appearance: HomeAppearance) {
         val context=view.context
-        view.background=ohi.andre.consolelauncher.tuils.TerminalBorderRuntime.customFrame(context,
-            android.graphics.drawable.ColorDrawable(Color.TRANSPARENT),ohi.andre.consolelauncher.tuils.FrameTarget.TOOLBAR)
-            ?: if(appearance.bool(Behavior.enable_cyberdeck_mode)) ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable(
+        view.background=ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime.customFrame(context,
+            android.graphics.drawable.ColorDrawable(Color.TRANSPARENT),ohi.andre.consolelauncher.tuils.frame.FrameTarget.TOOLBAR)
+            ?: if(appearance.bool(Behavior.enable_cyberdeck_mode)) ohi.andre.consolelauncher.tuils.frame.CyberpunkIconFrameDrawable(
                 ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.withMaxAlpha(appearance.color(Theme.terminal_border_color),230),
                 Tuils.dpToPx(context,1.6f),Tuils.dpToPx(context,9f),Tuils.dpToPx(context,9f)) else null
     }

@@ -58,7 +58,7 @@ class events : CommandAbstraction {
         }
 
         if (input == "-module" || input == "module" || input == "-print") {
-            return exampleScript()
+            return exampleScript(pack.context)
         }
 
         if (input == "-install" || input == "-add" || input == "install") {
@@ -89,14 +89,17 @@ class events : CommandAbstraction {
         LocalBroadcastManager.getInstance(pack.context.applicationContext).sendBroadcast(intent)
     }
 
-    private fun exampleScript(): String =
+    /** Translated text lands inside a double-quoted shell string, so it must not be able to end it or expand. */
+    private fun shellText(text: String) = text.replace(Regex("[\\\\\"$`]")) { "\\" + it.value }
+
+    private fun exampleScript(context: android.content.Context): String =
         "#!/data/data/com.termux/files/usr/bin/sh\n" +
             "\n" +
-            "echo \"::title Events\"\n" +
+            "echo \"::title " + shellText(context.getString(R.string.command_events_example_title)) + "\"\n" +
             "\n" +
             "EVENTS_FILE=\"%RETUI_CALENDAR_UPCOMING_MONTH\"\n" +
             "if [ ! -s \"\$EVENTS_FILE\" ]; then\n" +
-            "  echo \"::body No upcoming events this month.\"\n" +
+            "  echo \"::body " + shellText(context.getString(R.string.command_events_example_empty)) + "\"\n" +
             "else\n" +
             "  while IFS='\t' read -r date time title location; do\n" +
             "    if [ -n \"\$time\" ]; then\n" +

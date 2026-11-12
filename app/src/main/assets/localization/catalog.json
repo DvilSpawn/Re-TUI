@@ -1305,7 +1305,7 @@
   "changelog_release_highlights": {
     "formatted": false,
     "forms": {
-      "other": "Re:TUI V.5 turns IRC into a full client for any network, lets you open your dock modules from Search and Terminal mode, and adds recent, newest and most-used views to the app drawer.\n\n## IRC, rebuilt\n\nThe old Re:TUI chat server is retired. The IRC pane now connects to real IRC networks.\n\n- Pick Libera.Chat, OFTC, Rizon or hackint, or add any server that supports TLS. Connect to several networks at once.\n- Channels open side by side in a Termux-style split view. Tap a pane to start typing in it.\n- Dropped connections reconnect by themselves and rejoin your channels. They also reconnect as soon as your phone is back online.\n- Sign in with your account once, and Re:TUI can remember this phone with a device key, so you don't need the password next time. Where a network has no SASL, sign-in goes through NickServ.\n- If your nickname is taken, Re:TUI tries a variant instead of failing. When sign-in fails, the pane says why, such as a wrong password or an unverified account.\n- **Stay connected:** turn it on in the Networks page or with `/background on`. Your networks stay online after you close the pane, with an ongoing notification and a Disconnect button. Private messages and mentions of your nickname arrive as notifications; tap one to open that conversation.\n\n## Modules in Search and Terminal mode\n\n- Search results have a new **MODULES** group that lists your dock modules.\n- Tap one to open it right under the chips. The wallpaper blurs behind it, and the search bar and other results stay where they are.\n- Swipe sideways or tap another chip to switch modules. Tap the open chip, X or Back to close the module and return to your search.\n\n## Apps\n\n- `apps -r` opens the app drawer with your recently opened apps first, `apps -n` with the newest installed and `apps -u` with the most used. Tap the header to go back to A–Z.\n- The `apps` suggestion chips now lead with the views you use most.\n\n## Output pane\n\n- The output pane always keeps at least three lines, even when modules fill the screen.\n- When the output pane is collapsed, a ! on the OUTPUT tab shows that something new arrived.\n\n## Weather\n\n- `%name` shows your location again.\n- New placeholders for `weather_format`: `%temp_min` and `%temp_max` for the next 24 hours, and `%rain` for the rain expected in the next hour.\n\n## Fixes\n\n- Changes to alias.txt apply as soon as you save, without `restart`.\n- `-tutorial` on every command opens the right guide.\n- In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.\n\n## V.5.1 · Build 701\n\n- Type text as ASCII art: Settings, Personalization, ASCII Settings, Type text as ASCII. Pick from five fonts with a live preview; saving keeps your previous art as ascii.txt.bak.\n- ASCII effects: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift and glitch animate the art each time Home appears. They work on typed, imported and coloured art. Set the speed, loop them with a rest in between, or tap the art to replay.\n- Settings search: a search box in the Settings hub finds any setting by name or description and opens it on its page. `settings clock format` opens Settings with that search.\n- Settings pages: settings that sat in the wrong section moved next to the ones they belong with, for example the alias syntax settings now sit together under Commands.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: a new monochrome option in the World list shows a black sky with white stars and the planet, station and ships dithered to black and white.\n- Calculator: on the number pad, = now gives the result, C clears what you typed and AC starts over; hold ⌫ to clear the input. Results group their digits as 1,400,000, or as 14,00,000 in lakhs and crores: choose Digit grouping from the calculator's ? menu.\n\n## V.5.2 · Build 702\n\n- Pixel wallpapers: four new live wallpapers drawn as crisp, dithered pixels, in mono, Game Boy or your theme's colours. Pick them in Settings, Personalization, Re:TUI Wallpaper.\n- Shoreline: the time, the date or your own words in dot-matrix letters on black sand, with waves that wash over the bottom of the text and slowly give it back. Move it with the arrows.\n- Dither photo: any photo dithered into a small framed picture, with optional ripples. Ripples: a still pool that ripples where you touch. Doom fire: a classic pixel fire.\n- Use on phone: the wallpaper you set up now takes effect on phones that return straight to the home screen after applying, such as vivo.\n- ASCII Settings: the effect choices wrap into rows so every name is readable.\n\n## V.5.2 Hotfix 1 · Build 703\n\n- RE:TUI Keys: theme sync, keyboard frames and RE:TUI Keys Shortcuts work with the keyboard's new app (com.dvil.retui.keys, from Keys 0.2.1) as well as earlier versions.\n\nReopen these notes anytime with the `changelog` command."
+      "other": "Re:TUI 6 adds a full media player for music, podcasts and video, a new two-colour Mono home, community presets you can download and share from inside the launcher, and one tabbed edge stack in place of the sidebar and its pills.\n\n## One media player\n\n- Music, podcasts and video now live in one player with Library, Now playing, Queue, Podcasts and Video tabs. Open it with `music -open` or by tapping the title in the music panel.\n- Music and podcasts share one queue that survives restarts and is included in backups. Add, remove, reorder, shuffle and repeat.\n- Play your own files: `media -add` picks a folder through Android's folder picker, with no storage permission. `media` lists your folders, `media -rm` removes one and `media -scan` looks again.\n- Sleep timer, equaliser with presets, gapless playback, saved lists and search across the whole library.\n- Lyrics from a `.lrc` or `.txt` file beside the song, including `[offset:]`.\n- Podcasts gain chapters, playback speed, skip silence, notes, downloads, and NEW and OFFLINE shelves.\n- Streams are cached ahead (30 minutes, or 10 on metered networks) and recover from dropped connections by themselves.\n- The system media controls, lock screen, headset and Bluetooth buttons control playback. Playback pauses when headphones are unplugged.\n- Video keeps its own full-screen player with picture-in-picture, next-up, an unwatched filter and autoplay that skips watched episodes.\n- Music keeps playing when the launcher restarts.\n\n## Mono mode\n\n- `mode mono` draws Home in two colours, ink and paper, with the VT323 pixel font. Your other settings are left alone, so switching back restores them exactly.\n- A status strip, a dithered weather banner that animates with the weather and time of day, and one session pane with notes, events, reminders, notifications, music, timers and your commands with their answers.\n- An input line under the session runs commands and searches apps, modules and the web.\n\n## Community presets\n\n- `preset -market` now has a COMMUNITY tab next to the terminal themes. Browse presets made by other Re:TUI users, sorted by newest or most popular.\n- Open one to see its screenshot, what it changes (colours, suggestions, layout, behaviour) and whether it comes with a wallpaper or a font link.\n- Download & import checks the file first and saves it beside your presets. Your look stays the same until you run `preset -apply`.\n- A preset's wallpaper can come with it and is set when you apply the preset.\n- + SHARE MINE sends your own setup for review: pick what to share, add a screenshot and an optional wallpaper. It appears for everyone once approved.\n\n## Edge stack\n\n- The edge sidebar and its timer, stopwatch and podcast pills are now one tabbed stack on the screen edge.\n- Tap a small tab to bring it forward, tap the home tab to return to the sidebar, hold to open the sidebar, and drag to move the whole stack.\n\n## Toolbar\n\n- The app drawer button has its own setting, `show_apps_drawer_button` under Toolbar, separate from swipe-up. If you had swipe-up turned off, the button stays hidden after the update, as before.\n\n## Wallpapers and looks\n\n- Doom fire has a custom look. Pick your own background, ember, flame and tip colours.\n- Settings › System & Support uses the official GitHub, Discord and Reddit logos.\n\n## Modules\n\n- Lua modules can make text tappable. Bookmarks 1.0.2 opens a link when you tap it.\n- With a module open, the output shrinks to its tab before notification rows push anything off screen.\n\n## Fixes\n\n- Dot mode: a command's answer shows over the dot. Home or Back brings the dot back. Output nobody asked for no longer covers it.\n- A running or paused timer comes back after Android closes the launcher. A timer that ran out meanwhile is not rung late.\n- Tapping an ended or disconnected terminal tile reconnects it.\n- Adding a podcast selects the new show.\n- Mono's music line stays correct after switching modes.\n- The video library highlight clears when the player closes.\n- Fixed a crash in suggestions, kept the keyboard state across rotation, kept focus on search after a mode switch, and stopped showing unfilled notification formats.\n- Bare parameter commands, such as `apps`, show their help. `breach`, `credits`, `lockdown` and `pomodoro` now have help too.\n- Dot mode: closing the changelog or another screen no longer brings the keyboard up over the dot.\n- Android no longer tints the dot and mono homes grey.\n- The Hack overlay closes when you tap it."
     },
     "type": "string"
   },
@@ -1687,6 +1687,20 @@
     },
     "type": "string"
   },
+  "command_events_example_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No upcoming events this month."
+    },
+    "type": "string"
+  },
+  "command_events_example_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Events"
+    },
+    "type": "string"
+  },
   "command_events_invalid_lookahead_7cbc8": {
     "formatted": true,
     "forms": {
@@ -1761,6 +1775,34 @@
     "formatted": false,
     "forms": {
       "other": "Exported services"
+    },
+    "type": "string"
+  },
+  "command_inspect_handler_launch": {
+    "formatted": true,
+    "forms": {
+      "other": "launch"
+    },
+    "type": "string"
+  },
+  "command_inspect_handler_process_text": {
+    "formatted": true,
+    "forms": {
+      "other": "process text"
+    },
+    "type": "string"
+  },
+  "command_inspect_handler_share_text": {
+    "formatted": true,
+    "forms": {
+      "other": "share text"
+    },
+    "type": "string"
+  },
+  "command_inspect_handler_view_web": {
+    "formatted": true,
+    "forms": {
+      "other": "view web"
     },
     "type": "string"
   },
@@ -2257,7 +2299,7 @@
   "command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba": {
     "formatted": true,
     "forms": {
-      "other": "Unknown launcher mode: %1$s\nUsage: mode classic|search|terminal"
+      "other": "Unknown launcher mode: %1$s\nUsage: mode classic|search|terminal|dot|mono"
     },
     "type": "string"
   },
@@ -2265,6 +2307,13 @@
     "formatted": true,
     "forms": {
       "other": "Built-in modules cannot be removed. Use module -hide %1$s instead."
+    },
+    "type": "string"
+  },
+  "command_module_dock_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "<empty>"
     },
     "type": "string"
   },
@@ -3558,10 +3607,87 @@
     },
     "type": "string"
   },
+  "dot_home_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app."
+    },
+    "type": "string"
+  },
+  "dot_home_toggle_modules": {
+    "formatted": true,
+    "forms": {
+      "other": "Show or hide the time, battery and temperature"
+    },
+    "type": "string"
+  },
   "duo_status": {
     "formatted": true,
     "forms": {
       "other": "Duo command: enabled\nDuo layout: %1$s\nUsage: %2$s"
+    },
+    "type": "string"
+  },
+  "edge_pills_notification": {
+    "formatted": true,
+    "forms": {
+      "other": "Showing your timer on the screen edge"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_channel": {
+    "formatted": true,
+    "forms": {
+      "other": "Edge sidebar"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_handle": {
+    "formatted": true,
+    "forms": {
+      "other": "Re:T-UI sidebar. Tap to search, hold for more"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_notification": {
+    "formatted": true,
+    "forms": {
+      "other": "Edge sidebar is on"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_quick_app": {
+    "formatted": true,
+    "forms": {
+      "other": "quick app"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_quick_app_notes": {
+    "formatted": true,
+    "forms": {
+      "other": "Journal (default)"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_search": {
+    "formatted": true,
+    "forms": {
+      "other": "search"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_terminal": {
+    "formatted": true,
+    "forms": {
+      "other": "terminal"
+    },
+    "type": "string"
+  },
+  "edge_sidebar_turn_off": {
+    "formatted": true,
+    "forms": {
+      "other": "Turn off"
     },
     "type": "string"
   },
@@ -5126,6 +5252,48 @@
     },
     "type": "string"
   },
+  "floating_terminal_new_window": {
+    "formatted": true,
+    "forms": {
+      "other": "+ new window"
+    },
+    "type": "string"
+  },
+  "floating_terminal_open_workspace": {
+    "formatted": true,
+    "forms": {
+      "other": "open the full workspace"
+    },
+    "type": "string"
+  },
+  "floating_terminal_paste": {
+    "formatted": true,
+    "forms": {
+      "other": "paste"
+    },
+    "type": "string"
+  },
+  "floating_terminal_setup": {
+    "formatted": true,
+    "forms": {
+      "other": "Set up the tmux workspace once to use it here."
+    },
+    "type": "string"
+  },
+  "floating_terminal_title": {
+    "formatted": true,
+    "forms": {
+      "other": "tmux"
+    },
+    "type": "string"
+  },
+  "floating_terminal_windows": {
+    "formatted": true,
+    "forms": {
+      "other": "windows"
+    },
+    "type": "string"
+  },
   "frame_border_range": {
     "formatted": true,
     "forms": {
@@ -6057,6 +6225,13 @@
     },
     "type": "string"
   },
+  "help_breach": {
+    "formatted": true,
+    "forms": {
+      "other": "Open the Breach minigame. Needs RE:TUI credits turned on. \n\nUsage: \n$ breach"
+    },
+    "type": "string"
+  },
   "help_brightness": {
     "formatted": true,
     "forms": {
@@ -6110,6 +6285,13 @@
     "formatted": true,
     "forms": {
       "other": "-ls [optional: config file] -> list known files/options; with a file, read its values \n-info [option] -> read the type, default, and description \n-get [option] -> read the current value \n-set [option] [value] -> change a value; some options refresh live, others need restart \n-append [option] [value] -> concatenate text directly onto the current value, without a separator \n-file [known config file] -> edit a supported file such as behavior.xml, ui.xml, or theme.xml; saving changes configuration \n-erase [option] -> empty a value \n-reset [option] -> restore its default value \n-fontsize [integer] -> change ten legacy UI size fields, not all typography; use Settings for suggestions, module, and header sizes \n-apply [file] -> move an existing file into the configuration folder and rotate existing XML or font assets \n-tutorial -> open the external Configuration guide on re-tui.pages.dev (network) \n\nWarning: keep a personal backup before broad edits. -apply is a move, not a copy or portable preset import; it may replace existing assets and its reported path does not verify a successful move. Use the Settings shareable-configuration import for portable presets. \nKnown issue: -ls rss.xml currently returns notification values, not RSS values; do not use it to inspect feed configuration."
+    },
+    "type": "string"
+  },
+  "help_credits": {
+    "formatted": true,
+    "forms": {
+      "other": "Show your RE:TUI credits and breach keys. \n\nUsage: \n$ credits"
     },
     "type": "string"
   },
@@ -6232,6 +6414,13 @@
     },
     "type": "string"
   },
+  "help_journal": {
+    "formatted": true,
+    "forms": {
+      "other": "Log a line to today's journal, or open it.\nUsage: journal [text]"
+    },
+    "type": "string"
+  },
   "help_landscape": {
     "formatted": true,
     "forms": {
@@ -6246,6 +6435,13 @@
     },
     "type": "string"
   },
+  "help_lockdown": {
+    "formatted": true,
+    "forms": {
+      "other": "Start or check a lockdown. Needs RE:TUI credits turned on. \n\nUsage: \n$ lockdown \n$ lockdown [duration] [reason] \n$ lockdown -status \n$ lockdown -stop \n\nExamples: \n$ lockdown 1h deep work"
+    },
+    "type": "string"
+  },
   "help_ls": {
     "formatted": true,
     "forms": {
@@ -6257,6 +6453,13 @@
     "formatted": true,
     "forms": {
       "other": "Create and open launcher-native Lua apps. \n\nUsage: \n$ lua -apps \n$ lua -new app habit \n$ lua -app habit \n$ lua -edit habit \n$ lua -config habit \n$ lua -check habit \n$ lua -info habit \n$ lua -approve habit \n$ lua -export habit \n$ lua -disable habit \n$ lua -enable habit \n\nLua apps run inside Re:T-UI, not Termux. They use the same sandbox, prefs, files, permissions, editor, and ui:render layout objects as Lua modules, but open in a focused terminal-styled surface. Inside a Lua app, plain input is sent to on_input(text), and renderer buttons with action/value are sent to on_action(value). Local commands use a colon prefix: :help, :refresh, :restart, :config, :edit, :clear, and :close."
+    },
+    "type": "string"
+  },
+  "help_media": {
+    "formatted": true,
+    "forms": {
+      "other": "media: your media folders. media -add picks a folder · media -rm <n> drops folder n · media -scan looks through them again · media -v opens your videos. Once a folder is added, music plays from your folders."
     },
     "type": "string"
   },
@@ -6277,7 +6480,7 @@
   "help_music": {
     "formatted": true,
     "forms": {
-      "other": "-next -> play the next song \n-previous -> play the previous song \n-play -> play/pause the player \n-stop -> stop the player \n-ls -> list your tracks \n-select [song] -> play the selected song \n-info -> get info about the current song \n-seekto [seconds] -> seek to the selected part of the current song"
+      "other": "-open -> open the media player \n-next -> play the next song \n-previous -> play the previous song \n-play -> play/pause the player \n-stop -> stop the player \n-ls -> list your tracks \n-select [song] -> play the selected song \n-info -> get info about the current song \n-seekto [seconds] -> seek to the selected part of the current song"
     },
     "type": "string"
   },
@@ -6312,7 +6515,14 @@
   "help_podcast": {
     "formatted": true,
     "forms": {
-      "other": "Open podcasts on the home screen. Minimize to an edge pill; expand again with podcast or the pill. \nUsage: \n$ podcast \n$ podcast add <https-feed-url> \n$ podcast refresh \n$ podcast play \n$ podcast next \n$ podcast prev \n$ podcast speed <0.5-2.0> \n$ podcast close \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening. Now-playing title lives on the music module."
+      "other": "Open podcasts in the media player. While an episode is loaded, an edge pill plays, pauses and reopens it. \nUsage: \n$ podcast \n$ podcast add <https-feed-url> \n$ podcast refresh \n$ podcast play \n$ podcast next \n$ podcast prev \n$ podcast speed <0.5-2.0> \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening. Now-playing title lives on the music module."
+    },
+    "type": "string"
+  },
+  "help_pomodoro": {
+    "formatted": true,
+    "forms": {
+      "other": "Start or stop a pomodoro session. \n\nUsage: \n$ pomodoro \n$ pomodoro [task] \n$ pomodoro -stop \n\nExamples: \n$ pomodoro write report"
     },
     "type": "string"
   },
@@ -6712,6 +6922,13 @@
     "formatted": true,
     "forms": {
       "other": "Discord"
+    },
+    "type": "string"
+  },
+  "hub_edge_sidebar": {
+    "formatted": true,
+    "forms": {
+      "other": "Edge Sidebar"
     },
     "type": "string"
   },
@@ -7895,6 +8112,379 @@
     "formatted": true,
     "forms": {
       "other": "Connect as a guest to start chatting, or sign in with your account on this network."
+    },
+    "type": "string"
+  },
+  "journal_age_now": {
+    "formatted": true,
+    "forms": {
+      "other": "now"
+    },
+    "type": "string"
+  },
+  "journal_archive": {
+    "formatted": true,
+    "forms": {
+      "other": "old notes library ↗"
+    },
+    "type": "string"
+  },
+  "journal_attach_camera": {
+    "formatted": true,
+    "forms": {
+      "other": "camera"
+    },
+    "type": "string"
+  },
+  "journal_attach_photo": {
+    "formatted": true,
+    "forms": {
+      "other": "photo"
+    },
+    "type": "string"
+  },
+  "journal_camera_denied": {
+    "formatted": true,
+    "forms": {
+      "other": "Camera access is needed to take a photo"
+    },
+    "type": "string"
+  },
+  "journal_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "Cancel editing"
+    },
+    "type": "string"
+  },
+  "journal_clear_done": {
+    "formatted": true,
+    "forms": {
+      "other": "clear done"
+    },
+    "type": "string"
+  },
+  "journal_copied": {
+    "formatted": true,
+    "forms": {
+      "other": "Copied"
+    },
+    "type": "string"
+  },
+  "journal_delete": {
+    "formatted": true,
+    "forms": {
+      "other": "del"
+    },
+    "type": "string"
+  },
+  "journal_edit": {
+    "formatted": true,
+    "forms": {
+      "other": "edit"
+    },
+    "type": "string"
+  },
+  "journal_edit_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "edit the entry"
+    },
+    "type": "string"
+  },
+  "journal_editing": {
+    "formatted": true,
+    "forms": {
+      "other": "editing %1$s · %2$s · empty deletes it"
+    },
+    "type": "string"
+  },
+  "journal_empty_day": {
+    "formatted": true,
+    "forms": {
+      "other": "nothing logged this day."
+    },
+    "type": "string"
+  },
+  "journal_empty_today": {
+    "formatted": true,
+    "forms": {
+      "other": "nothing logged today. type below and tap log."
+    },
+    "type": "string"
+  },
+  "journal_entries": {
+    "formatted": true,
+    "forms": {
+      "one": "%d entry",
+      "other": "%d entries"
+    },
+    "type": "plurals"
+  },
+  "journal_esc": {
+    "formatted": true,
+    "forms": {
+      "other": "esc"
+    },
+    "type": "string"
+  },
+  "journal_find_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "type to search every day of the journal"
+    },
+    "type": "string"
+  },
+  "journal_format_back": {
+    "formatted": true,
+    "forms": {
+      "other": "Back to all formats"
+    },
+    "type": "string"
+  },
+  "journal_hide": {
+    "formatted": true,
+    "forms": {
+      "other": "hide"
+    },
+    "type": "string"
+  },
+  "journal_hide_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Couldn't hide that text on this device"
+    },
+    "type": "string"
+  },
+  "journal_image_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Couldn't add an image"
+    },
+    "type": "string"
+  },
+  "journal_image_missing": {
+    "formatted": true,
+    "forms": {
+      "other": "[image missing]"
+    },
+    "type": "string"
+  },
+  "journal_log": {
+    "formatted": true,
+    "forms": {
+      "other": "log"
+    },
+    "type": "string"
+  },
+  "journal_logged": {
+    "formatted": true,
+    "forms": {
+      "other": "logged to today's journal"
+    },
+    "type": "string"
+  },
+  "journal_matches": {
+    "formatted": true,
+    "forms": {
+      "one": "%1$d entry matches \"%2$s\"",
+      "other": "%1$d entries match \"%2$s\""
+    },
+    "type": "plurals"
+  },
+  "journal_moved": {
+    "formatted": true,
+    "forms": {
+      "other": "Moved to today's journal"
+    },
+    "type": "string"
+  },
+  "journal_next_day": {
+    "formatted": true,
+    "forms": {
+      "other": "Next day"
+    },
+    "type": "string"
+  },
+  "journal_no_camera": {
+    "formatted": true,
+    "forms": {
+      "other": "No camera app found"
+    },
+    "type": "string"
+  },
+  "journal_no_viewer": {
+    "formatted": true,
+    "forms": {
+      "other": "No app can open this image"
+    },
+    "type": "string"
+  },
+  "journal_pick_day": {
+    "formatted": true,
+    "forms": {
+      "other": "Pick a day"
+    },
+    "type": "string"
+  },
+  "journal_pin": {
+    "formatted": true,
+    "forms": {
+      "other": "pin"
+    },
+    "type": "string"
+  },
+  "journal_previous_day": {
+    "formatted": true,
+    "forms": {
+      "other": "Previous day"
+    },
+    "type": "string"
+  },
+  "journal_prompt_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "write… enter for a new line"
+    },
+    "type": "string"
+  },
+  "journal_prompt_hint_past": {
+    "formatted": true,
+    "forms": {
+      "other": "write… logs to today"
+    },
+    "type": "string"
+  },
+  "journal_quick_count": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d open · %2$d done"
+    },
+    "type": "string"
+  },
+  "journal_quick_edit_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "edit the line, empty deletes it"
+    },
+    "type": "string"
+  },
+  "journal_quick_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "nothing here yet. one line each: they show on your home screen."
+    },
+    "type": "string"
+  },
+  "journal_quick_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "one line…"
+    },
+    "type": "string"
+  },
+  "journal_quick_rule": {
+    "formatted": true,
+    "forms": {
+      "other": "one line each · long thoughts go to journal"
+    },
+    "type": "string"
+  },
+  "journal_redact_unavailable": {
+    "formatted": true,
+    "forms": {
+      "other": "Edit the entry to redact styled text"
+    },
+    "type": "string"
+  },
+  "journal_save": {
+    "formatted": true,
+    "forms": {
+      "other": "save"
+    },
+    "type": "string"
+  },
+  "journal_selection_find": {
+    "formatted": true,
+    "forms": {
+      "other": "find"
+    },
+    "type": "string"
+  },
+  "journal_selection_hide": {
+    "formatted": true,
+    "forms": {
+      "other": "redact"
+    },
+    "type": "string"
+  },
+  "journal_selection_link": {
+    "formatted": true,
+    "forms": {
+      "other": "Link"
+    },
+    "type": "string"
+  },
+  "journal_selection_note": {
+    "formatted": true,
+    "forms": {
+      "other": "→ note"
+    },
+    "type": "string"
+  },
+  "journal_selection_noted": {
+    "formatted": true,
+    "forms": {
+      "other": "Added to quick notes"
+    },
+    "type": "string"
+  },
+  "journal_selection_tag": {
+    "formatted": true,
+    "forms": {
+      "other": "#tag"
+    },
+    "type": "string"
+  },
+  "journal_show": {
+    "formatted": true,
+    "forms": {
+      "other": "show"
+    },
+    "type": "string"
+  },
+  "journal_tab_journal": {
+    "formatted": true,
+    "forms": {
+      "other": "journal"
+    },
+    "type": "string"
+  },
+  "journal_tab_notes": {
+    "formatted": true,
+    "forms": {
+      "other": "notes"
+    },
+    "type": "string"
+  },
+  "journal_to_journal": {
+    "formatted": true,
+    "forms": {
+      "other": "jrnl"
+    },
+    "type": "string"
+  },
+  "journal_today": {
+    "formatted": true,
+    "forms": {
+      "other": "today"
+    },
+    "type": "string"
+  },
+  "journal_unpin": {
+    "formatted": true,
+    "forms": {
+      "other": "unpin"
     },
     "type": "string"
   },
@@ -10089,6 +10679,309 @@
     },
     "type": "string"
   },
+  "media_add_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "That folder could not be added."
+    },
+    "type": "string"
+  },
+  "media_added": {
+    "formatted": true,
+    "forms": {
+      "other": "Added %1$s. Scanning…"
+    },
+    "type": "string"
+  },
+  "media_no_folders": {
+    "formatted": true,
+    "forms": {
+      "other": "No media folders yet. Add one with media -add."
+    },
+    "type": "string"
+  },
+  "media_no_such_folder": {
+    "formatted": true,
+    "forms": {
+      "other": "There is no folder with that number. See media for the list."
+    },
+    "type": "string"
+  },
+  "media_no_videos": {
+    "formatted": true,
+    "forms": {
+      "other": "No videos found in your media folders."
+    },
+    "type": "string"
+  },
+  "media_removed": {
+    "formatted": true,
+    "forms": {
+      "other": "Removed %1$s."
+    },
+    "type": "string"
+  },
+  "media_scanning": {
+    "formatted": true,
+    "forms": {
+      "other": "Scanning your media folders…"
+    },
+    "type": "string"
+  },
+  "media_tracks": {
+    "formatted": true,
+    "forms": {
+      "one": "%1$d track",
+      "other": "%1$d tracks"
+    },
+    "type": "plurals"
+  },
+  "media_video_audio": {
+    "formatted": true,
+    "forms": {
+      "other": "AUD"
+    },
+    "type": "string"
+  },
+  "media_video_audio_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Audio track"
+    },
+    "type": "string"
+  },
+  "media_video_back": {
+    "formatted": true,
+    "forms": {
+      "other": "Back"
+    },
+    "type": "string"
+  },
+  "media_video_back10": {
+    "formatted": true,
+    "forms": {
+      "other": "-10"
+    },
+    "type": "string"
+  },
+  "media_video_back10_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Back 10 seconds, hold to seek backward"
+    },
+    "type": "string"
+  },
+  "media_video_cannot_play": {
+    "formatted": true,
+    "forms": {
+      "other": "This file cannot be played."
+    },
+    "type": "string"
+  },
+  "media_video_cc": {
+    "formatted": true,
+    "forms": {
+      "other": "CC"
+    },
+    "type": "string"
+  },
+  "media_video_cc_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Subtitles"
+    },
+    "type": "string"
+  },
+  "media_video_done": {
+    "formatted": true,
+    "forms": {
+      "other": "done"
+    },
+    "type": "string"
+  },
+  "media_video_fill": {
+    "formatted": true,
+    "forms": {
+      "other": "FILL"
+    },
+    "type": "string"
+  },
+  "media_video_filter": {
+    "formatted": true,
+    "forms": {
+      "other": "filter videos"
+    },
+    "type": "string"
+  },
+  "media_video_fit": {
+    "formatted": true,
+    "forms": {
+      "other": "FIT"
+    },
+    "type": "string"
+  },
+  "media_video_fit_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Fit or crop"
+    },
+    "type": "string"
+  },
+  "media_video_forward10": {
+    "formatted": true,
+    "forms": {
+      "other": "+10"
+    },
+    "type": "string"
+  },
+  "media_video_forward10_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Forward 10 seconds, hold to seek forward"
+    },
+    "type": "string"
+  },
+  "media_video_list": {
+    "formatted": true,
+    "forms": {
+      "other": "LIST"
+    },
+    "type": "string"
+  },
+  "media_video_list_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Playlist"
+    },
+    "type": "string"
+  },
+  "media_video_next_up": {
+    "formatted": true,
+    "forms": {
+      "other": "Next: %1$s in %2$dm"
+    },
+    "type": "string"
+  },
+  "media_video_pause": {
+    "formatted": true,
+    "forms": {
+      "other": "PAUSE"
+    },
+    "type": "string"
+  },
+  "media_video_pip": {
+    "formatted": true,
+    "forms": {
+      "other": "PIP"
+    },
+    "type": "string"
+  },
+  "media_video_pip_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Picture in picture"
+    },
+    "type": "string"
+  },
+  "media_video_play": {
+    "formatted": true,
+    "forms": {
+      "other": "PLAY"
+    },
+    "type": "string"
+  },
+  "media_video_playlist": {
+    "formatted": true,
+    "forms": {
+      "other": "playlist · %1$s"
+    },
+    "type": "string"
+  },
+  "media_video_results": {
+    "formatted": true,
+    "forms": {
+      "other": "video filter results"
+    },
+    "type": "string"
+  },
+  "media_video_resume": {
+    "formatted": true,
+    "forms": {
+      "other": "resume %1$s from %2$s"
+    },
+    "type": "string"
+  },
+  "media_video_resume_at": {
+    "formatted": true,
+    "forms": {
+      "other": "resume %1$s"
+    },
+    "type": "string"
+  },
+  "media_video_resume_show": {
+    "formatted": true,
+    "forms": {
+      "other": "resume"
+    },
+    "type": "string"
+  },
+  "media_video_seek_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Seek"
+    },
+    "type": "string"
+  },
+  "media_video_seeking": {
+    "formatted": true,
+    "forms": {
+      "other": "seeking %1$s"
+    },
+    "type": "string"
+  },
+  "media_video_speed_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Playback speed"
+    },
+    "type": "string"
+  },
+  "media_video_start_over": {
+    "formatted": true,
+    "forms": {
+      "other": "start over"
+    },
+    "type": "string"
+  },
+  "media_video_start_show": {
+    "formatted": true,
+    "forms": {
+      "other": "start"
+    },
+    "type": "string"
+  },
+  "media_video_vol": {
+    "formatted": true,
+    "forms": {
+      "other": "vol"
+    },
+    "type": "string"
+  },
+  "media_video_volume_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "Volume"
+    },
+    "type": "string"
+  },
+  "media_videos": {
+    "formatted": true,
+    "forms": {
+      "one": "%1$d video",
+      "other": "%1$d videos"
+    },
+    "type": "plurals"
+  },
   "mobile_data_label": {
     "formatted": true,
     "forms": {
@@ -10394,6 +11287,104 @@
     "formatted": true,
     "forms": {
       "other": "Unknown library module. Use module -library."
+    },
+    "type": "string"
+  },
+  "mono_banner_description": {
+    "formatted": true,
+    "forms": {
+      "other": "Weather scene. Tap to step through the scenes."
+    },
+    "type": "string"
+  },
+  "mono_no_events": {
+    "formatted": true,
+    "forms": {
+      "other": "nothing coming up"
+    },
+    "type": "string"
+  },
+  "mono_no_music": {
+    "formatted": true,
+    "forms": {
+      "other": "nothing playing"
+    },
+    "type": "string"
+  },
+  "mono_no_notes": {
+    "formatted": true,
+    "forms": {
+      "other": "no notes · add one with notes -add"
+    },
+    "type": "string"
+  },
+  "mono_no_notifications": {
+    "formatted": true,
+    "forms": {
+      "other": "all quiet"
+    },
+    "type": "string"
+  },
+  "mono_no_reminders": {
+    "formatted": true,
+    "forms": {
+      "other": "none set · reminder 18:00 call"
+    },
+    "type": "string"
+  },
+  "mono_no_timer": {
+    "formatted": true,
+    "forms": {
+      "other": "not running · timer 5m"
+    },
+    "type": "string"
+  },
+  "mono_prompt_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "search or type a command"
+    },
+    "type": "string"
+  },
+  "mono_session_title": {
+    "formatted": true,
+    "forms": {
+      "other": "── session ──"
+    },
+    "type": "string"
+  },
+  "mono_stopwatch_paused": {
+    "formatted": true,
+    "forms": {
+      "other": "stopwatch %1$s · paused"
+    },
+    "type": "string"
+  },
+  "mono_stopwatch_running": {
+    "formatted": true,
+    "forms": {
+      "other": "stopwatch %1$s"
+    },
+    "type": "string"
+  },
+  "mono_timer_paused": {
+    "formatted": true,
+    "forms": {
+      "other": "timer %1$s left · paused"
+    },
+    "type": "string"
+  },
+  "mono_timer_running": {
+    "formatted": true,
+    "forms": {
+      "other": "timer %1$s left"
+    },
+    "type": "string"
+  },
+  "music_songs_folder_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "0 songs found in songs_folder. If it holds music, add the folder with media -add instead; it works without storage permission."
     },
     "type": "string"
   },
@@ -13400,6 +14391,671 @@
     },
     "type": "string"
   },
+  "pixel_grid_off": {
+    "formatted": true,
+    "forms": {
+      "other": "off"
+    },
+    "type": "string"
+  },
+  "pixel_grid_status": {
+    "formatted": true,
+    "forms": {
+      "other": "Pixel grid: %1$s · %2$.1f dp cells"
+    },
+    "type": "string"
+  },
+  "pixel_grid_unsupported": {
+    "formatted": true,
+    "forms": {
+      "other": "The pixel grid needs Android 13 or newer."
+    },
+    "type": "string"
+  },
+  "pixel_grid_usage": {
+    "formatted": true,
+    "forms": {
+      "other": "pixelgrid on|off|snap|1bit|<cell size in dp, 1–6>"
+    },
+    "type": "string"
+  },
+  "player_add": {
+    "formatted": true,
+    "forms": {
+      "other": "ADD"
+    },
+    "type": "string"
+  },
+  "player_add_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "add from the library"
+    },
+    "type": "string"
+  },
+  "player_add_to_queue": {
+    "formatted": true,
+    "forms": {
+      "other": "ADD TO QUEUE"
+    },
+    "type": "string"
+  },
+  "player_albums": {
+    "formatted": true,
+    "forms": {
+      "other": "ALBUMS"
+    },
+    "type": "string"
+  },
+  "player_all": {
+    "formatted": true,
+    "forms": {
+      "other": "ALL"
+    },
+    "type": "string"
+  },
+  "player_all_watched": {
+    "formatted": true,
+    "forms": {
+      "other": "Everything here is watched."
+    },
+    "type": "string"
+  },
+  "player_artists": {
+    "formatted": true,
+    "forms": {
+      "other": "ARTISTS"
+    },
+    "type": "string"
+  },
+  "player_ask_next": {
+    "formatted": true,
+    "forms": {
+      "other": "NEXT"
+    },
+    "type": "string"
+  },
+  "player_ask_queue": {
+    "formatted": true,
+    "forms": {
+      "other": "QUEUE"
+    },
+    "type": "string"
+  },
+  "player_back_15": {
+    "formatted": true,
+    "forms": {
+      "other": "back 15 seconds"
+    },
+    "type": "string"
+  },
+  "player_buffering": {
+    "formatted": true,
+    "forms": {
+      "other": "buffering"
+    },
+    "type": "string"
+  },
+  "player_cancel": {
+    "formatted": true,
+    "forms": {
+      "other": "CANCEL"
+    },
+    "type": "string"
+  },
+  "player_cant_play": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not play %1$s. Skipping it."
+    },
+    "type": "string"
+  },
+  "player_chapter_n": {
+    "formatted": true,
+    "forms": {
+      "other": "Chapter %1$d"
+    },
+    "type": "string"
+  },
+  "player_chapters": {
+    "formatted": true,
+    "forms": {
+      "other": "CHAPTERS"
+    },
+    "type": "string"
+  },
+  "player_chapters_none": {
+    "formatted": true,
+    "forms": {
+      "other": "This episode has no chapters."
+    },
+    "type": "string"
+  },
+  "player_clear": {
+    "formatted": true,
+    "forms": {
+      "other": "CLEAR"
+    },
+    "type": "string"
+  },
+  "player_close": {
+    "formatted": true,
+    "forms": {
+      "other": "close media player"
+    },
+    "type": "string"
+  },
+  "player_continue": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s %2$s / %3$s"
+    },
+    "type": "string"
+  },
+  "player_delete": {
+    "formatted": true,
+    "forms": {
+      "other": "DELETE"
+    },
+    "type": "string"
+  },
+  "player_download": {
+    "formatted": true,
+    "forms": {
+      "other": "DOWNLOAD"
+    },
+    "type": "string"
+  },
+  "player_download_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Download failed."
+    },
+    "type": "string"
+  },
+  "player_eq": {
+    "formatted": true,
+    "forms": {
+      "other": "EQ"
+    },
+    "type": "string"
+  },
+  "player_eq_none": {
+    "formatted": true,
+    "forms": {
+      "other": "This device has no equaliser presets."
+    },
+    "type": "string"
+  },
+  "player_filter": {
+    "formatted": true,
+    "forms": {
+      "other": "search music, video, podcasts"
+    },
+    "type": "string"
+  },
+  "player_folders": {
+    "formatted": true,
+    "forms": {
+      "other": "FOLDERS"
+    },
+    "type": "string"
+  },
+  "player_forward_30": {
+    "formatted": true,
+    "forms": {
+      "other": "forward 30 seconds"
+    },
+    "type": "string"
+  },
+  "player_gave_up": {
+    "formatted": true,
+    "forms": {
+      "other": "Nothing in the queue could be played."
+    },
+    "type": "string"
+  },
+  "player_library": {
+    "formatted": true,
+    "forms": {
+      "other": "back to library"
+    },
+    "type": "string"
+  },
+  "player_list_name": {
+    "formatted": true,
+    "forms": {
+      "other": "List name"
+    },
+    "type": "string"
+  },
+  "player_list_name_needed": {
+    "formatted": true,
+    "forms": {
+      "other": "Give the list a name."
+    },
+    "type": "string"
+  },
+  "player_list_saved": {
+    "formatted": true,
+    "forms": {
+      "other": "Saved %1$s"
+    },
+    "type": "string"
+  },
+  "player_lists": {
+    "formatted": true,
+    "forms": {
+      "other": "LISTS"
+    },
+    "type": "string"
+  },
+  "player_lists_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "saved playlists"
+    },
+    "type": "string"
+  },
+  "player_looking": {
+    "formatted": true,
+    "forms": {
+      "other": "Looking..."
+    },
+    "type": "string"
+  },
+  "player_lyrics": {
+    "formatted": true,
+    "forms": {
+      "other": "LYRICS"
+    },
+    "type": "string"
+  },
+  "player_lyrics_none": {
+    "formatted": true,
+    "forms": {
+      "other": "No lyrics found. Put a .lrc or .txt file with the same name beside the song, then run media -scan."
+    },
+    "type": "string"
+  },
+  "player_mark_played": {
+    "formatted": true,
+    "forms": {
+      "other": "PLAYED"
+    },
+    "type": "string"
+  },
+  "player_mark_unplayed": {
+    "formatted": true,
+    "forms": {
+      "other": "UNPLAYED"
+    },
+    "type": "string"
+  },
+  "player_music_off": {
+    "formatted": true,
+    "forms": {
+      "other": "Music is off. Turn it on with config -set enable_music true, then restart the launcher."
+    },
+    "type": "string"
+  },
+  "player_new": {
+    "formatted": true,
+    "forms": {
+      "other": "NEW"
+    },
+    "type": "string"
+  },
+  "player_newest": {
+    "formatted": true,
+    "forms": {
+      "other": "NEWEST"
+    },
+    "type": "string"
+  },
+  "player_next": {
+    "formatted": true,
+    "forms": {
+      "other": "next track"
+    },
+    "type": "string"
+  },
+  "player_no_new": {
+    "formatted": true,
+    "forms": {
+      "other": "No unplayed episodes."
+    },
+    "type": "string"
+  },
+  "player_no_offline": {
+    "formatted": true,
+    "forms": {
+      "other": "No downloads yet. Long-press an episode to download it."
+    },
+    "type": "string"
+  },
+  "player_no_playlists": {
+    "formatted": true,
+    "forms": {
+      "other": "No saved lists yet. Open the queue and tap SAVE."
+    },
+    "type": "string"
+  },
+  "player_no_results": {
+    "formatted": true,
+    "forms": {
+      "other": "Nothing found."
+    },
+    "type": "string"
+  },
+  "player_notes": {
+    "formatted": true,
+    "forms": {
+      "other": "NOTES"
+    },
+    "type": "string"
+  },
+  "player_notes_none": {
+    "formatted": true,
+    "forms": {
+      "other": "No notes for this episode. Refreshing the show may bring them back."
+    },
+    "type": "string"
+  },
+  "player_nothing": {
+    "formatted": true,
+    "forms": {
+      "other": "Nothing playing"
+    },
+    "type": "string"
+  },
+  "player_now_playing": {
+    "formatted": true,
+    "forms": {
+      "other": "back to now playing"
+    },
+    "type": "string"
+  },
+  "player_offline": {
+    "formatted": true,
+    "forms": {
+      "other": "OFFLINE"
+    },
+    "type": "string"
+  },
+  "player_oldest": {
+    "formatted": true,
+    "forms": {
+      "other": "OLDEST"
+    },
+    "type": "string"
+  },
+  "player_pause": {
+    "formatted": true,
+    "forms": {
+      "other": "PAUSE"
+    },
+    "type": "string"
+  },
+  "player_play": {
+    "formatted": true,
+    "forms": {
+      "other": "PLAY"
+    },
+    "type": "string"
+  },
+  "player_play_next": {
+    "formatted": true,
+    "forms": {
+      "other": "PLAY NEXT"
+    },
+    "type": "string"
+  },
+  "player_previous": {
+    "formatted": true,
+    "forms": {
+      "other": "previous track"
+    },
+    "type": "string"
+  },
+  "player_queue": {
+    "formatted": true,
+    "forms": {
+      "other": "QUEUE"
+    },
+    "type": "string"
+  },
+  "player_queue_count": {
+    "formatted": true,
+    "forms": {
+      "other": "QUEUE %1$d"
+    },
+    "type": "string"
+  },
+  "player_recent": {
+    "formatted": true,
+    "forms": {
+      "other": "RECENT"
+    },
+    "type": "string"
+  },
+  "player_reconnecting": {
+    "formatted": true,
+    "forms": {
+      "other": "Reconnecting..."
+    },
+    "type": "string"
+  },
+  "player_refresh": {
+    "formatted": true,
+    "forms": {
+      "other": "REFRESH"
+    },
+    "type": "string"
+  },
+  "player_remove": {
+    "formatted": true,
+    "forms": {
+      "other": "remove from queue"
+    },
+    "type": "string"
+  },
+  "player_reorder": {
+    "formatted": true,
+    "forms": {
+      "other": "drag to reorder"
+    },
+    "type": "string"
+  },
+  "player_repeat": {
+    "formatted": true,
+    "forms": {
+      "other": "repeat"
+    },
+    "type": "string"
+  },
+  "player_repeat_all": {
+    "formatted": true,
+    "forms": {
+      "other": "ALL"
+    },
+    "type": "string"
+  },
+  "player_repeat_off": {
+    "formatted": true,
+    "forms": {
+      "other": "OFF"
+    },
+    "type": "string"
+  },
+  "player_repeat_one": {
+    "formatted": true,
+    "forms": {
+      "other": "ONE"
+    },
+    "type": "string"
+  },
+  "player_save_list": {
+    "formatted": true,
+    "forms": {
+      "other": "SAVE"
+    },
+    "type": "string"
+  },
+  "player_saved": {
+    "formatted": true,
+    "forms": {
+      "other": "saved"
+    },
+    "type": "string"
+  },
+  "player_search": {
+    "formatted": true,
+    "forms": {
+      "other": "RESULTS"
+    },
+    "type": "string"
+  },
+  "player_seek": {
+    "formatted": true,
+    "forms": {
+      "other": "position in track"
+    },
+    "type": "string"
+  },
+  "player_shows": {
+    "formatted": true,
+    "forms": {
+      "other": "SHOWS"
+    },
+    "type": "string"
+  },
+  "player_shuffle": {
+    "formatted": true,
+    "forms": {
+      "other": "SHUF"
+    },
+    "type": "string"
+  },
+  "player_silence": {
+    "formatted": true,
+    "forms": {
+      "other": "SILENCE"
+    },
+    "type": "string"
+  },
+  "player_silence_desc": {
+    "formatted": true,
+    "forms": {
+      "other": "skip silence in podcasts"
+    },
+    "type": "string"
+  },
+  "player_sleep": {
+    "formatted": true,
+    "forms": {
+      "other": "SLEEP"
+    },
+    "type": "string"
+  },
+  "player_sleep_end": {
+    "formatted": true,
+    "forms": {
+      "other": "End of this track"
+    },
+    "type": "string"
+  },
+  "player_sleep_end_short": {
+    "formatted": true,
+    "forms": {
+      "other": "END"
+    },
+    "type": "string"
+  },
+  "player_sleep_left": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$dm"
+    },
+    "type": "string"
+  },
+  "player_sleep_minutes": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d minutes"
+    },
+    "type": "string"
+  },
+  "player_sleep_off": {
+    "formatted": true,
+    "forms": {
+      "other": "Off"
+    },
+    "type": "string"
+  },
+  "player_songs": {
+    "formatted": true,
+    "forms": {
+      "other": "SONGS"
+    },
+    "type": "string"
+  },
+  "player_tab_music": {
+    "formatted": true,
+    "forms": {
+      "other": "MUSIC"
+    },
+    "type": "string"
+  },
+  "player_tab_podcasts": {
+    "formatted": true,
+    "forms": {
+      "other": "PODCASTS"
+    },
+    "type": "string"
+  },
+  "player_tab_video": {
+    "formatted": true,
+    "forms": {
+      "other": "VIDEO"
+    },
+    "type": "string"
+  },
+  "player_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Media player"
+    },
+    "type": "string"
+  },
+  "player_unwatched": {
+    "formatted": true,
+    "forms": {
+      "other": "UNWATCHED"
+    },
+    "type": "string"
+  },
+  "player_unwatched_count": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d of %2$d unwatched"
+    },
+    "type": "string"
+  },
+  "player_up_next": {
+    "formatted": true,
+    "forms": {
+      "other": "UP NEXT %1$d"
+    },
+    "type": "string"
+  },
+  "player_waiting_network": {
+    "formatted": true,
+    "forms": {
+      "other": "Waiting for network..."
+    },
+    "type": "string"
+  },
   "podcast_pill_description": {
     "formatted": true,
     "forms": {
@@ -13659,6 +15315,174 @@
     },
     "type": "string"
   },
+  "preset_community_anonymous": {
+    "formatted": true,
+    "forms": {
+      "other": "anonymous"
+    },
+    "type": "string"
+  },
+  "preset_community_back": {
+    "formatted": true,
+    "forms": {
+      "other": "Back"
+    },
+    "type": "string"
+  },
+  "preset_community_by": {
+    "formatted": true,
+    "forms": {
+      "other": "by %1$s · ↓ %2$d"
+    },
+    "type": "string"
+  },
+  "preset_community_checking": {
+    "formatted": true,
+    "forms": {
+      "other": "Checking…"
+    },
+    "type": "string"
+  },
+  "preset_community_detail_note": {
+    "formatted": true,
+    "forms": {
+      "other": "The file is checked before import. Your current look stays until you run preset -apply."
+    },
+    "type": "string"
+  },
+  "preset_community_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No community presets yet. Be the first: + SHARE MINE."
+    },
+    "type": "string"
+  },
+  "preset_community_extras": {
+    "formatted": true,
+    "forms": {
+      "other": "EXTRAS"
+    },
+    "type": "string"
+  },
+  "preset_community_font_link": {
+    "formatted": true,
+    "forms": {
+      "other": "Uses a custom font. Open the link in your browser, then import it with Settings › Fonts."
+    },
+    "type": "string"
+  },
+  "preset_community_font_none": {
+    "formatted": true,
+    "forms": {
+      "other": "No custom font."
+    },
+    "type": "string"
+  },
+  "preset_community_has_font": {
+    "formatted": true,
+    "forms": {
+      "other": "font link"
+    },
+    "type": "string"
+  },
+  "preset_community_has_wallpaper": {
+    "formatted": true,
+    "forms": {
+      "other": "wallpaper"
+    },
+    "type": "string"
+  },
+  "preset_community_intro": {
+    "formatted": true,
+    "forms": {
+      "other": "Made by Re:TUI users and reviewed before listing. Downloading checks the file, then saves it beside your presets."
+    },
+    "type": "string"
+  },
+  "preset_community_made_on": {
+    "formatted": true,
+    "forms": {
+      "other": "made on build %1$s"
+    },
+    "type": "string"
+  },
+  "preset_community_open_font": {
+    "formatted": true,
+    "forms": {
+      "other": "Open font link"
+    },
+    "type": "string"
+  },
+  "preset_community_part_behaviour": {
+    "formatted": true,
+    "forms": {
+      "other": "Behaviour"
+    },
+    "type": "string"
+  },
+  "preset_community_part_colours": {
+    "formatted": true,
+    "forms": {
+      "other": "Colours"
+    },
+    "type": "string"
+  },
+  "preset_community_part_layout": {
+    "formatted": true,
+    "forms": {
+      "other": "Layout"
+    },
+    "type": "string"
+  },
+  "preset_community_part_suggestions": {
+    "formatted": true,
+    "forms": {
+      "other": "Suggestions"
+    },
+    "type": "string"
+  },
+  "preset_community_share_mine": {
+    "formatted": true,
+    "forms": {
+      "other": "+ SHARE MINE"
+    },
+    "type": "string"
+  },
+  "preset_community_sort_new": {
+    "formatted": true,
+    "forms": {
+      "other": "NEW"
+    },
+    "type": "string"
+  },
+  "preset_community_sort_popular": {
+    "formatted": true,
+    "forms": {
+      "other": "POPULAR"
+    },
+    "type": "string"
+  },
+  "preset_community_view": {
+    "formatted": true,
+    "forms": {
+      "other": "View & download"
+    },
+    "type": "string"
+  },
+  "preset_community_wallpaper_option": {
+    "formatted": true,
+    "forms": {
+      "other": "Also download its wallpaper (%1$s) and set it when you apply this preset"
+    },
+    "type": "string"
+  },
+  "preset_community_what_changes": {
+    "formatted": true,
+    "forms": {
+      "other": "WHAT IT CHANGES"
+    },
+    "type": "string"
+  },
   "preset_market_cancelled": {
     "formatted": true,
     "forms": {
@@ -13729,10 +15553,66 @@
     },
     "type": "string"
   },
+  "preset_market_tab_community": {
+    "formatted": true,
+    "forms": {
+      "other": "COMMUNITY"
+    },
+    "type": "string"
+  },
+  "preset_market_tab_terminal": {
+    "formatted": true,
+    "forms": {
+      "other": "TERMINAL"
+    },
+    "type": "string"
+  },
   "preset_market_title": {
     "formatted": true,
     "forms": {
       "other": "Preset marketplace"
+    },
+    "type": "string"
+  },
+  "preset_wallpaper_ask_message": {
+    "formatted": true,
+    "forms": {
+      "other": "Re:TUI can't read the current wallpaper. Choose the image to keep with %1$s?"
+    },
+    "type": "string"
+  },
+  "preset_wallpaper_ask_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Preset wallpaper"
+    },
+    "type": "string"
+  },
+  "preset_wallpaper_choose": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose image"
+    },
+    "type": "string"
+  },
+  "preset_wallpaper_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "That image could not be used"
+    },
+    "type": "string"
+  },
+  "preset_wallpaper_saved": {
+    "formatted": true,
+    "forms": {
+      "other": "Wallpaper saved with preset %1$s"
+    },
+    "type": "string"
+  },
+  "preset_wallpaper_skip": {
+    "formatted": true,
+    "forms": {
+      "other": "Without wallpaper"
     },
     "type": "string"
   },
@@ -14537,6 +16417,13 @@
     },
     "type": "string"
   },
+  "setting_behavior_dot_apps_description": {
+    "formatted": true,
+    "forms": {
+      "other": "In Dot mode, the apps on the rings around the dot, innermost first, separated by commas (up to 5). Leave empty to use your most-used apps."
+    },
+    "type": "string"
+  },
   "setting_behavior_double_tap_cmd_description": {
     "formatted": false,
     "forms": {
@@ -14562,6 +16449,34 @@
     "formatted": true,
     "forms": {
       "other": "Swap Duo top panes: keep statuses with input/output and move the module dock and open module to the secondary screen. Only applies in Duo mode."
+    },
+    "type": "string"
+  },
+  "setting_behavior_edge_pill_length_description": {
+    "formatted": false,
+    "forms": {
+      "other": "How long the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default (50 to 300)"
+    },
+    "type": "string"
+  },
+  "setting_behavior_edge_pill_width_description": {
+    "formatted": false,
+    "forms": {
+      "other": "How thick the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default; raise it for larger text and easier taps (50 to 300)"
+    },
+    "type": "string"
+  },
+  "setting_behavior_edge_sidebar_description": {
+    "formatted": false,
+    "forms": {
+      "other": "Shows a tab on the screen edge over every app. Tap it or swipe in to open launcher search, a floating tmux terminal and your quick app. Drag it along the edge to move it. Needs permission to display over other apps"
+    },
+    "type": "string"
+  },
+  "setting_behavior_edge_sidebar_quick_app_description": {
+    "formatted": false,
+    "forms": {
+      "other": "The app the sidebar's third button opens. Tap Apps to pick one; empty starts a new note, filed in a folder named for today's date"
     },
     "type": "string"
   },
@@ -14631,7 +16546,7 @@
   "setting_behavior_launcher_mode_description": {
     "formatted": false,
     "forms": {
-      "other": "Launcher layout mode: classic, search, or terminal"
+      "other": "Launcher layout mode: classic, search, terminal, dot, or mono"
     },
     "type": "string"
   },
@@ -14688,6 +16603,20 @@
     "formatted": false,
     "forms": {
       "other": "A value which is used to tell how deep Re:T-UI can go in a nested optional value"
+    },
+    "type": "string"
+  },
+  "setting_behavior_mono_ink_color_description": {
+    "formatted": true,
+    "forms": {
+      "other": "In Mono mode, the colour everything is drawn in: text, lines and selections."
+    },
+    "type": "string"
+  },
+  "setting_behavior_mono_paper_color_description": {
+    "formatted": true,
+    "forms": {
+      "other": "In Mono mode, the background colour."
     },
     "type": "string"
   },
@@ -14981,7 +16910,7 @@
   "setting_behavior_swipe_up_apps_drawer_description": {
     "formatted": false,
     "forms": {
-      "other": "Show the apps drawer button and allow swipe-up on non-scrolling launcher surfaces. Terminal output remains scrollable"
+      "other": "Allow swipe-up on non-scrolling launcher surfaces to open the apps drawer. Terminal output remains scrollable"
     },
     "type": "string"
   },
@@ -17344,6 +19273,13 @@
     },
     "type": "string"
   },
+  "setting_toolbar_show_apps_drawer_button_description": {
+    "formatted": false,
+    "forms": {
+      "other": "If true, the apps drawer button is shown in the toolbar"
+    },
+    "type": "string"
+  },
   "setting_toolbar_show_toolbar_description": {
     "formatted": false,
     "forms": {
@@ -18307,6 +20243,230 @@
     "formatted": true,
     "forms": {
       "other": "System wallpaper is shown in the full preview."
+    },
+    "type": "string"
+  },
+  "share_back_to_community": {
+    "formatted": true,
+    "forms": {
+      "other": "Back to Community"
+    },
+    "type": "string"
+  },
+  "share_behaviour": {
+    "formatted": true,
+    "forms": {
+      "other": "Behaviour settings… (you pick which)"
+    },
+    "type": "string"
+  },
+  "share_capture": {
+    "formatted": true,
+    "forms": {
+      "other": "Capture home screen"
+    },
+    "type": "string"
+  },
+  "share_captured": {
+    "formatted": true,
+    "forms": {
+      "other": "✓ Home screen captured"
+    },
+    "type": "string"
+  },
+  "share_choose_image": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose an image instead"
+    },
+    "type": "string"
+  },
+  "share_choose_wallpaper": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose wallpaper image"
+    },
+    "type": "string"
+  },
+  "share_colours": {
+    "formatted": true,
+    "forms": {
+      "other": "Colours & suggestions (always)"
+    },
+    "type": "string"
+  },
+  "share_consent": {
+    "formatted": true,
+    "forms": {
+      "other": "I checked the behaviour settings I picked and removed personal paths, commands, tokens and other private data."
+    },
+    "type": "string"
+  },
+  "share_description": {
+    "formatted": true,
+    "forms": {
+      "other": "DESCRIPTION"
+    },
+    "type": "string"
+  },
+  "share_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Not sent: %1$s"
+    },
+    "type": "string"
+  },
+  "share_font": {
+    "formatted": true,
+    "forms": {
+      "other": "CUSTOM FONT LINK"
+    },
+    "type": "string"
+  },
+  "share_image_error": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not read that image."
+    },
+    "type": "string"
+  },
+  "share_intro": {
+    "formatted": true,
+    "forms": {
+      "other": "Shares your current look, not a backup. It is reviewed before anyone can download it."
+    },
+    "type": "string"
+  },
+  "share_layout": {
+    "formatted": true,
+    "forms": {
+      "other": "Layout"
+    },
+    "type": "string"
+  },
+  "share_log_exported": {
+    "formatted": true,
+    "forms": {
+      "other": "✓ exported %1$s"
+    },
+    "type": "string"
+  },
+  "share_log_screenshot": {
+    "formatted": true,
+    "forms": {
+      "other": "✓ attached screenshot (%1$s)"
+    },
+    "type": "string"
+  },
+  "share_log_uploaded": {
+    "formatted": true,
+    "forms": {
+      "other": "✓ uploaded"
+    },
+    "type": "string"
+  },
+  "share_log_wallpaper": {
+    "formatted": true,
+    "forms": {
+      "other": "✓ attached wallpaper (%1$s)"
+    },
+    "type": "string"
+  },
+  "share_missing": {
+    "formatted": true,
+    "forms": {
+      "other": "Add a name, a description and a screenshot, and tick the privacy box."
+    },
+    "type": "string"
+  },
+  "share_name": {
+    "formatted": true,
+    "forms": {
+      "other": "NAME"
+    },
+    "type": "string"
+  },
+  "share_optional": {
+    "formatted": true,
+    "forms": {
+      "other": "optional"
+    },
+    "type": "string"
+  },
+  "share_screenshot": {
+    "formatted": true,
+    "forms": {
+      "other": "SCREENSHOT"
+    },
+    "type": "string"
+  },
+  "share_send": {
+    "formatted": true,
+    "forms": {
+      "other": "Send for review"
+    },
+    "type": "string"
+  },
+  "share_sending": {
+    "formatted": true,
+    "forms": {
+      "other": "Uploading…"
+    },
+    "type": "string"
+  },
+  "share_sent": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s is waiting for review. It shows up under Community once approved. Nothing changed on your phone."
+    },
+    "type": "string"
+  },
+  "share_tags": {
+    "formatted": true,
+    "forms": {
+      "other": "TAGS"
+    },
+    "type": "string"
+  },
+  "share_tags_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "calm, water"
+    },
+    "type": "string"
+  },
+  "share_title": {
+    "formatted": true,
+    "forms": {
+      "other": "SHARE MY SETUP"
+    },
+    "type": "string"
+  },
+  "share_wallpaper": {
+    "formatted": true,
+    "forms": {
+      "other": "Wallpaper image"
+    },
+    "type": "string"
+  },
+  "share_wallpaper_unreadable": {
+    "formatted": true,
+    "forms": {
+      "other": "Your current wallpaper can't be read here. Choose an image to include one."
+    },
+    "type": "string"
+  },
+  "share_what": {
+    "formatted": true,
+    "forms": {
+      "other": "WHAT TO SHARE"
+    },
+    "type": "string"
+  },
+  "share_your_name": {
+    "formatted": true,
+    "forms": {
+      "other": "YOUR NAME"
     },
     "type": "string"
   },
@@ -20673,7 +22833,7 @@
   "surface_no_subscriptions_yet_use_add_or_type_podcast_add_feed_url_d4398": {
     "formatted": false,
     "forms": {
-      "other": "No subscriptions yet.\nUse ADD or type podcast add <feed-url>."
+      "other": "No subscriptions yet.\nUse + or type podcast add <feed-url>."
     },
     "type": "string"
   },
@@ -26072,6 +28232,13 @@
     "formatted": true,
     "forms": {
       "other": "doom fire"
+    },
+    "type": "string"
+  },
+  "wallpaper_fire_pick_color": {
+    "formatted": true,
+    "forms": {
+      "other": "Pick Fire Color"
     },
     "type": "string"
   },

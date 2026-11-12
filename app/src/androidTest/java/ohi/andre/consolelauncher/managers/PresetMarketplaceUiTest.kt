@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.commands.tuixt.PresetMarketplaceActivity
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.junit.Assert.*
 import org.junit.Test

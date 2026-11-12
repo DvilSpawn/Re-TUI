@@ -9,15 +9,18 @@ import android.widget.TextView
 object NotesPaneLinks {
     fun bind(view: TextView) {
         view.setOnClickListener { LauncherNotes.open(it.context) }
+        // Holding the pane opens the list to edit, pin or hide a line; the lift after it must not also tick one.
+        var held = false
+        view.setOnLongClickListener { held = true; LauncherNotes.open(it.context); true }
         var downX = 0f
         var downY = 0f
         var dragged = false
         val slop = android.view.ViewConfiguration.get(view.context).scaledTouchSlop
         view.setOnTouchListener { _, event ->
             when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y; dragged = false }
+                MotionEvent.ACTION_DOWN -> { downX = event.x; downY = event.y; dragged = false; held = false }
                 MotionEvent.ACTION_MOVE -> if (kotlin.math.abs(event.x - downX) > slop || kotlin.math.abs(event.y - downY) > slop) dragged = true
-                MotionEvent.ACTION_UP -> if (dragged) return@setOnTouchListener true
+                MotionEvent.ACTION_UP -> if (dragged || held) return@setOnTouchListener true
             }
             val layout = view.layout
             val text = view.text as? Spanned

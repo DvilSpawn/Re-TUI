@@ -1,5 +1,7 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
+import android.content.Intent
+import ohi.andre.consolelauncher.managers.mediaplayer.MediaPlayerActivity
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
@@ -9,10 +11,30 @@ import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.libsuperuser.Shell
 import java.util.Locale
+import ohi.andre.consolelauncher.managers.media.MediaLibrary
+import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
+import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.music.Song
+
+/**
+ * No songs found. When they were meant to come from songs_folder, say how to add the folder instead: builds without
+ * storage access (Play Store, Android 13+) cannot list it, and media -add works without that permission.
+ */
+private fun emptyLibrary(pack: ExecutePack): String {
+    val fromFolder = XMLPrefsManager.get(Behavior.songs_folder).isNotEmpty() &&
+        !XMLPrefsManager.getBoolean(Behavior.songs_from_mediastore) && MediaLibrary.folders(pack.context).isEmpty()
+    return pack.context.getString(if (fromFolder) R.string.music_songs_folder_hint else R.string.no_songs)
+}
 
 class music : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
+        `open` {
+            override fun exec(pack: ExecutePack): String? {
+                if ((pack as MainPack).player == null) return pack.context.getString(R.string.player_music_off)
+                pack.context.startActivity(Intent(pack.context, MediaPlayerActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                return null
+            }
+        },
         next {
             override fun exec(pack: ExecutePack): String? {
                 if ((pack as MainPack).player == null) {
@@ -22,6 +44,8 @@ class music : ParamCommand() {
 
                 pack.player!!.useLocalSongs()
                 val title = pack.player!!.playNext()
+                // An empty library answers with its own message, which is not a song title.
+                if (title == pack.context.getString(R.string.no_songs)) return emptyLibrary(pack)
                 if (title != null) return pack.context.getString(R.string.output_playing) + Tuils.SPACE + title
                 return null
             }
@@ -35,6 +59,8 @@ class music : ParamCommand() {
 
                 pack.player!!.useLocalSongs()
                 val title = pack.player!!.playPrev()
+                // An empty library answers with its own message, which is not a song title.
+                if (title == pack.context.getString(R.string.no_songs)) return emptyLibrary(pack)
                 if (title != null) return pack.context.getString(R.string.output_playing) + Tuils.SPACE + title
                 return null
             }
@@ -55,7 +81,7 @@ class music : ParamCommand() {
 
                 pack.player!!.useLocalSongs()
                 val title = pack.player!!.play()
-                if (title == null) return null
+                if (title == null) return if (pack.player!!.songs.isNullOrEmpty() && pack.player!!.currentSong() == null) emptyLibrary(pack) else null
                 return pack.context.getString(R.string.output_playing) + Tuils.SPACE + title
             }
         },
@@ -95,7 +121,7 @@ class music : ParamCommand() {
                 val builder = StringBuilder()
 
                 val m: MusicManager2 = pack.player!!
-                val song = m.get(m.songIndex)
+                val song = m.currentSong()
                 if (song == null) return pack.context.getString(R.string.output_songnotfound)
 
                 builder.append(pack.context.getString(R.string.command_music_name_b3f69)).append(song.getTitle()).append(Tuils.NEWLINE)

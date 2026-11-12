@@ -1,7 +1,7 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.RssManager
+import ohi.andre.consolelauncher.managers.net.RssManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 

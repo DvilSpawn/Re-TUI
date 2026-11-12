@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.apps.AppFinder
 
 class AppFinderTest {
     @Test fun namesRankAheadOfPackagesAndCategories() {

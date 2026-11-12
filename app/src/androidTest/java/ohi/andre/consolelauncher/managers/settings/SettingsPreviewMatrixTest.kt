@@ -27,8 +27,8 @@ import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.AsciiArtTextView
-import ohi.andre.consolelauncher.tuils.FrameManager
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.junit.Assert.*
 import org.junit.Test

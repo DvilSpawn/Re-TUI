@@ -24,8 +24,8 @@ import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResult
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultError
 import com.joaomgcd.taskerpluginlibrary.runner.TaskerPluginResultSucess
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.PresetManager
-import ohi.andre.consolelauncher.managers.SpaceManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
+import ohi.andre.consolelauncher.managers.preset.SpaceManager
 import ohi.andre.consolelauncher.managers.tasker.TaskerIntegrationManager
 import ohi.andre.consolelauncher.tuils.Tuils
 

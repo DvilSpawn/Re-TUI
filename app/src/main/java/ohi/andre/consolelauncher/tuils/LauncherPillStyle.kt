@@ -11,6 +11,8 @@ import androidx.core.widget.TextViewCompat
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Theme
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 
 /** Shared visual contract for docked Launcher pills. */
 object LauncherPillStyle {

@@ -250,7 +250,8 @@ class ModuleLibraryDeviceTest {
                 val result = checked(engine.submitConfig("save", JSONObject().put("links", "Example | HTTPS://example.com\nBad | javascript:alert(1)\nEmpty | https://\nBroken | https://foo..bar\nPort | https://example.com:99999\nLabel | https://good.-bad.com")))
                 assertEquals(1, result.suggestions.size)
                 assertTrue(result.suggestions.single()!!.command!!.startsWith("intent -view "))
-                assertTrue(result.body!!.contains("Invalid link"))
+                assertTrue(result.layoutJson!!.contains("Invalid link"))
+                assertTrue(result.layoutJson!!.contains("intent -view "))
                 val cancelled = checked(engine.submitConfig("cancel", JSONObject().put("links", "")))
                 assertEquals(1, cancelled.suggestions.size)
             }

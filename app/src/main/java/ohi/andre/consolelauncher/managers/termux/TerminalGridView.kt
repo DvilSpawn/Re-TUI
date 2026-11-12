@@ -7,7 +7,16 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.graphics.Rect
+import android.view.ActionMode
+import android.view.HapticFeedbackConstants
+import android.view.Menu
+import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import kotlin.math.ceil
 import kotlin.math.max
@@ -42,6 +51,12 @@ class TerminalGridView @JvmOverloads constructor(
     private var streamEmulator: com.termux.terminal.TerminalEmulator? = null
     private val normalGlyphWidths = HashMap<String, Float>()
     private val boldGlyphWidths = HashMap<String, Float>()
+
+    /**
+     * Where pasted text goes; set by the pane that owns the terminal. Without it the selection menu only copies.
+     */
+    var onPasteText: ((String) -> Unit)? = null
+    private val selection = TextSelection()
 
     init {
         setWillNotDraw(false)
@@ -93,6 +108,7 @@ class TerminalGridView @JvmOverloads constructor(
         if (sizeChanged) {
             cols = c; rows = r
             cells = Array(cols * rows) { Cell() }
+            selection.clamp()
         } else clearCells()
         cursorX = if (emulator.isCursorEnabled) emulator.cursorCol else null
         cursorY = if (emulator.isCursorEnabled) emulator.cursorRow else null
@@ -198,6 +214,196 @@ class TerminalGridView @JvmOverloads constructor(
                     canvas.drawText(" ", left, top + baseline, textPaint)
                 }
             }
+        }
+        selection.draw(canvas)
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean =
+        selection.touch(event) || super.dispatchTouchEvent(event)
+
+    /**
+     * Long-press text selection, as in Termux: a long press selects the word under the finger and dragging
+     * extends it; handles move either end; the floating toolbar copies, pastes or selects everything. While a
+     * selection is shown it takes all touches on the terminal, and a tap elsewhere on it clears the selection.
+     */
+    private inner class TextSelection {
+        private val slop = ViewConfiguration.get(context).scaledTouchSlop
+        private val handleRadius = 9f * resources.displayMetrics.density
+        private val grabRadius = 28f * resources.displayMetrics.density
+        private val highlight = Paint()
+        private val handlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private var active = false
+        /** A long press on empty space: no selection, just a menu to paste at the shell's cursor. */
+        private var pasteOnly = false
+        private var pressX = 0f; private var pressY = 0f
+        private var startCol = 0; private var startRow = 0
+        private var endCol = 0; private var endRow = 0
+        private var dragging = 0 // 0 none, 1 start handle, 2 end handle
+        private var downX = 0f; private var downY = 0f
+        private var pending = false
+        private var actionMode: ActionMode? = null
+        private val longPress = Runnable { pending = false; begin(downX, downY) }
+
+        fun touch(event: MotionEvent): Boolean {
+            if (!active) {
+                when (event.actionMasked) {
+                    MotionEvent.ACTION_DOWN -> {
+                        downX = event.x; downY = event.y; pending = true
+                        postDelayed(longPress, ViewConfiguration.getLongPressTimeout().toLong())
+                    }
+                    MotionEvent.ACTION_MOVE -> if (pending && (kotlin.math.abs(event.x - downX) > slop || kotlin.math.abs(event.y - downY) > slop)) cancelPending()
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> cancelPending()
+                }
+                return false
+            }
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (pasteOnly) { clear(); return true }
+                    dragging = when {
+                        near(event, startCol, startRow, true) -> 1
+                        near(event, endCol, endRow, false) -> 2
+                        else -> 0
+                    }
+                    if (dragging == 0) { clear(); return true }
+                    actionMode?.hide(0)
+                }
+                MotionEvent.ACTION_MOVE -> if (dragging != 0) moveHandle(event.x, event.y)
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    dragging = 0
+                    showMenu()
+                }
+            }
+            return true
+        }
+
+        private fun cancelPending() { pending = false; removeCallbacks(longPress) }
+
+        private fun cellAt(x: Float, y: Float): Pair<Int, Int> =
+            (x / characterWidth()).toInt().coerceIn(0, cols - 1) to (y / lineHeight()).coerceIn(0f, (rows - 1).toFloat()).toInt().coerceIn(0, rows - 1)
+
+        private fun blank(col: Int, row: Int) = cells[indexOf(col, row)].text.isBlank()
+
+        private fun begin(x: Float, y: Float) {
+            val (col, row) = cellAt(x, y)
+            pressX = x; pressY = y
+            // Pasting always types at the shell's cursor, so empty space only needs the menu.
+            pasteOnly = blank(col, row) && onPasteText != null
+            var first = col; var last = col
+            if (!blank(col, row)) {
+                while (first > 0 && !blank(first - 1, row)) first--
+                while (last < cols - 1 && !blank(last + 1, row)) last++
+            }
+            startCol = first; startRow = row; endCol = last; endRow = row
+            active = true; dragging = if (pasteOnly) 0 else 2
+            performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            parent?.requestDisallowInterceptTouchEvent(true)
+            // The pane's own gesture (tap to focus, swipe to switch) ends here.
+            val now = android.os.SystemClock.uptimeMillis()
+            MotionEvent.obtain(now, now, MotionEvent.ACTION_CANCEL, x, y, 0).also { super@TerminalGridView.dispatchTouchEvent(it); it.recycle() }
+            invalidate()
+        }
+
+        private fun moveHandle(x: Float, y: Float) {
+            // Handles sit below the text, so aim a line above the finger.
+            val (col, row) = cellAt(x, y - lineHeight())
+            if (dragging == 1) { startCol = col; startRow = row } else { endCol = col; endRow = row }
+            if (startRow > endRow || (startRow == endRow && startCol > endCol)) {
+                val c = startCol; val r = startRow
+                startCol = endCol; startRow = endRow; endCol = c; endRow = r
+                dragging = if (dragging == 1) 2 else 1
+            }
+            invalidate()
+        }
+
+        private fun handlePoint(col: Int, row: Int, start: Boolean): Pair<Float, Float> {
+            val x = (if (start) col else col + 1) * characterWidth()
+            return x to ((row + 1) * lineHeight() + handleRadius)
+        }
+
+        private fun near(event: MotionEvent, col: Int, row: Int, start: Boolean): Boolean {
+            val (x, y) = handlePoint(col, row, start)
+            return kotlin.math.hypot((event.x - x).toDouble(), (event.y - y).toDouble()) <= grabRadius
+        }
+
+        fun draw(canvas: Canvas) {
+            if (!active || pasteOnly) return
+            highlight.color = terminalAccent; highlight.alpha = 90
+            val w = characterWidth(); val h = lineHeight().toFloat()
+            for (row in startRow..endRow) {
+                val from = if (row == startRow) startCol else 0
+                val to = if (row == endRow) endCol else cols - 1
+                canvas.drawRect(from * w, row * h, (to + 1) * w, (row + 1) * h, highlight)
+            }
+            handlePaint.color = terminalAccent
+            for (start in listOf(true, false)) {
+                val (x, y) = if (start) handlePoint(startCol, startRow, true) else handlePoint(endCol, endRow, false)
+                canvas.drawCircle(x, y, handleRadius, handlePaint)
+                canvas.drawRect(x - 1.5f, y - handleRadius - 2f, x + 1.5f, y, handlePaint)
+            }
+        }
+
+        fun text(): String {
+            streamEmulator?.let { return it.getSelectedText(startCol, startRow, endCol, endRow) }
+            return (startRow..endRow).joinToString("\n") { row ->
+                val from = if (row == startRow) startCol else 0
+                val to = if (row == endRow) endCol else cols - 1
+                (from..to).joinToString("") { cells[indexOf(it, row)].text }.trimEnd()
+            }
+        }
+
+        private fun showMenu() {
+            actionMode?.let { it.invalidateContentRect(); it.hide(0); return }
+            actionMode = startActionMode(object : ActionMode.Callback2() {
+                override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+                    if (!pasteOnly) menu.add(0, 1, 0, android.R.string.copy)
+                    if (onPasteText != null) menu.add(0, 2, 1, android.R.string.paste)
+                    menu.add(0, 3, 2, android.R.string.selectAll)
+                    return true
+                }
+                override fun onPrepareActionMode(mode: ActionMode, menu: Menu) = false
+                override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
+                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    when (item.itemId) {
+                        1 -> { clipboard.setPrimaryClip(ClipData.newPlainText("terminal", text())); clear() }
+                        2 -> {
+                            val pasted = clipboard.primaryClip?.takeIf { it.itemCount > 0 }?.getItemAt(0)?.coerceToText(context)?.toString()
+                            clear()
+                            if (!pasted.isNullOrEmpty()) onPasteText?.invoke(pasted)
+                        }
+                        3 -> {
+                            startCol = 0; startRow = 0; endCol = cols - 1; endRow = rows - 1
+                            // Select all turns the paste menu into a full selection that can be copied.
+                            if (pasteOnly) { pasteOnly = false; mode.menu.add(0, 1, 0, android.R.string.copy) }
+                            invalidate(); mode.invalidateContentRect()
+                        }
+                    }
+                    return true
+                }
+                override fun onDestroyActionMode(mode: ActionMode) {
+                    if (actionMode === mode) { actionMode = null; if (active) clear() }
+                }
+                override fun onGetContentRect(mode: ActionMode, view: View, outRect: Rect) {
+                    val w = characterWidth(); val h = lineHeight()
+                    if (pasteOnly) { outRect.set(pressX.toInt(), pressY.toInt() - h, pressX.toInt() + 1, pressY.toInt()); return }
+                    outRect.set(0, startRow * h, (cols * w).toInt(), (endRow + 1) * h)
+                    if (startRow == endRow) outRect.set((startCol * w).toInt(), startRow * h, ((endCol + 1) * w).toInt(), (endRow + 1) * h)
+                }
+            }, ActionMode.TYPE_FLOATING)
+        }
+
+        fun clear() {
+            if (!active) return
+            active = false; pasteOnly = false; dragging = 0
+            actionMode?.let { actionMode = null; it.finish() }
+            parent?.requestDisallowInterceptTouchEvent(false)
+            invalidate()
+        }
+
+        /** Keeps the selection inside the grid when the terminal changes size. */
+        fun clamp() {
+            if (!active) return
+            startCol = startCol.coerceIn(0, cols - 1); endCol = endCol.coerceIn(0, cols - 1)
+            startRow = startRow.coerceIn(0, rows - 1); endRow = endRow.coerceIn(0, rows - 1)
         }
     }
 

@@ -27,6 +27,8 @@ import ohi.andre.consolelauncher.managers.suggestions.SuggestionsManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 
 /**
  * Every saved network's connection, one per app process. The pane shows one network at a time; the others keep

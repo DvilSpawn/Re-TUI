@@ -8378,8 +8378,15 @@
     }
   ],
   "activityExceptions": {
+    ".notes.JournalActivity": "Quick notes and the journal; draws with the same Help pane frame and output colors captured on RememberActivity. Register its own capture with the notes split styling pass.",
+    ".sidebar.FloatingTerminalActivity": "One workspace tmux window in a pane over the current app; draws with the workspace output and panel colors captured on TermuxWorkspaceActivity. Register its own capture with the sidebar styling pass.",
+    ".sidebar.GlobalSearchActivity": "Search opened from the edge sidebar; reuses the Search mode input and result renderer captured on LauncherActivity. Register its own capture with the sidebar styling pass.",
     ".tuils.stuff.FakeLauncherActivity": "Transparent launcher routing activity; no readable UI.",
-    ".commands.tuixt.PinShortcutConfirmActivity": "System-supplied pin request; test error/cancel UI separately, no synthetic shortcut pinning."
+    ".commands.tuixt.PinShortcutConfirmActivity": "System-supplied pin request; test error/cancel UI separately, no synthetic shortcut pinning.",
+    ".managers.mediaplayer.MediaPlayerActivity": "Media player music, video and podcast libraries, now playing and queue; draws with the same workspace panel, frame and control colors as the Help pane.",
+    ".managers.media.VideoPlayerActivity": "Video library and player; colors come straight from ThemeColorResolver over a fixed black video background.",
+    ".managers.media.MediaFolderPickerActivity": "Invisible host for the system folder picker; draws no launcher surface.",
+    ".managers.preset.PresetWallpaperPickerActivity": "Invisible host for the system photo picker; draws no launcher surface."
   },
   "limits": [
     "External Android widgets and OS-owned pickers/authentication are not launcher-controlled.",
@@ -8396,7 +8403,6 @@
       "openKeyboard",
       "openLuaApp",
       "openNotificationShade",
-      "openPodcastSurface",
       "openProfileSurface",
       "openSearchModules",
       "openSettingsSurface",
@@ -8407,22 +8413,21 @@
       "showAndroidWidgetDrawer",
       "showAppsDrawer",
       "showHomeModule",
-      "showLuaModuleIfSource",
-      "showLuaWidgetModule",
-      "showMusicModule",
-      "showNotificationSettingsPopup",
-      "showNotificationsModule",
       "showPlainTermuxOutput",
-      "showPodcastAddDialog",
-      "showPodcastEpisodeSearchDialog",
-      "showPodcastPill",
-      "showPodcastShowMenu",
-      "showPodcastSpeedMenu",
-      "showPodcastTagsDialog",
       "showRichTermuxOutput",
-      "showTerminalSearch",
       "showTermuxAppGridOutput",
       "showTextModule"
+    ],
+    "managers/ui/FileConsoleController.kt": [
+      "openFileConsole"
+    ],
+    "managers/modules/home/LuaModules.kt": [
+      "showLuaModuleIfSource",
+      "showLuaWidgetModule"
+    ],
+    "managers/modules/home/NotificationsModule.kt": [
+      "openNotificationShade",
+      "showNotificationSettingsPopup"
     ],
     "irc/IrcActivity.kt": [
       "openDeleteMessages",
@@ -8449,6 +8454,7 @@
       "openSearchResult",
       "openSection",
       "openSettingsChild",
+      "openBehaviorPage",
       "openSoundsSettings",
       "openUiPackageZipPicker",
       "showBackupPasswordDialog",

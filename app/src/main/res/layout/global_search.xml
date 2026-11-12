@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Search opened from the edge sidebar: the Search mode results, clock tab and input from launcher_home_scene. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/global_search_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:id="@+id/search_mode_results_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:overScrollMode="ifContentScrolls"
+        android:scrollbars="vertical">
+
+        <LinearLayout
+            android:id="@+id/search_mode_results_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:orientation="vertical" />
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/search_mode_tabs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="bottom"
+        android:orientation="horizontal">
+
+        <TextClock
+            android:id="@+id/search_mode_clock_tab"
+            style="@style/Retui.Text.Control"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:format12Hour="EEE, MMM d  •  h:mm a"
+            android:format24Hour="EEE, MMM d  •  HH:mm"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:paddingStart="10dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="3dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/input_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="@integer/input_group_weightsum">
+
+        <ohi.andre.consolelauncher.tuils.OutlineTextView
+            android:id="@+id/prefix_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ohi.andre.consolelauncher.tuils.OutlineEditText
+            android:id="@+id/input_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="@integer/input_view_weight"
+            android:background="@null"
+            android:imeOptions="actionGo|flagNoFullscreen"
+            android:importantForAutofill="no"
+            android:lines="1"
+            android:singleLine="true"
+            android:textCursorDrawable="@drawable/cursor" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="@integer/enter_view_weight"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/submit_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:contentDescription="@string/cd_submit_command"
+                android:src="@drawable/ic_enter" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

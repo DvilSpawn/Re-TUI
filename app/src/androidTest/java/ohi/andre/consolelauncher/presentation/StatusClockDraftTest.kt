@@ -6,7 +6,7 @@ import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
 import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave

@@ -41,7 +41,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
+import ohi.andre.consolelauncher.tuils.frame.CrtOverlayDrawable
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.wallpaper.astro.AstroChartView
 import ohi.andre.consolelauncher.wallpaper.pixel.DoomFireView
@@ -73,6 +73,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private val tuningControls = mutableListOf<View>()
     private val topoColorControls = mutableListOf<Button>()
     private val pixelColorControls = mutableListOf<Button>()
+    private val fireColorControls = mutableListOf<Button>()
+    private lateinit var fireColorRow: View
     private lateinit var topoColorRow: View
     private lateinit var pixelColorRow: View
     private lateinit var settingsPanel: View
@@ -143,6 +145,15 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             }
         }
         panel.addView(pixelColorRow)
+
+        fireColorRow = row().apply {
+            addView(label(getString(R.string.wallpaper_pixel_colors)))
+            listOf("BG", "EMBER", "FLAME", "TIP").forEachIndexed { index, name ->
+                fireColorControls += compactControl(name) { showFireColorPicker(index) }
+                addView(fireColorControls.last())
+            }
+        }
+        panel.addView(fireColorRow)
 
         val tuning = row()
         heightLabel = label(when (scene) {
@@ -439,7 +450,10 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             is MatrixRainView -> RetuiWallpaperSettings.saveMatrix(target, current.styleName, current.charSet.name)
             is PhotoDitherView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.look.id, current.ripples, current.offset)
             is RipplesView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.style)
-            is DoomFireView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.styleName)
+            is DoomFireView -> {
+                RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.styleName)
+                RetuiWallpaperSettings.saveDoomFireColors(target, current.customColors())
+            }
             is ShorelineView -> RetuiWallpaperSettings.saveShoreline(target, current.look.id, current.offsetX, current.offsetY, current.mode, current.customText)
         }
         if (scene == NagomiView.SCENE) sendBroadcast(Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(packageName))
@@ -547,7 +561,10 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             }
         }
         // Pixel wallpapers: the palette the picture is dithered to (fire also keeps its classic colours).
-        is DoomFireView -> spinner(DoomFireView.LOOKS, DoomFireView.LOOKS.indexOf(current.styleName).coerceAtLeast(0)) { current.styleName = it }
+        is DoomFireView -> spinner(DoomFireView.LOOKS, DoomFireView.LOOKS.indexOf(current.styleName).coerceAtLeast(0)) {
+            current.styleName = it
+            updateSceneControls()
+        }
         is PhotoDitherView -> PixelLook.entries.map { it.id }.let { names -> spinner(names, names.indexOf(current.look.id)) { current.look = PixelLook.of(it) } }
         is ShorelineView -> PixelLook.entries.map { it.id }.let { names -> spinner(names, names.indexOf(current.look.id)) { current.look = PixelLook.of(it) } }
         is RipplesView -> spinner(RipplesView.STYLES, RipplesView.STYLES.indexOf(current.style).coerceAtLeast(0)) { current.style = it }
@@ -612,12 +629,13 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         }
         topoColorRow.visibility = if (scene == TopoNoiseView.SCENE && available) View.VISIBLE else View.GONE
         pixelColorRow.visibility = if (scene == PixelDreamView.SCENE && available) View.VISIBLE else View.GONE
+        fireColorRow.visibility = if (scene == DoomFireView.SCENE && available) View.VISIBLE else View.GONE
         val zoomVisibility = if (scene == TopoNoiseView.SCENE) View.GONE else View.VISIBLE
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
         zoomPlus.visibility = zoomVisibility
         panelParams.height = if (!available) dp(116) else if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT
-            else if (scene == PhotoDitherView.SCENE || scene == ShorelineView.SCENE) dp(166) else dp(if (clouds || pixelScene) 116 else if (astro || matrix) 166 else if (scene == TopoNoiseView.SCENE) 318 else 268)
+            else if (scene == PhotoDitherView.SCENE || scene == ShorelineView.SCENE || scene == DoomFireView.SCENE) dp(166) else dp(if (clouds || pixelScene) 116 else if (astro || matrix) 166 else if (scene == TopoNoiseView.SCENE) 318 else 268)
         settingsPanel.layoutParams = panelParams
         topoColorControls.forEachIndexed { index, button ->
             val topo = preview as? TopoNoiseView ?: return@forEachIndexed
@@ -628,6 +646,11 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             val pixel = preview as? PixelDreamView ?: return@forEachIndexed
             button.setBackgroundColor(pixel.color(index))
             button.setTextColor(if (ColorUtils.calculateLuminance(pixel.color(index)) > 0.5) Color.BLACK else Color.WHITE)
+        }
+        fireColorControls.forEachIndexed { index, button ->
+            val fire = preview as? DoomFireView ?: return@forEachIndexed
+            button.setBackgroundColor(fire.color(index))
+            button.setTextColor(if (ColorUtils.calculateLuminance(fire.color(index)) > 0.5) Color.BLACK else Color.WHITE)
         }
     }
 
@@ -686,6 +709,15 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         val pixel = preview as? PixelDreamView ?: return
         showColorPicker(pixel.color(index), getString(R.string.wallpaper_pixel_pick_color)) { color ->
             pixel.setCustomColor(index, color)
+            replacePaletteSpinner()
+            updateSceneControls()
+        }
+    }
+
+    private fun showFireColorPicker(index: Int) {
+        val fire = preview as? DoomFireView ?: return
+        showColorPicker(fire.color(index), getString(R.string.wallpaper_fire_pick_color)) { color ->
+            fire.setCustomColor(index, color)
             replacePaletteSpinner()
             updateSceneControls()
         }

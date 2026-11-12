@@ -21,7 +21,7 @@ import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class OfflineHelpActivity : LocalizedComponentActivity() {
@@ -93,7 +93,7 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
         root.findViewById<View>(R.id.offline_help_panel).background = TerminalBorderRuntime.panelDrawable(this,
             ThemeColorResolver.color(Theme.workspace_panel_background_color), ThemeColorResolver.color(Theme.workspace_panel_border_color),
             1.5f, ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputCornerRadius(),
-            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.frame.FrameTarget.OVERLAYS)
         TerminalBorderRuntime.bind(root.findViewById(R.id.offline_help_panel), root.findViewById(R.id.offline_help_header))
         input.showSoftInputOnFocus = false
         input.setOnKeyListener { _, key, event ->
@@ -183,7 +183,7 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
         root.findViewById<View>(R.id.offline_help_panel).background = TerminalBorderRuntime.panelDrawable(this,
             ThemeColorResolver.color(Theme.workspace_panel_background_color), ThemeColorResolver.color(Theme.workspace_panel_border_color),
             1.5f, ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputCornerRadius(),
-            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.frame.FrameTarget.OVERLAYS)
         val keys = root.findViewById<GridLayout>(R.id.offline_help_keys)
         keys.descendants.filterIsInstance<Button>().forEach { key ->
             key.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
@@ -196,14 +196,14 @@ class OfflineHelpActivity : LocalizedComponentActivity() {
             setTypeface(Tuils.getTypeface(this@OfflineHelpActivity), Typeface.BOLD)
             textSize = ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputHeaderTextSize().toFloat()
             background = TerminalBorderRuntime.tabDrawable(this@OfflineHelpActivity,
-                ThemeColorResolver.color(Theme.workspace_header_background_color), ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
+                ThemeColorResolver.color(Theme.workspace_header_background_color), ohi.andre.consolelauncher.tuils.frame.FrameTarget.OVERLAYS)
         }
         TerminalBorderRuntime.bind(root.findViewById(R.id.offline_help_panel), root.findViewById(R.id.offline_help_header))
         root.findViewById<View>(R.id.offline_help_main_pane).background = TerminalBorderRuntime.panelDrawable(this,
             ThemeColorResolver.color(Theme.workspace_output_background_color),
             ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_border_color), 210),
             1.2f, ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputCornerRadius(),
-            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS)
+            ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders(), target = ohi.andre.consolelauncher.tuils.frame.FrameTarget.OVERLAYS)
         windowPanel.refreshTheme()
         render(preserveScroll = true)
     }

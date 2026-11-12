@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="help_media">media: your media folders. media -add picks a folder · media -rm &lt;n&gt; drops folder n · media -scan looks through them again · media -v opens your videos. Once a folder is added, music plays from your folders.</string>
+    <string name="media_no_folders">No media folders yet. Add one with media -add.</string>
+    <string name="media_no_such_folder">There is no folder with that number. See media for the list.</string>
+    <string name="media_added">Added %1$s. Scanning…</string>
+    <string name="media_removed">Removed %1$s.</string>
+    <string name="media_scanning">Scanning your media folders…</string>
+    <string name="media_add_failed">That folder could not be added.</string>
+    <string name="media_no_videos">No videos found in your media folders.</string>
+    <string name="media_video_filter">filter videos</string>
+    <string name="media_video_results">video filter results</string>
+    <string name="media_video_resume">resume %1$s from %2$s</string>
+    <string name="media_video_done">done</string>
+    <string name="media_video_resume_at">resume %1$s</string>
+    <string name="media_video_start_over">start over</string>
+    <string name="media_video_resume_show">resume</string>
+    <string name="media_video_start_show">start</string>
+    <string name="media_video_playlist">playlist · %1$s</string>
+    <string name="media_video_seeking">seeking %1$s</string>
+    <string name="media_video_cannot_play">This file cannot be played.</string>
+    <string name="media_video_back">Back</string>
+    <string name="media_video_back10">-10</string>
+    <string name="media_video_back10_desc">Back 10 seconds, hold to seek backward</string>
+    <string name="media_video_forward10">+10</string>
+    <string name="media_video_forward10_desc">Forward 10 seconds, hold to seek forward</string>
+    <string name="media_video_pause">PAUSE</string>
+    <string name="media_video_play">PLAY</string>
+    <string name="media_video_cc">CC</string>
+    <string name="media_video_cc_desc">Subtitles</string>
+    <string name="media_video_audio">AUD</string>
+    <string name="media_video_audio_desc">Audio track</string>
+    <string name="media_video_speed_desc">Playback speed</string>
+    <string name="media_video_fit">FIT</string>
+    <string name="media_video_fill">FILL</string>
+    <string name="media_video_fit_desc">Fit or crop</string>
+    <string name="media_video_pip">PIP</string>
+    <string name="media_video_pip_desc">Picture in picture</string>
+    <string name="media_video_list">LIST</string>
+    <string name="media_video_list_desc">Playlist</string>
+    <string name="media_video_vol">vol</string>
+    <string name="media_video_volume_desc">Volume</string>
+    <string name="media_video_seek_desc">Seek</string>
+    <plurals name="media_tracks">
+        <item quantity="one">%1$d track</item>
+        <item quantity="other">%1$d tracks</item>
+    </plurals>
+    <plurals name="media_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
+</resources>

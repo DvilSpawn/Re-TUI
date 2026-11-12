@@ -2,13 +2,11 @@ package ohi.andre.consolelauncher.notes
 
 
 import android.os.Bundle
-import java.util.UUID
 
 object PreviewContract {
     const val ACTION = "com.dvil.retui.remember.RESOLVE_PREVIEWS"
     const val LAUNCHER_PACKAGE = "com.dvil.tui_renewed"
     const val PROTOCOL_VERSION = 1
-    const val MAX_IDS = 64
     const val MAX_PREVIEW_CHARS = 240
 
     const val EXTRA_PROTOCOL_VERSION = "protocol_version"
@@ -105,17 +103,6 @@ object PreviewContract {
             FRAME_BORDER_RIGHT, FRAME_BORDER_BOTTOM, FRAME_MODE_TOP, FRAME_MODE_RIGHT,
             FRAME_MODE_BOTTOM, FRAME_MODE_LEFT, FRAME_MODE_CENTER, FRAME_FILTERING
         )
-    }
-
-    fun validateIds(ids: List<String>?): List<String>? {
-        if (ids == null || ids.size > MAX_IDS) return null
-        val unique = LinkedHashSet<String>()
-        for (id in ids) {
-            val canonical = runCatching { UUID.fromString(id).toString() }.getOrNull() ?: return null
-            if (canonical != id) return null
-            unique += id
-        }
-        return unique.toList()
     }
 
     fun preview(note: Note?, id: String) = Bundle().apply {

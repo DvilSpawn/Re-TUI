@@ -101,9 +101,9 @@ class OfflineHelpIntegrationTest {
         val terminalOutput = TextView(activity)
         val terminalScroll = ScrollView(activity).apply { addView(terminalOutput) }
         val terminalInput = EditText(activity)
-        ohi.andre.consolelauncher.managers.TimeManager(activity)
+        ohi.andre.consolelauncher.managers.time.TimeManager(activity)
         val dispatched = mutableListOf<String?>()
-        val terminal = ohi.andre.consolelauncher.managers.TerminalManager(terminalOutput, terminalInput,
+        val terminal = ohi.andre.consolelauncher.managers.terminal.TerminalManager(terminalOutput, terminalInput,
             TextView(activity), null, null, null, null, null, activity, pack,
             ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter { command, _ -> dispatched.add(command) })
         val suggestions = LinearLayout(activity)
@@ -136,7 +136,7 @@ class OfflineHelpIntegrationTest {
             manager.clickSuggestion(generic)
             assertEquals(count, dispatched.size)
             assertEquals("help ", terminal.input)
-            terminal.restoreState(ohi.andre.consolelauncher.managers.TerminalManager.State("launcher draft", "launcher output", listOf("help apps"), 0, false))
+            terminal.restoreState(ohi.andre.consolelauncher.managers.terminal.TerminalManager.State("launcher draft", "launcher output", listOf("help apps"), 0, false))
             val saved = terminal.snapshotState()
             val prefsBefore = guide.all.toMap()
             activity.findViewById<EditText>(R.id.offline_help_input).setText("1")
@@ -163,8 +163,8 @@ class OfflineHelpIntegrationTest {
                 val input = EditText(host).apply { setSingleLine(true) }
                 val output = TextView(host)
                 ScrollView(host).addView(output)
-                ohi.andre.consolelauncher.managers.TimeManager(host)
-                val terminal = ohi.andre.consolelauncher.managers.TerminalManager(output, input,
+                ohi.andre.consolelauncher.managers.time.TimeManager(host)
+                val terminal = ohi.andre.consolelauncher.managers.terminal.TerminalManager(output, input,
                     TextView(host), null, null, null, null, null, host, pack,
                     ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter { command, _ ->
                         pack.clear(); CommandTuils.parse(command!!, pack)!!.exec(pack)

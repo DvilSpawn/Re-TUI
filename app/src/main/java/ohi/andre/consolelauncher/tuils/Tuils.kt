@@ -5,13 +5,9 @@ import android.app.PendingIntent.CanceledException
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.graphics.Matrix
 import android.graphics.drawable.Drawable
-import android.location.Address
 import android.net.Uri
-import android.os.BatteryManager
 import android.os.Build
 import android.os.Process
 import android.provider.Settings
@@ -19,11 +15,9 @@ import android.text.TextUtils
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
-import android.widget.ImageView
 import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.tuils.Tuils.find
-import org.w3c.dom.Node
 import org.xml.sax.SAXParseException
 import java.io.BufferedReader
 import java.io.File
@@ -35,7 +29,6 @@ import java.io.InputStreamReader
 import java.io.OutputStream
 import java.io.PrintStream
 import java.io.PrintWriter
-import java.io.Reader
 import java.io.StringWriter
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -46,11 +39,6 @@ import java.util.Locale
 import java.util.Scanner
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import javax.xml.transform.OutputKeys
-import javax.xml.transform.TransformerException
-import javax.xml.transform.TransformerFactory
-import javax.xml.transform.dom.DOMSource
-import javax.xml.transform.stream.StreamResult
 import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
@@ -69,12 +57,9 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.PorterDuff
 import android.graphics.Typeface
-import android.graphics.drawable.BitmapDrawable
-import android.location.Geocoder
 import android.os.Environment
 import android.os.Parcelable
 import android.os.StatFs
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.telephony.TelephonyManager
@@ -86,7 +71,6 @@ import android.text.style.ForegroundColorSpan
 import android.util.DisplayMetrics
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import java.io.RandomAccessFile
 import java.lang.reflect.Field
@@ -94,12 +78,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.channels.Channels
 import java.util.ArrayList
-import java.util.NoSuchElementException
 import javax.xml.transform.Transformer
 import dalvik.system.DexFile
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.managers.music.Song
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
@@ -108,7 +91,6 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.tuils.interfaces.OnBatteryUpdate
 import ohi.andre.consolelauncher.tuils.stuff.FakeLauncherActivity
 
 object Tuils {
@@ -168,6 +150,11 @@ object Tuils {
                 Log.e("TUI-FONT", "Unable to load font prefs, trying filesystem fallback", e)
             }
 
+            // Mono mode always draws in its own pixel font.
+            if (prefsLoaded && ohi.andre.consolelauncher.managers.settings.MonoMode.active()) {
+                runCatching { Typeface.createFromAsset(context.assets, ohi.andre.consolelauncher.managers.settings.MonoMode.FONT_ASSET) }
+                    .getOrNull()?.let { globalTypeface = it; return it }
+            }
             val loaded=LauncherTypeface.load(context,folder,prefsLoaded && systemFont,configuredFont)
             if(prefsLoaded && !systemFont && loaded.legacyFileName!=null) {
                 try { LauncherSettings.setUi(Ui.font_file,loaded.legacyFileName) } catch(_:Exception) { }
@@ -195,17 +182,6 @@ object Tuils {
     fun cancelFont() {
         globalTypeface = null
         fontPath = null
-    }
-
-    fun locationName(context: Context, lat: Double, lng: Double): String? {
-        val geocoder: Geocoder = Geocoder(context, Locale.getDefault())
-        var addresses: MutableList<Address?>? = null
-        try {
-            addresses = geocoder.getFromLocation(lat, lng, 1)
-            return addresses!!.get(0)!!.getAddressLine(2)
-        } catch (e: Exception) {
-            return null
-        }
     }
 
     fun notificationServiceIsRunning(context: Context): Boolean {
@@ -242,55 +218,7 @@ object Tuils {
         return false
     }
 
-    @Throws(IOException::class)
-    fun readerToString(initialReader: Reader): String {
-        val arr = CharArray(8 * 1024)
-        val buffer = StringBuilder()
-        var numCharsRead: Int
-        while ((initialReader.read(arr, 0, arr.size).also { numCharsRead = it }) != -1) {
-            buffer.append(arr, 0, numCharsRead)
-        }
-        initialReader.close()
-        return buffer.toString()
-    }
-
-    private var batteryUpdate: OnBatteryUpdate? = null
     private var batteryReceiver: BroadcastReceiver? = null
-
-    fun registerBatteryReceiver(context: Context, listener: OnBatteryUpdate?) {
-        try {
-            batteryReceiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context?, intent: Intent) {
-                    val update = batteryUpdate ?: return
-
-                    when (intent.getAction()) {
-                        Intent.ACTION_BATTERY_CHANGED -> {
-                            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
-                            update.update(level.toFloat())
-                        }
-
-                        Intent.ACTION_POWER_CONNECTED -> update.onCharging()
-                        Intent.ACTION_POWER_DISCONNECTED -> update.onNotCharging()
-                    }
-                }
-            }
-
-            val iFilter: IntentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-            iFilter.addAction(Intent.ACTION_POWER_CONNECTED)
-            iFilter.addAction(Intent.ACTION_POWER_DISCONNECTED)
-
-            ContextCompat.registerReceiver(
-                context,
-                batteryReceiver,
-                iFilter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
-
-            batteryUpdate = listener
-        } catch (e: Exception) {
-            toFile(e)
-        }
-    }
 
     fun unregisterBatteryReceiver(context: Context) {
         if (batteryReceiver != null) {
@@ -602,14 +530,6 @@ object Tuils {
         return success
     }
 
-    fun getOld(name: String): File? {
-        val old = File(folder, "old")
-        val file = File(old, name)
-
-        if (file.exists()) return file
-        return null
-    }
-
     fun deepView(v: View) {
         log(v.toString())
 
@@ -631,58 +551,6 @@ object Tuils {
         val g: ViewGroup = v as ViewGroup
 
         for (c in 0..<g.getChildCount()) deepClickView(g.getChildAt(c))
-    }
-
-    @Throws(NoSuchElementException::class)
-    fun scaleImage(view: ImageView, newX: Int, newY: Int) {
-        // Get bitmap from the the ImageView.
-        var bitmap: Bitmap? = null
-
-        try {
-            val drawing = view.getDrawable()
-            bitmap = (drawing as BitmapDrawable).getBitmap()
-        } catch (e: NullPointerException) {
-            throw NoSuchElementException("No drawable on given view")
-        }
-
-        // Get current dimensions AND the desired bounding box
-        var width = 0
-
-        try {
-            width = bitmap!!.getWidth()
-        } catch (e: NullPointerException) {
-            throw NoSuchElementException("Can't find bitmap on given view/drawable")
-        }
-
-        var height = bitmap.getHeight()
-        val xBounding = dpToPx(view.getContext(), newX)
-        val yBounding = dpToPx(view.getContext(), newY)
-
-        // Determine how much to scale: the dimension requiring less scaling is
-        // closer to the its side. This way the image always stays inside your
-        // bounding box AND either x/y axis touches it.
-        val xScale = (xBounding.toFloat()) / width
-        val yScale = (yBounding.toFloat()) / height
-        val scale = if (xScale <= yScale) xScale else yScale
-
-        // Create a matrix for the scaling and add the scaling data
-        val matrix = Matrix()
-        matrix.postScale(scale, scale)
-
-        // Create a new bitmap and convert it to a format understood by the ImageView
-        val scaledBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true)
-        width = scaledBitmap.getWidth() // re-use
-        height = scaledBitmap.getHeight() // re-use
-        val result: BitmapDrawable = BitmapDrawable(scaledBitmap)
-
-        // Apply the scaled bitmap
-        view.setImageDrawable(result)
-
-        // Now change ImageView's dimensions to match the scaled image
-        val params: LinearLayout.LayoutParams = view.getLayoutParams() as LinearLayout.LayoutParams
-        params.width = width
-        params.height = height
-        view.setLayoutParams(params)
     }
 
     fun dpToPx(context: Context, dp: Int): Int {
@@ -939,11 +807,6 @@ object Tuils {
         return format
     }
 
-    fun findPrefix(list: MutableList<String?>, prefix: String): Int {
-        for (count in list.indices) if (list.get(count)!!.startsWith(prefix)) return count
-        return -1
-    }
-
     fun mmToPx(metrics: DisplayMetrics?, mm: Int): Int {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_MM, mm.toFloat(), metrics).toInt()
     }
@@ -1003,24 +866,6 @@ object Tuils {
             if (count < strings.size - 1) output = output + separator
         }
         return output
-    }
-
-    fun nodeToString(node: Node?): String? {
-        try {
-            val transfac = TransformerFactory.newInstance()
-            val trans = transfac.newTransformer()
-            trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
-            trans.setOutputProperty(OutputKeys.INDENT, "yes")
-            val sw = StringWriter()
-            val result = StreamResult(sw)
-            val source = DOMSource(node)
-            trans.transform(source, result)
-
-            return sw.toString()
-        } catch (e: TransformerException) {
-            e.printStackTrace()
-            return null
-        }
     }
 
     fun log(o: Any?) {
@@ -1103,22 +948,6 @@ object Tuils {
         return ohi.andre.consolelauncher.tuils.TextUtils.toPlanString(strings, separator)
     }
 
-    fun filesToPlanString(files: MutableList<File?>?, separator: String?): String? {
-        if (files == null || files.size == 0) {
-            return null
-        }
-
-        val builder = StringBuilder()
-        val limit = files.size - 1
-        for (count in files.indices) {
-            builder.append(files.get(count)!!.getName())
-            if (count < limit) {
-                builder.append(separator)
-            }
-        }
-        return builder.toString()
-    }
-
     fun toPlanString(strings: List<String?>?): String {
         return toPlanString(strings, NEWLINE)
     }
@@ -1174,17 +1003,6 @@ object Tuils {
         return sw.getBuffer().toString()
     }
 
-    fun isAlpha(s: String?): Boolean {
-        if (s == null) {
-            return false
-        }
-        val chars = s.toCharArray()
-
-        for (c in chars) if (!Character.isLetter(c)) return false
-
-        return true
-    }
-
     fun isPhoneNumber(s: String?): Boolean {
         if (s == null) {
             return false
@@ -1217,22 +1035,6 @@ object Tuils {
         return 0.toChar()
     }
 
-    fun isNumber(s: String?): Boolean {
-        if (s == null || s.length == 0) {
-            return false
-        }
-
-        val chars = s.toCharArray()
-
-        for (c in chars) {
-            if (!Character.isDigit(c)) {
-                return false
-            }
-        }
-
-        return true
-    }
-
     fun openFile(c: Context, f: File): Intent {
         val intent: Intent = Intent(Intent.ACTION_VIEW)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -1246,22 +1048,6 @@ object Tuils {
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_PREFIX_URI_PERMISSION
 
         intent.addFlags(flags)
-
-        return intent
-    }
-
-    fun shareFile(c: Context, f: File): Intent {
-        val intent: Intent = Intent(Intent.ACTION_SEND)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-        val u = buildFile(c, f)
-
-        val mimetype = MimeTypes.getMimeType(f.getAbsolutePath(), f.isDirectory())
-
-        intent.setDataAndType(u, mimetype)
-
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        intent.putExtra(Intent.EXTRA_STREAM, u)
 
         return intent
     }

@@ -10,8 +10,8 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.tuixt.WidgetEditorActivity
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.RssManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
+import ohi.andre.consolelauncher.managers.net.RssManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager

@@ -1,8 +1,8 @@
 package ohi.andre.consolelauncher.managers.settings
 
 import android.content.Context
-import ohi.andre.consolelauncher.managers.BackupManager
-import ohi.andre.consolelauncher.managers.BackupRestoreTransaction
+import ohi.andre.consolelauncher.managers.backup.BackupManager
+import ohi.andre.consolelauncher.managers.backup.BackupRestoreTransaction
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File

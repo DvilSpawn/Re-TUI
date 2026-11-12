@@ -3,7 +3,7 @@ package ohi.andre.consolelauncher.tuils.libsuperuser
 import android.content.Context
 import java.io.File
 import java.util.regex.Pattern
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.tuils.Tuils

@@ -12,7 +12,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.UIManager
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
 import ohi.andre.consolelauncher.managers.settings.*
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager

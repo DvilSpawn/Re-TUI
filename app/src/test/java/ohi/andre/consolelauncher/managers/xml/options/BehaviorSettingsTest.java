@@ -1,7 +1,7 @@
 package ohi.andre.consolelauncher.managers.xml.options;
 
+import ohi.andre.consolelauncher.SourceFiles;
 import org.junit.Test;
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.regex.Matcher;
@@ -10,9 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 public class BehaviorSettingsTest {
     private String setting(String name) throws Exception {
-        File root = new File("src/main").isDirectory() ? new File(".") : new File("app");
-        String source = new String(Files.readAllBytes(new File(root,
-                "src/main/java/ohi/andre/consolelauncher/managers/xml/options/Behavior.kt").toPath()),
+        String source = new String(Files.readAllBytes(SourceFiles.kotlin("Behavior.kt").toPath()),
                 StandardCharsets.UTF_8);
         Matcher entry = Pattern.compile("(?m)^    " + name + " \\{([\\s\\S]*?)(?=^    \\},)").matcher(source);
         assertTrue("Missing Behavior setting: " + name, entry.find());

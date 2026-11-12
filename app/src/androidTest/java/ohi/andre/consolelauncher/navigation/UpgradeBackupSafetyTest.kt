@@ -2,7 +2,7 @@ package ohi.andre.consolelauncher.navigation
 
 import android.net.Uri
 import androidx.test.platform.app.InstrumentationRegistry
-import ohi.andre.consolelauncher.managers.BackupManager
+import ohi.andre.consolelauncher.managers.backup.BackupManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings

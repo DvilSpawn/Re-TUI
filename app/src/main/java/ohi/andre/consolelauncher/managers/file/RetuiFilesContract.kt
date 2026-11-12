@@ -7,7 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 
 object RetuiFilesContract {
     const val PACKAGE = "com.dvil.retui.fm"

@@ -37,6 +37,8 @@ import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import java.util.UUID
 import java.lang.ref.WeakReference
 import kotlin.math.abs
@@ -260,6 +262,8 @@ class TermuxWorkspaceActivity : LocalizedActivity() {
             grid.addOnLayoutChangeListener { _, l, t, r, b, ol, ot, or, ob ->
                 if (r - l != or - ol || b - t != ob - ot) scheduleGeometryCapture()
             }
+            // Paste from the selection menu goes to this tile's window.
+            grid.onPasteText = { text -> focusTile(tile); terminals[tile]?.paste(text) ?: directText(text) }
             panels[tile] = panel; labels[tile] = label; grids[tile] = grid
             tiles.addView(panel)
         }

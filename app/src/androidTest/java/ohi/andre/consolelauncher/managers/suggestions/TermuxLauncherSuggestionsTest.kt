@@ -13,10 +13,10 @@ import ohi.andre.consolelauncher.commands.CommandGroup
 import ohi.andre.consolelauncher.commands.CommandsPreferences
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.help.OfflineHelpActivity
-import ohi.andre.consolelauncher.managers.AliasManager
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.TerminalManager
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.terminal.AliasManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.Tuils

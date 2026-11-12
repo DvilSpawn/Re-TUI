@@ -1,5 +1,6 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
+import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
@@ -11,7 +12,7 @@ open class credits : CommandAbstraction {
 
     override fun priority(): Int = 2
 
-    override fun helpRes(): Int = 0
+    override fun helpRes(): Int = R.string.help_credits
 
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String = exec(pack)
 

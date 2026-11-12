@@ -1,3 +1,0 @@
-connected=true
-paired=true
-status=‹ | Page 1 / 1 · swipe here | › | ▶ Choose window |   Choose window | Preparing Termux connection… | REFRESH | ESC | / | - | HOME | ↑ | END | PGUP | TAB | CTRL | ALT | SHIFT | ← | ↓ | → | PGDN |  | No shell windows · add a new shell · TERMUX WORKSPACE |  |  |  | 

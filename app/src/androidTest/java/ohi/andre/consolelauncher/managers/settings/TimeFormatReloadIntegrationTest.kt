@@ -5,7 +5,7 @@ import android.text.SpannableStringBuilder
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.LauncherActivity
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import org.junit.Assert.*
 import org.junit.Assume.assumeTrue

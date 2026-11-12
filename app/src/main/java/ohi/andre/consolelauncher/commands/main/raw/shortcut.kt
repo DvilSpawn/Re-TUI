@@ -11,10 +11,10 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.APICommand
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
-import ohi.andre.consolelauncher.managers.PinnedShortcutManager
+import ohi.andre.consolelauncher.managers.apps.PinnedShortcutManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Locale
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 
 /**
  * Created by francescoandreuzzi on 24/03/2018.

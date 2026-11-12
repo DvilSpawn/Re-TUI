@@ -4,8 +4,8 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
-import ohi.andre.consolelauncher.tuils.FrameManager
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import com.dvil.retui.contract.RetuiVisualContract
 import org.junit.Assert.*
 import org.junit.Test

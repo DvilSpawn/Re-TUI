@@ -33,10 +33,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.commands.tuixt.TuixtActivity
 import ohi.andre.consolelauncher.calculator.CalculatorEngine
-import ohi.andre.consolelauncher.managers.RegexManager
-import ohi.andre.consolelauncher.managers.SpaceManager
-import ohi.andre.consolelauncher.managers.TerminalManager
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.terminal.RegexManager
+import ohi.andre.consolelauncher.managers.preset.SpaceManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.notifications.KeeperService
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
@@ -82,7 +82,7 @@ import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.LauncherSoundManager
 import ohi.andre.consolelauncher.managers.KeyboardShortcutManager
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
+import ohi.andre.consolelauncher.managers.apps.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
@@ -97,10 +97,16 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         private set
     private var main: MainManager? = null
 
+    /** Runs input the way the launcher's own terminal does; used by search opened over other apps. */
+    internal fun commandExecuter(): ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter? = main?.executer()
+
     private var privateIOReceiver: PrivateIOReceiver? = null
     private var publicIOReceiver: PublicIOReceiver? = null
 
     private var openKeyboardOnStart = false
+    private var inputFocusOrientation = Configuration.ORIENTATION_UNDEFINED
+    private var rotatedSinceWindowFocus = false
+    private var keyboardOpenBeforeRotation = false
     private val pendingReloadMessages = StringBuilder()
     private var canApplyTheme = false
     private var backButtonEnabled = false
@@ -162,12 +168,6 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
                 )
             }
         }
-
-        fun onBack() {
-            if (backButtonEnabled) {
-                onBackPressedDispatcher.onBackPressed()
-            }
-        }
     }
 
     private val out: Outputable = object : Outputable {
@@ -194,6 +194,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         instance = this
+        inputFocusOrientation = resources.configuration.orientation
 
         // Special check for MANAGE_EXTERNAL_STORAGE (API 30+)
         if (shouldRequestAllFilesAccess()) {
@@ -247,13 +248,16 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         LauncherSettings.freezeLegacyWallpaperAuto(this)
         SpaceManager.ensureInitialized(this)
 
-        val useSystemWP = XMLPrefsManager.getBoolean(Ui.system_wallpaper)
+        // Dot mode is pure black from the first frame: no wallpaper showing through while the launcher starts.
+        val dotMode = ohi.andre.consolelauncher.managers.settings.LauncherMode.isDot()
+        val useSystemWP = XMLPrefsManager.getBoolean(Ui.system_wallpaper) && !dotMode
         if (useSystemWP) {
             setTheme(R.style.Custom_SystemWP)
         } else {
             setTheme(R.style.Custom_Solid)
         }
 
+        if (dotMode) window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.BLACK))
         requestNoTitleIfFullscreen(this)
         enableEdgeToEdge()
 
@@ -466,7 +470,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         applyWallpaperWindowMode()
         // The renderer must support clearing pixels before its first surface is created.
         // UIManager paints the normal background inside the shared fade boundary.
-        window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(Color.TRANSPARENT))
+        window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(
+            if (ohi.andre.consolelauncher.managers.settings.LauncherMode.isDot()) Color.BLACK else Color.TRANSPARENT))
         window.setFormat(android.graphics.PixelFormat.TRANSLUCENT)
 
         val mainView = BreathOutLayout(this)
@@ -525,7 +530,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     private fun applyWallpaperWindowMode() {
-        if (LauncherSettings.getBoolean(Ui.system_wallpaper) || LauncherSettings.getBoolean(Behavior.breath_out)) {
+        val dotMode = ohi.andre.consolelauncher.managers.settings.LauncherMode.isDot()
+        if (!dotMode && (LauncherSettings.getBoolean(Ui.system_wallpaper) || LauncherSettings.getBoolean(Behavior.breath_out))) {
             window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
         } else {
             window.clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER)
@@ -672,6 +678,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onResume() {
         super.onResume()
+        ohi.andre.consolelauncher.sidebar.EdgeSidebar.sync(this)
         launcherResumed = true
         breathOutRoot?.setActive(hasWindowFocus())
         setWallpaperInteractionEnabled(true)
@@ -811,11 +818,18 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
             applyFullscreen(this)
         }
         if (hasFocus) requestStartupHomeAfterDraw()
+        // Rotating briefly takes the window's focus; getting it back is not the user arriving at the launcher.
+        val rotated = hasFocus && rotatedSinceWindowFocus
+        if (hasFocus) rotatedSinceWindowFocus = false
         if (hasFocus && this@LauncherActivity.uiManager != null && !StartupMenuManager.isFirstInstallPending(this)) {
             if (maybeShowChangelog()) return
-            uiManager!!.activateTerminalInput(openKeyboardOnStart)
+            // These homes keep the keyboard away until their own gesture reveals it.
+            if (!ohi.andre.consolelauncher.managers.settings.LauncherMode.managesOwnKeyboard()) uiManager!!.activateTerminalInput(if (rotated) keyboardOpenBeforeRotation else openKeyboardOnStart)
         }
     }
+
+    private fun keyboardOpen(): Boolean =
+        ViewCompat.getRootWindowInsets(window.decorView)?.isVisible(WindowInsetsCompat.Type.ime()) == true
 
     private fun setWallpaperInteractionEnabled(enabled: Boolean) {
         RetuiWallpaperService.setInteraction(this, enabled)
@@ -887,6 +901,11 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        if (launcherResumed && newConfig.orientation != inputFocusOrientation) {
+            rotatedSinceWindowFocus = true
+            keyboardOpenBeforeRotation = keyboardOpen()
+        }
+        inputFocusOrientation = newConfig.orientation
         if (this@LauncherActivity.uiManager != null) {
             uiManager!!.onConfigurationChanged(newConfig)
         }

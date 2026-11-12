@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
 import org.junit.Assert.*
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.file.FileOperationCancellation
 
 class FileOperationCancellationTest {
     @Test fun cancellationBeforeStartPreventsWork() {

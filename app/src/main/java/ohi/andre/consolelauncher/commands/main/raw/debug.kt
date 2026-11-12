@@ -5,7 +5,7 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.MusicSettings

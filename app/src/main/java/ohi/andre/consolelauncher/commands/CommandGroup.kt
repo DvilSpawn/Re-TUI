@@ -31,11 +31,11 @@ class CommandGroup(private val packageName: String) {
                     listOf(
                         "alias", "apps", "beep", "bluetooth", "breach", "brightness", "calc", "call", "cd",
                         "changelog", "clear", "cntcts", "config", "contacts", "credits", "ctrlc", "debug", "devutils",
-                        "donate", "duo", "exit", "files", "flash", "guide", "hack", "help", "htmlextract", "install",
-                        "inspect", "intent", "irc", "landscape", "location", "lockdown", "ls", "lua", "module", "music", "notes", "notifications", "open",
-                        "mode", "orientation", "podcast", "pomodoro", "portrait", "post", "preset", "private", "profile", "pwd", "rate", "refresh", "regex",
+                        "donate", "duo", "events", "exit", "files", "flash", "guide", "hack", "help", "htmlextract", "install",
+                        "inspect", "intent", "irc", "journal", "landscape", "location", "lockdown", "ls", "lua", "media", "module", "music", "notes", "notifications", "open",
+                        "mode", "orientation", "pixelgrid", "podcast", "pomodoro", "portrait", "post", "preset", "private", "profile", "pwd", "rate", "refresh", "regex",
                         "reminder", "reply", "restart", "retuitoken", "rss", "search", "settings", "share", "shell", "shortcut",
-                        "status", "stopwatch", "tasker", "tbridge", "termux", "termuxopen", "themer", "time", "timer", "tmux",
+                        "space", "status", "stopwatch", "tasker", "tbridge", "termux", "termuxopen", "themer", "time", "timer", "tmux",
                         "tui", "tuiweather", "tuixt", "tutorial", "uninstall", "username", "vibrate", "volume",
                         "wallet", "wallpaper", "webhook", "widget", "wifi"
                     )

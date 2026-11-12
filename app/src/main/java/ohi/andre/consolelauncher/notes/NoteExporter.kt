@@ -13,26 +13,6 @@ class NoteExporter(
 ) {
     private val exportRoot = File(context.cacheDir, "notes-exports")
 
-    fun noteFiles(note: Note): List<File> {
-        resetExports()
-        val bundle = File(exportRoot, safeName(note.title.ifBlank { "untitled" })).apply { mkdirs() }
-        val images = File(bundle, "images").apply { mkdirs() }
-        val refs = mutableMapOf<String, String>()
-        val copied = mutableListOf<File>()
-        MarkdownDocument.imagePaths(MarkdownDocument.ensure(note)).forEach { path ->
-            ownedImage(path)?.let { source ->
-                val name = uniqueImageName(path, source)
-                val target = File(images, name)
-                source.copyTo(target)
-                refs[path] = "images/$name"
-                copied.add(target)
-            }
-        }
-        val markdown = File(bundle, "${safeName(note.title.ifBlank { "untitled" })}.md")
-        markdown.writeText(markdown(note, revealRedactions) { refs[it] })
-        return listOf(markdown) + copied
-    }
-
     fun folderZip(name: String, notes: List<Note>): File {
         resetExports()
         val rootName = safeName(name.ifBlank { "folder" })

@@ -54,6 +54,11 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
     private var waitingPodcastIndex: Int = 0
     private var waitingPodcastListener: MusicService.PlaybackListener? = null
     private var podcastPlaybackSpeed = 1f
+    private var podcastSkipSilence = false
+    private var libraryReloaded = false
+
+    /** Hears about podcast episodes even when one was restored rather than started by the podcast manager. */
+    var podcastListener: MusicService.PlaybackListener? = null
 
     var headsetBroadcast: BroadcastReceiver?
     var headsetReceiverRegistered: Boolean = false
@@ -66,6 +71,7 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
 
     fun refresh() {
         if (!loadLocalLibrary) return
+        libraryReloaded = true
         destroy()
         updateSongs()
         registerHeadsetReceiver()
@@ -84,6 +90,19 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
         musicBound = false
         playbackPaused = true
         stopped = true
+    }
+
+    /** The launcher screen is closing. Whatever is playing keeps going; the next launcher binds to the same service. */
+    fun release() {
+        val service = musicSrv
+        if (service == null || !musicBound || !service.isPlaying) {
+            destroy()
+            return
+        }
+        mContext.unbindService(musicConnection)
+        musicSrv = null
+        musicBound = false
+        unregisterHeadsetReceiver()
     }
 
     private fun registerHeadsetReceiver() {
@@ -142,7 +161,8 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
         return musicSrv!!.playPrev()
     }
 
-    fun playPodcast(
+    /** Replaces the queue with [playlist] and starts it at [index]. */
+    fun playList(
         playlist: MutableList<Song>,
         index: Int,
         listener: MusicService.PlaybackListener?
@@ -168,6 +188,11 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
         return musicSrv!!.playSong()
     }
 
+    fun setSkipSilence(enabled: Boolean) {
+        podcastSkipSilence = enabled
+        if (musicBound) musicSrv?.setSkipSilence(enabled)
+    }
+
     fun setPodcastPlaybackSpeed(speed: Float) {
         podcastPlaybackSpeed = speed.coerceIn(0.5f, 2f)
         if (musicBound) musicSrv?.setPlaybackSpeed(podcastPlaybackSpeed)
@@ -175,10 +200,8 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
 
     fun useLocalSongs() {
         if (musicSrv != null && musicBound) {
-            musicSrv!!.setPlaybackSpeed(1f)
-            musicSrv!!.setPlaybackListener(null)
             musicSrv!!.setShuffle(XMLPrefsManager.getBoolean(Behavior.random_play))
-            musicSrv!!.setList(songs)
+            musicSrv!!.offerLibrary(songs)
         }
     }
 
@@ -201,10 +224,14 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
             musicSrv!!.playSong()
             playbackPaused = false
             stopped = false
-        } else if (playbackPaused) {
+        } else if (musicSrv!!.isPlaying) {
+            // Media keys and the notification can change this without going through here.
+            playbackPaused = false
+            pause()
+        } else {
             playbackPaused = false
             musicSrv!!.playPlayer()
-        } else pause()
+        }
 
         return null
     }
@@ -231,7 +258,14 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
                     if (songs == null) songs = ArrayList<Song>()
                     else songs!!.clear()
 
-                    if (XMLPrefsManager.getBoolean(Behavior.songs_from_mediastore)) {
+                    // Folders chosen with media -add replace the older sources: their files, by folder.
+                    val chosen = ohi.andre.consolelauncher.managers.media.MediaLibrary.folders(mContext)
+                    if (chosen.isNotEmpty()) {
+                        ohi.andre.consolelauncher.managers.media.MediaLibrary.items(mContext).filter { !it.video }.forEach { item ->
+                            songs!!.add(Song(item.name, item.artist.ifEmpty { item.folder.substringAfterLast('/') }, item.uri,
+                                MusicService.SOURCE_INTERNAL, null, null, 0).also { it.album = item.album.orEmpty(); it.folder = item.folder })
+                        }
+                    } else if (XMLPrefsManager.getBoolean(Behavior.songs_from_mediastore)) {
                         val musicResolver = mContext.getContentResolver()
                         val musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                         val musicCursor = musicResolver.query(musicUri, null, null, null, null)
@@ -241,11 +275,16 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
                             val idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID)
                             val artistColumn =
                                 musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)
+                            val albumColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)
+                            val folderColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH)
                             do {
                                 val thisId = musicCursor.getLong(idColumn)
                                 val thisTitle = musicCursor.getString(titleColumn)
                                 val thisArtist = musicCursor.getString(artistColumn)
-                                songs!!.add(Song(thisId, thisTitle, thisArtist))
+                                songs!!.add(Song(thisId, thisTitle, thisArtist).also { song ->
+                                    if (albumColumn != -1) song.album = musicCursor.getString(albumColumn).orEmpty()
+                                    if (folderColumn != -1) song.folder = musicCursor.getString(folderColumn).orEmpty()
+                                })
                             } while (musicCursor.moveToNext())
                         }
                         musicCursor!!.close()
@@ -293,7 +332,11 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
                 }
             }
 
-            musicSrv!!.setList(songs)
+            musicSrv!!.setPlaybackListener(podcastListener)
+            musicSrv!!.setPlaybackSpeed(podcastPlaybackSpeed)
+            musicSrv!!.setSkipSilence(podcastSkipSilence)
+            if (libraryReloaded) musicSrv!!.setList(songs) else musicSrv!!.fillIfEmpty(songs)
+            libraryReloaded = false
             musicBound = true
 
             when (waitingMethod) {
@@ -301,7 +344,7 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
                 WAITING_PREVIOUS -> playPrev()
                 WAITING_PLAY -> play()
                 WAITING_LISTEN -> select(savedParam)
-                WAITING_PODCAST -> playPodcast(
+                WAITING_PODCAST -> playList(
                     waitingPodcastSongs ?: ArrayList<Song>(),
                     waitingPodcastIndex,
                     waitingPodcastListener
@@ -415,7 +458,12 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
             return
         }
 
-        musicSrv!!.setSong(i)
+        // A saved queue holds its own copies of songs, so a song outside it starts over from the library.
+        val song = songs!!.get(i)
+        if (!musicSrv!!.selectSong(song)) {
+            musicSrv!!.setList(songs)
+            musicSrv!!.selectSong(song)
+        }
         musicSrv!!.playSong()
     }
 

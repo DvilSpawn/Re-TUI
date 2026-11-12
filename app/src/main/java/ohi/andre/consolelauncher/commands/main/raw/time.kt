@@ -3,7 +3,7 @@ package ohi.andre.consolelauncher.commands.main.raw
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 
 class time : CommandAbstraction {
     override fun exec(pack: ExecutePack): String = TimeManager.instance!!.replace("%t${pack.getInt()}").toString()

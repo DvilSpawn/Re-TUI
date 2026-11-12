@@ -75,7 +75,8 @@ object PodcastParser {
             description = firstText(item, "description", "summary", "subtitle"),
             duration = firstText(item, "duration").ifBlank { firstText(item, "itunes:duration").ifBlank { null } },
             publishedAt = parseDate(firstText(item, "pubDate", "published", "updated")),
-            feedOrder = feedOrder
+            feedOrder = feedOrder,
+            chaptersUrl = elements(item, "podcast:chapters").firstOrNull()?.getAttribute("url")?.trim()?.ifBlank { null }
         )
     }
 

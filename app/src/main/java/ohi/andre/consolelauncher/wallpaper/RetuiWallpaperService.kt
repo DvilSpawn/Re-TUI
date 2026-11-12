@@ -23,7 +23,7 @@ import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.music.MusicService
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
+import ohi.andre.consolelauncher.tuils.frame.CrtOverlayDrawable
 import ohi.andre.consolelauncher.wallpaper.astro.AstroChartView
 import ohi.andre.consolelauncher.wallpaper.pixel.DoomFireView
 import ohi.andre.consolelauncher.wallpaper.pixel.PhotoDitherView

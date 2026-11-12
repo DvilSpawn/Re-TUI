@@ -56,7 +56,7 @@ class SettingsFilesTest {
                 val source = File(root, "incoming").apply { writeText("new") }
                 val journal = File(root, "settings-transaction/journal")
                 try {
-                    ohi.andre.consolelauncher.managers.BackupRestoreTransaction.replace(mapOf(target to source),
+                    ohi.andre.consolelauncher.managers.backup.BackupRestoreTransaction.replace(mapOf(target to source),
                         journal, emptyMap(), { it == target }, {},
                         checkpoint = { if (it == phase) throw Killed() }, commit = {})
                     fail("Expected interruption at $phase")

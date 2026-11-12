@@ -2,8 +2,13 @@ package ohi.andre.consolelauncher.managers.podcast
 
 import ohi.andre.consolelauncher.R
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Handler
 import android.os.Looper
+import androidx.core.text.HtmlCompat
+import ohi.andre.consolelauncher.managers.mediaplayer.Chapter
+import ohi.andre.consolelauncher.managers.mediaplayer.Chapters
 import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.managers.music.MusicService
 import ohi.andre.consolelauncher.managers.music.Song
@@ -11,7 +16,9 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.net.URI
+import java.util.concurrent.ConcurrentHashMap
 import java.util.LinkedHashSet
 import kotlin.math.max
 import kotlin.math.min
@@ -26,6 +33,18 @@ class PodcastManager(
     private val prefs = appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val handler = Handler(Looper.getMainLooper())
     @Volatile private var shows: List<PodcastShow> = loadCachedShows()
+
+    init {
+        player?.podcastListener = this
+        player?.setPodcastPlaybackSpeed(playbackSpeed())
+        player?.setSkipSilence(skipsSilence())
+    }
+
+    val downloads = EpisodeDownloads(context, client)
+    private val chapterCache = ConcurrentHashMap<String, List<Chapter>>()
+
+    /** The playback manager podcasts run on, which is the music one when music is on. */
+    val playback: MusicManager2? get() = player
 
     fun feeds(): List<String> = prefs.getStringSet(KEY_FEEDS, emptySet())?.toList() ?: emptyList()
 
@@ -89,6 +108,7 @@ class PodcastManager(
         editor.remove(recentEpisodeKey(show.id)).remove(recentUpdatedKey(show.id)).remove(sortNewestKey(show.id))
         editor.apply()
 
+        show.episodes.forEach(downloads::delete)
         val current = player?.currentSong()
         if (current?.getSource() == MusicService.SOURCE_PODCAST && current.getPodcastShowId() == show.id) {
             player.stop()
@@ -106,7 +126,7 @@ class PodcastManager(
         val next = LinkedHashSet(feeds())
         next.add(clean)
         prefs.edit().putStringSet(KEY_FEEDS, next).apply()
-        refreshFeed(clean, done)
+        refreshFeed(clean, done, select = true)
     }
 
     fun refresh(done: (String?) -> Unit) {
@@ -166,17 +186,7 @@ class PodcastManager(
         val episodes = episodesFor(show)
         val index = episodes.indexOfFirst { it.key == episode.key }
         if (index == -1) return appContext.getString(R.string.podcast_podcastmanager_episode_not_found_c7d67)
-        val songs = episodes.map {
-            Song(
-                it.title,
-                show.title,
-                it.audioUrl,
-                MusicService.SOURCE_PODCAST,
-                show.id,
-                it.key,
-                progress(it)
-            )
-        }.toMutableList()
+        val songs = episodes.map { songFor(show, it) }.toMutableList()
         prefs.edit()
             .putString(KEY_SELECTED_SHOW, show.id)
             .putString(KEY_ACTIVE_SHOW, show.id)
@@ -185,8 +195,70 @@ class PodcastManager(
             .putLong(recentUpdatedKey(show.id), System.currentTimeMillis())
             .apply()
         manager.setPodcastPlaybackSpeed(playbackSpeed())
-        val title = manager.playPodcast(songs, index, this)
+        val title = manager.playList(songs, index, this)
         return if (title == null) appContext.getString(R.string.podcast_podcastmanager_starting_podcast_5f39c) else appContext.getString(R.string.podcast_podcastmanager_playing_7dabc, title)
+    }
+
+    /** An episode as a queue item, starting from where it was left. */
+    fun songFor(show: PodcastShow, episode: PodcastEpisode) = Song(
+        episode.title,
+        show.title,
+        episode.audioUrl,
+        MusicService.SOURCE_PODCAST,
+        show.id,
+        episode.key,
+        progress(episode)
+    )
+
+    fun artworkUrl(song: Song): String? =
+        shows.firstOrNull { it.id == song.getPodcastShowId() }?.imageUrl?.trim()?.takeIf { it.isNotEmpty() }
+
+    /** Fetches a show's picture, scaled down for the player. Call it off the main thread. */
+    fun artwork(url: String): Bitmap? = try {
+        val request = Request.Builder().url(url).header("User-Agent", "ReTUI/1.0 Android Podcast").get().build()
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) return null
+            val bytes = response.body?.bytes() ?: return null
+            val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+            var sample = 1
+            while (bounds.outWidth / sample > MAX_ART_PX || bounds.outHeight / sample > MAX_ART_PX) sample *= 2
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size, BitmapFactory.Options().apply { inSampleSize = sample })
+        }
+    } catch (_: Exception) {
+        null
+    }
+
+    fun skipsSilence(): Boolean = prefs.getBoolean(KEY_SKIP_SILENCE, false)
+
+    fun setSkipsSilence(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_SKIP_SILENCE, enabled).apply()
+        player?.setSkipSilence(enabled)
+    }
+
+    /** The episode behind a queue item. */
+    fun episodeOf(song: Song): PodcastEpisode? =
+        shows.firstOrNull { it.id == song.getPodcastShowId() }?.episodes?.firstOrNull { it.key == song.getPodcastEpisodeKey() }
+
+    override fun localFile(song: Song): File? = song.getPodcastEpisodeKey()?.let(downloads::file)
+
+    /** The show notes as plain text. */
+    fun notes(episode: PodcastEpisode): String =
+        HtmlCompat.fromHtml(episode.description, HtmlCompat.FROM_HTML_MODE_COMPACT).toString().trim()
+
+    /** The chapters a feed publishes for [episode]; empty when it has none. Answers on the main thread. */
+    internal fun feedChapters(episode: PodcastEpisode, done: (List<Chapter>) -> Unit) {
+        val url = episode.chaptersUrl ?: return done(emptyList())
+        chapterCache[url]?.let { return done(it) }
+        Thread {
+            val found = runCatching {
+                client.newCall(Request.Builder().url(url).get().build()).execute().use { response ->
+                    if (response.isSuccessful) Chapters.parseJson(response.body?.string().orEmpty()) else emptyList()
+                }
+            }.getOrDefault(emptyList())
+            chapterCache[url] = found
+            handler.post { done(found) }
+        }.start()
     }
 
     fun playbackSpeed(): Float = prefs.getFloat(KEY_PLAYBACK_SPEED, 1f)
@@ -355,7 +427,7 @@ class PodcastManager(
         }
     }
 
-    private fun refreshFeed(feedUrl: String, done: (String?) -> Unit) {
+    private fun refreshFeed(feedUrl: String, done: (String?) -> Unit, select: Boolean = false) {
         Thread {
             try {
                 val show = mergeStoredTags(fetch(feedUrl))
@@ -363,7 +435,7 @@ class PodcastManager(
                 val merged = mergeRetainedEpisodes(previous, show)
                 shows = sortedShows(shows.filterNot { it.feedUrl == feedUrl || it.id == show.id } + merged)
                 cacheShows()
-                if (prefs.getString(KEY_SELECTED_SHOW, null) == null) {
+                if (select || prefs.getString(KEY_SELECTED_SHOW, null) == null) {
                     prefs.edit().putString(KEY_SELECTED_SHOW, show.id).apply()
                 }
                 handler.post { done(null) }
@@ -446,6 +518,8 @@ class PodcastManager(
 
     private fun writeShow(show: PodcastShow): JSONObject {
         val episodes = JSONArray()
+        // Notes are the bulk of a feed, so only the newest are kept on disk; a refresh brings the rest back.
+        val keepNotes = show.episodes.sortedByDescending { it.publishedAt ?: Long.MIN_VALUE }.take(NOTES_KEPT).map { it.key }.toSet()
         for (episode in show.episodes) {
             episodes.put(JSONObject()
                 .put("showId", episode.showId)
@@ -454,6 +528,8 @@ class PodcastManager(
                 .put("audioUrl", episode.audioUrl)
                 .put("link", episode.link)
                 .put("duration", episode.duration)
+                .put("chaptersUrl", episode.chaptersUrl)
+                .put("description", if (episode.key in keepNotes) episode.description.take(NOTES_MAX_CHARS) else "")
                 .put("publishedAt", episode.publishedAt)
                 .put("feedOrder", episode.feedOrder))
         }
@@ -481,7 +557,8 @@ class PodcastManager(
                 description = episode.optString("description"),
                 duration = episode.optString("duration").ifBlank { null },
                 publishedAt = if (episode.has("publishedAt") && !episode.isNull("publishedAt")) episode.optLong("publishedAt") else null,
-                feedOrder = episode.optInt("feedOrder")
+                feedOrder = episode.optInt("feedOrder"),
+                chaptersUrl = episode.optString("chaptersUrl").ifBlank { null }
             ))
         }
         val feedUrl = obj.optString("feedUrl")
@@ -568,6 +645,10 @@ class PodcastManager(
         private const val MIN_PLAYBACK_SPEED = 0.5f
         private const val MAX_PLAYBACK_SPEED = 2f
 
+        private const val MAX_ART_PX = 512
+        private const val NOTES_KEPT = 30
+        private const val NOTES_MAX_CHARS = 4000
+        private const val KEY_SKIP_SILENCE = "skip_silence"
         val PLAYBACK_SPEEDS = floatArrayOf(0.75f, 1f, 1.25f, 1.5f, 1.75f, 2f)
 
         fun isSecureFeedUrl(value: String?): Boolean = try {

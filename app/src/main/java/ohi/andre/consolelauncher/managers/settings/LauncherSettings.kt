@@ -16,7 +16,6 @@ import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
-import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorderOption
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
@@ -31,8 +30,13 @@ object LauncherSettings {
     private val snapshot: MutableMap<String, String> = HashMap()
     private var snapshotLoaded = false
 
+    /** The value as the user set it, with mono mode's overrides applied on top. */
     @JvmStatic
-    fun get(value: XMLPrefsSave?): String? {
+    fun get(value: XMLPrefsSave?): String? = MonoMode.override(value) ?: raw(value)
+
+    /** The user's own value, never overridden. */
+    @JvmStatic
+    fun raw(value: XMLPrefsSave?): String? {
         if (value == null) {
             return null
         }
@@ -184,7 +188,7 @@ object LauncherSettings {
                     revision++
                 }
             }
-            if (files.keys.any { it.name == "frames" }) ohi.andre.consolelauncher.tuils.FrameManager.settingsCommitted()
+            if (files.keys.any { it.name == "frames" }) ohi.andre.consolelauncher.tuils.frame.FrameManager.settingsCommitted()
             val change = Change(previous, currentSnapshot(), edits.keys.toSet())
             SettingsRefreshCoordinator.request(owner, change)
             change
@@ -203,18 +207,8 @@ object LauncherSettings {
     }
 
     @JvmStatic
-    fun setSuggestion(value: Suggestions, rawValue: String?) {
-        set(value, rawValue)
-    }
-
-    @JvmStatic
     fun setUi(value: Ui, rawValue: String?) {
         set(value, rawValue)
-    }
-
-    @JvmStatic
-    fun setAutoColorPick(enabled: Boolean) {
-        setUi(Ui.auto_color_pick, enabled.toString())
     }
 
     @WorkerThread

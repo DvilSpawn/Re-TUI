@@ -7,7 +7,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
-import ohi.andre.consolelauncher.managers.WebhookManager.Webhook
+import ohi.andre.consolelauncher.managers.net.WebhookManager.Webhook
 import ohi.andre.consolelauncher.tuils.Tuils
 import okhttp3.Call
 import okhttp3.Callback
@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference
 import java.util.AbstractMap.SimpleEntry
 import java.util.Locale
 import java.util.ArrayList
-import ohi.andre.consolelauncher.managers.WebhookManager
+import ohi.andre.consolelauncher.managers.net.WebhookManager
 
 class webhook : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {

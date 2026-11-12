@@ -39,7 +39,7 @@ From the launcher checkout:
 
 ```sh
 python3 scripts/terminal_colors/snapshot.py --refresh  # only to refresh the pinned source
-python3 scripts/terminal_colors/generate.py --site /Users/mako/StudioProjects/Re-TUI-site
+python3 scripts/terminal_colors/generate.py --site ../Re-TUI-site
 python3 scripts/terminal_colors/test_catalog.py
 ```
 
@@ -50,7 +50,7 @@ local data, including role checks and adjustment history.
 Run the site tests using a working Node runtime:
 
 ```sh
-node --test /Users/mako/StudioProjects/Re-TUI-site/tests/*.mjs
+node --test ../Re-TUI-site/tests/*.mjs
 ```
 
 The terminal-colors test runs every actual download through the marketplace's
@@ -68,7 +68,7 @@ debug build. Do not change release notice policy.
 
 ```sh
 python3 scripts/terminal_colors/run.py --serial emulator-5582 \
-  --output /Users/mako/StudioProjects/TUI-ConsoleLauncher-artifacts/terminal-colors/baseline \
+  --output ../TUI-ConsoleLauncher-artifacts/terminal-colors/baseline \
   --install
 ```
 
@@ -113,9 +113,9 @@ Android widgets are outside launcher control.
 
 ```sh
 python3 scripts/terminal_colors/report.py \
-  --evidence /Users/mako/StudioProjects/TUI-ConsoleLauncher-artifacts/terminal-colors/baseline \
-  --output /Users/mako/StudioProjects/TUI-ConsoleLauncher-artifacts/terminal-colors/report \
-  --site /Users/mako/StudioProjects/Re-TUI-site --sync-previews
+  --evidence ../TUI-ConsoleLauncher-artifacts/terminal-colors/baseline \
+  --output ../TUI-ConsoleLauncher-artifacts/terminal-colors/report \
+  --site ../Re-TUI-site --sync-previews
 ```
 
 Report generation requires Pillow. Open `report/index.html`: filter by name,

@@ -1,6 +1,6 @@
 package ohi.andre.consolelauncher.managers
 
-import java.io.File
+import ohi.andre.consolelauncher.SourceFiles
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -19,24 +19,21 @@ class ChangelogPolicyTest {
         assertFalse(ChangelogPolicy.shouldShow(499, 500))
     }
     @Test fun offlineCommandAndStartupUseTheSamePaneWithIndependentGeometry() {
-        val root = generateSequence(File(checkNotNull(System.getProperty("user.dir")))) { it.parentFile }
-            .first { File(it, "app/src/main").isDirectory }
-        fun source(path: String) = File(root, "app/src/main/java/ohi/andre/consolelauncher/$path").readText()
-        val manager = source("managers/ChangelogManager.kt")
+        val manager = SourceFiles.kotlin("ChangelogManager.kt").readText()
         assertFalse(manager.contains("pastebin")); assertFalse(manager.contains("OkHttp"))
         assertFalse(manager.substringAfter("// A failed launch").contains("markSeen("))
-        assertTrue(source("commands/main/raw/changelog.kt").contains("ChangelogManager.open(pack.context)"))
-        val activity = source("help/ChangelogActivity.kt")
+        assertTrue(SourceFiles.kotlin("changelog.kt").readText().contains("ChangelogManager.open(pack.context)"))
+        val activity = SourceFiles.kotlin("ChangelogActivity.kt").readText()
         assertTrue(activity.contains("statePrefix = \"changelog\""))
         assertTrue(activity.contains("windowPanel.reserveBottomCorners(bottom)"))
         assertTrue(activity.contains("windowPanel.persist()"))
-        val launcher = source("LauncherActivity.kt")
+        val launcher = SourceFiles.kotlin("LauncherActivity.kt").readText()
         assertTrue(launcher.contains("StartupMenuManager.isFirstInstallPending(this)"))
         assertFalse(launcher.contains("ChangelogManager.seedFreshInstall(this)"))
         val automatic = launcher.substringAfter("private fun maybeShowChangelog").substringBefore("override fun onResume")
         assertTrue(automatic.indexOf("StartupMenuManager.isFirstInstallPending(this)") < automatic.indexOf("ChangelogManager.maybeOpen(this)"))
         assertTrue(automatic.substringBefore("ChangelogManager.maybeOpen(this)").contains("return false"))
         assertTrue(launcher.contains("if (maybeShowChangelog()) return"))
-        assertTrue(File(root, "app/src/main/AndroidManifest.xml").readText().contains(".help.ChangelogActivity\" android:exported=\"false\""))
+        assertTrue(SourceFiles.repo("app/src/main/AndroidManifest.xml").readText().contains(".help.ChangelogActivity\" android:exported=\"false\""))
     }
 }

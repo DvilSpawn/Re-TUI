@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.json.JSONObject
 import org.json.JSONArray

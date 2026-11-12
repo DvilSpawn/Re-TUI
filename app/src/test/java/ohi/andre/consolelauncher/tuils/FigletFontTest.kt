@@ -1,12 +1,12 @@
 package ohi.andre.consolelauncher.tuils
 
-import java.io.File
+import ohi.andre.consolelauncher.SourceFiles
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class FigletFontTest {
-    private fun font(name: String) = FigletFont.parse(File("src/main/assets/figlet/$name.flf").readText())
+    private fun font(name: String) = FigletFont.parse(SourceFiles.repo("app/src/main/assets/figlet/$name.flf").readText())
 
     @Test
     fun smallMatchesFiglet() {

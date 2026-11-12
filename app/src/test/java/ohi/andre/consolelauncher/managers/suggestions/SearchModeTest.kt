@@ -184,7 +184,7 @@ class SearchModeTest {
 
     @Test
     fun modeParameterSuggestionsIncludeEveryLauncherMode() {
-        assertEquals(listOf("classic", "search", "terminal"), SuggestionsManager.modeTargets(""))
+        assertEquals(listOf("classic", "search", "terminal", "dot", "mono"), SuggestionsManager.modeTargets(""))
         assertEquals(listOf("terminal"), SuggestionsManager.modeTargets("ter"))
         assertEquals(emptyList<String>(), SuggestionsManager.modeTargets("f"))
     }

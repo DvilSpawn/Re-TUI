@@ -11,7 +11,7 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.ArrayList
 import java.util.LinkedHashSet
@@ -47,7 +47,7 @@ class inspect : CommandAbstraction {
         val out = StringBuilder()
         out.append(packageInfo.applicationInfo?.loadLabel(pm) ?: packageName)
             .append(Tuils.NEWLINE).append(packageName).append(Tuils.NEWLINE)
-        val common = commonHandlers(pm, packageName)
+        val common = commonHandlers(pack.context, pm, packageName)
         if (common.isNotEmpty()) {
             out.append(Tuils.NEWLINE).append(pack.context.getString(R.string.command_inspect_common_intents_f22d7)).append(Tuils.NEWLINE)
             common.forEach { out.append("- ").append(it).append(Tuils.NEWLINE) }
@@ -59,12 +59,12 @@ class inspect : CommandAbstraction {
         return out.toString().trim()
     }
 
-    private fun commonHandlers(pm: PackageManager, packageName: String): List<String> {
+    private fun commonHandlers(context: android.content.Context, pm: PackageManager, packageName: String): List<String> {
         val lines = ArrayList<String>()
-        addActivityHandler(pm, lines, "launch", Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setPackage(packageName))
-        addActivityHandler(pm, lines, "share text", Intent(Intent.ACTION_SEND).setType("text/plain").setPackage(packageName))
-        addActivityHandler(pm, lines, "view web", Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com")).setPackage(packageName))
-        addActivityHandler(pm, lines, "process text", Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain").setPackage(packageName))
+        addActivityHandler(pm, lines, context.getString(R.string.command_inspect_handler_launch), Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER).setPackage(packageName))
+        addActivityHandler(pm, lines, context.getString(R.string.command_inspect_handler_share_text), Intent(Intent.ACTION_SEND).setType("text/plain").setPackage(packageName))
+        addActivityHandler(pm, lines, context.getString(R.string.command_inspect_handler_view_web), Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com")).setPackage(packageName))
+        addActivityHandler(pm, lines, context.getString(R.string.command_inspect_handler_process_text), Intent(Intent.ACTION_PROCESS_TEXT).setType("text/plain").setPackage(packageName))
         return lines
     }
 

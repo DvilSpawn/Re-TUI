@@ -20,7 +20,7 @@ class TimeManager(
     override fun update() {
         listener?.onUpdate(
             UIManager.Label.time,
-            ohi.andre.consolelauncher.managers.TimeManager.instance!!.getCharSequence(context, size, "%t")
+            ohi.andre.consolelauncher.managers.time.TimeManager.instance!!.getCharSequence(context, size, "%t")
         )
     }
 }

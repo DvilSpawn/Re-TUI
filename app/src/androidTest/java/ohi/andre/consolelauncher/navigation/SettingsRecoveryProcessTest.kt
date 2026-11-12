@@ -5,10 +5,10 @@ import android.os.SystemClock
 import android.widget.Button
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.commands.tuixt.ThemerActivity
-import ohi.andre.consolelauncher.managers.BackupManager
-import ohi.andre.consolelauncher.managers.BackupRestoreTransaction
-import ohi.andre.consolelauncher.managers.FileOperationCancellation
-import ohi.andre.consolelauncher.tuils.FrameManager
+import ohi.andre.consolelauncher.managers.backup.BackupManager
+import ohi.andre.consolelauncher.managers.backup.BackupRestoreTransaction
+import ohi.andre.consolelauncher.managers.file.FileOperationCancellation
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.junit.Assert.*
 import org.junit.Test

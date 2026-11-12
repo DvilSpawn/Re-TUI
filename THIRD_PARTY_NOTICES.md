@@ -51,6 +51,17 @@ The original Shell notice names 2012-2015; current upstream StreamGobbler names
 Apache-2.0; full license in `LICENSES/Material-Symbols-Apache-2.0.txt`.
 Source: https://github.com/Chainfire/libsuperuser
 
+## VT323 Regular
+
+Mono mode's typeface is VT323 Regular 2.000, bundled unmodified under SIL Open
+Font License 1.1; redistribution with the required notices is permitted. The
+font retains its own license, not the code's GPL.
+
+Copyright 2011, The VT323 Project Authors (peter.hull@oikoi.com). The license
+text is in `LICENSES/VT323-OFL.txt`, also packaged in the app.
+
+Source: https://github.com/google/fonts/tree/main/ofl/vt323
+
 ## JetBrains Mono Nerd Font Regular
 
 The default bundled typeface is JetBrains Mono Nerd Font Regular: JetBrains
@@ -117,8 +128,8 @@ and does not grant trademark rights.
 
 ## Google Material Symbols
 
-The 66 Material vectors, including Notes formatting, toolbar/window controls and
-neutral support-link symbols, adapt Google's outlined/rounded Material Symbols.
+The 63 Material vectors, including Notes formatting and toolbar/window controls,
+adapt Google's outlined/rounded Material Symbols.
 The SVG coordinate origin is translated into an Android vector viewport; paths
 are unchanged. Existing resource dimensions and the resize-arrow rotation wrapper
 are retained. Per-file source URLs/SVG hashes and modified-output hashes are in
@@ -126,14 +137,25 @@ are retained. Per-file source URLs/SVG hashes and modified-output hashes are in
 `49d4db35df873165d6bd6ba09b063c7dafbac2f4`.
 
 The former unverified Notes formatting PNGs and support brand-logo vectors are
-not included in current builds. Neutral code/chat/forum symbols link to the same
-destinations without asserting brand-logo rights. The block-letter wordmark and
+not included in current builds; see "Brand marks" for the official replacements. The block-letter wordmark and
 two tree connectors are independently authored Re:TUI geometric paths under the
 project GPL-3.0-or-later license, not extracted font outlines; exact hashes are in
 `third_party/project-vector-icons.json`.
 
 Source: https://github.com/google/material-design-icons/tree/master/symbols/web
 License: Apache-2.0; see `LICENSES/Material-Symbols-Apache-2.0.txt`.
+
+## Brand marks
+
+The GitHub, Discord and Reddit marks in the System & Support footer are official
+artwork from each owner's brand pages, used only as buttons linking to this
+project's pages on those services
+(https://brand.github.com/foundations/logo,
+https://redditbrand.lingoapp.com/s/Logo-d9x3n2/). GITHUB and the Invertocat logo
+design are trademarks of GitHub, Inc.; Discord and its symbol are trademarks of
+Discord Inc.; Reddit and the Snoo logo are trademarks of Reddit, Inc. These marks
+are not covered by the project license and no trademark rights are granted. Source
+and hashes are in `third_party/brand-icons.json`.
 
 ## Qalculate native engine
 

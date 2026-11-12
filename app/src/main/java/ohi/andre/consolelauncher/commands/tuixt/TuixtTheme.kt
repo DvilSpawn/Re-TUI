@@ -18,10 +18,10 @@ import android.widget.TextView
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
-import ohi.andre.consolelauncher.tuils.FrameManager
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.CrtOverlayDrawable
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 
 object TuixtTheme {
@@ -38,6 +38,9 @@ object TuixtTheme {
 
     @JvmStatic
     fun accentColor(): Int = color(Theme.settings_header_text_color)
+
+    @JvmStatic
+    fun iconButtonBackgroundColor(): Int = color(Theme.icon_button_background_color)
 
     @JvmStatic
     fun textColor(): Int = color(Theme.settings_panel_text_color)

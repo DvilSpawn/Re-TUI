@@ -24,10 +24,10 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.Tuils
 
 /** Offline release highlights, using the same chrome and geometry as Help. */

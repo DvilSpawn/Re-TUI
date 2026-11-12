@@ -6,7 +6,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
-import ohi.andre.consolelauncher.managers.SpaceManager
+import ohi.andre.consolelauncher.managers.preset.SpaceManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable

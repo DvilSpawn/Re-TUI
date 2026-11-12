@@ -248,7 +248,9 @@ private class BurnEffect(art: AsciiArt) : AsciiEffect(art) {
     init {
         val origin = chars[random.nextInt(chars.size)]
         // Spread by distance from where it caught, with a little noise so the edge flickers rather than rings.
-        order = ArrayDeque(chars.sortedBy { hypot((it.col - origin.col).toDouble(), ((it.row - origin.row) * 2).toDouble()) + random.nextDouble() * 3 })
+        // Each key is drawn once: a sort that re-rolls the random part per comparison breaks its contract and throws.
+        order = ArrayDeque(chars.map { it to hypot((it.col - origin.col).toDouble(), ((it.row - origin.row) * 2).toDouble()) + random.nextDouble() * 3 }
+            .sortedBy { it.second }.map { it.first })
         chars.forEach { it.visible = true; it.look(it.symbol, FxColor.darker(it.color, 0.75f)) }
     }
 

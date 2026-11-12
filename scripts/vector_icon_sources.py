@@ -2,7 +2,7 @@
 
 Android resource identifiers/intrinsic sizes are preserved. Callers apply the
 emitted patch and remove only the listed obsolete PNGs. Full upstream paths stay
-in the vector source. Generic social-link symbols replace unverified brand logos.
+in the vector source. Official brand marks are tracked in third_party/brand-icons.json.
 """
 import concurrent.futures
 import hashlib
@@ -25,9 +25,9 @@ OUTLINED = {
     "ic_toolbar_note_24": "edit_note", "ic_toolbar_refresh_24": "refresh",
     "ic_toolbar_search_24": "search", "ic_toolbar_star_24": "star",
     "ic_toolbar_terminal_24": "terminal", "ic_toolbar_widgets_24": "widgets",
-    "ic_tuixt_delete_24": "delete", "ic_tuixt_discord_24": "chat",
-    "ic_tuixt_github_24": "code", "ic_tuixt_lock_24": "lock",
-    "ic_tuixt_lock_open_24": "lock_open", "ic_tuixt_reddit_24": "forum",
+    "ic_tuixt_delete_24": "delete",
+    "ic_tuixt_lock_24": "lock",
+    "ic_tuixt_lock_open_24": "lock_open",
     "ic_tuixt_web_24": "language", "ic_widget_resize_arrow": "arrow_drop_up",
     "ic_workspace_add_24": "add", "ic_workspace_keyboard_24": "keyboard",
     "ic_workspace_layout_24": "view_quilt", "open_in_full_24": "open_in_full",

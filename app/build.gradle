@@ -53,8 +53,8 @@ android {
         applicationId = "com.dvil.tui_renewed"
         minSdk = 23
         targetSdk = 36
-        versionCode = 703
-        versionName = "5.2"
+        versionCode = 800
+        versionName = "6"
 
         testInstrumentationRunner = providers.gradleProperty('ircReleaseSmokeRunner').map { it.toBoolean() }
                 .getOrElse(false) ? "ohi.andre.consolelauncher.irc.IrcReleaseSmokeInstrumentation"
@@ -320,6 +320,7 @@ def isAllowedAsset = { File assetsDir, File sourceFile ->
     def relativeAssetPath = assetsDir.toPath().relativize(sourceFile.toPath()).toString().replace(File.separator, "/")
     return relativeAssetPath in ["termux-ssh/setup.sh", "termux-ssh/daemon.sh", "termux-ssh/dispatch.sh", "calculator-runtime/index.html", "calculator-runtime/bootstrap.js", "calculator-runtime/worker.js"]
             || relativeAssetPath == "JetBrainsMonoNerdFont-Regular.ttf"
+            || relativeAssetPath == "VT323-Regular.ttf"
             || relativeAssetPath == "terminal-widgets/dashboard.sh"
             || relativeAssetPath in ["figlet/small.flf", "figlet/standard.flf", "figlet/slant.flf", "figlet/mini.flf", "figlet/shadow.flf"]
             || relativeAssetPath in ["localization/catalog.json", "localization/english-template.zip"]
@@ -432,6 +433,8 @@ dependencies {
     implementation 'androidx.activity:activity:1.13.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+    implementation 'androidx.media3:media3-exoplayer:1.11.1'
+    implementation 'androidx.media3:media3-session:1.11.1'
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
 

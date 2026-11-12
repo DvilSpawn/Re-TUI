@@ -13,9 +13,6 @@ import android.app.PendingIntent.CanceledException
 import android.app.admin.DevicePolicyManager
 import android.content.BroadcastReceiver
 import android.content.ComponentName
-import ohi.andre.consolelauncher.tuils.CalendarLabels
-import androidx.core.os.ConfigurationCompat
-import java.text.DateFormatSymbols
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -79,7 +76,6 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.PopupWindow
-import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
 import android.widget.TextView
@@ -101,16 +97,16 @@ import ohi.andre.consolelauncher.commands.tuixt.BreachDialog
 import ohi.andre.consolelauncher.commands.tuixt.ThemerActivity
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.ConfirmAction
-import ohi.andre.consolelauncher.managers.AliasManager
-import ohi.andre.consolelauncher.managers.BreachManager
-import ohi.andre.consolelauncher.managers.ClockManager
-import ohi.andre.consolelauncher.managers.FocusFrictionStyle
-import ohi.andre.consolelauncher.managers.LockdownManager
-import ohi.andre.consolelauncher.managers.PomodoroManager
-import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
+import ohi.andre.consolelauncher.managers.terminal.AliasManager
+import ohi.andre.consolelauncher.managers.net.BreachManager
+import ohi.andre.consolelauncher.managers.time.ClockManager
+import ohi.andre.consolelauncher.managers.apps.FocusFrictionStyle
+import ohi.andre.consolelauncher.managers.apps.LockdownManager
+import ohi.andre.consolelauncher.managers.time.PomodoroManager
+import ohi.andre.consolelauncher.managers.time.PomodoroManager.SessionType
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager
 import ohi.andre.consolelauncher.managers.ToolbarShortcutManager.slot
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
@@ -118,7 +114,20 @@ import ohi.andre.consolelauncher.managers.modules.ModuleDockButtonFactory
 import ohi.andre.consolelauncher.managers.modules.ModulePromptManager
 import ohi.andre.consolelauncher.managers.modules.ModuleVariableManager
 import ohi.andre.consolelauncher.managers.modules.ReminderManager
+import ohi.andre.consolelauncher.managers.modules.home.CalendarModule
+import ohi.andre.consolelauncher.managers.modules.home.HomeModuleEvent
+import ohi.andre.consolelauncher.managers.modules.home.HomeModuleHost
+import ohi.andre.consolelauncher.managers.modules.home.HomeModules
+import ohi.andre.consolelauncher.managers.modules.home.LuaModules
+import ohi.andre.consolelauncher.managers.modules.home.MusicModule
+import ohi.andre.consolelauncher.managers.modules.home.NotesModule
+import ohi.andre.consolelauncher.managers.modules.home.NotificationsModule
+import ohi.andre.consolelauncher.managers.modules.home.ReminderModule
+import ohi.andre.consolelauncher.managers.modules.home.RssModule
+import ohi.andre.consolelauncher.managers.modules.home.TimerModule
+import ohi.andre.consolelauncher.managers.modules.home.WeatherModule
 import ohi.andre.consolelauncher.managers.modules.UpcomingEventsManager
+import ohi.andre.consolelauncher.managers.mediaplayer.MediaPlayerActivity
 import ohi.andre.consolelauncher.managers.music.MusicService
 import ohi.andre.consolelauncher.managers.notifications.NotificationGroups
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
@@ -126,7 +135,6 @@ import ohi.andre.consolelauncher.managers.notifications.NotificationService
 import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.cyberdeckMode
-import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorderCornerRadius
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleBodyTextSize
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleButtonBackgroundColor
@@ -164,7 +172,6 @@ import ohi.andre.consolelauncher.managers.status.StorageManager
 import ohi.andre.consolelauncher.managers.status.TimeManager
 import ohi.andre.consolelauncher.managers.status.UnlockManager
 import ohi.andre.consolelauncher.managers.status.WeatherManager
-import ohi.andre.consolelauncher.managers.status.WeatherResponseParser
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionTextWatcher
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionsManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.dirs
@@ -175,10 +182,17 @@ import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.createResultPendingIntent
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.requestRunCommandPermissionIfPossible
 import ohi.andre.consolelauncher.managers.termux.TerminalGridView
+import ohi.andre.consolelauncher.managers.termux.TermuxAnsiRenderer
+import ohi.andre.consolelauncher.managers.termux.TermuxAppScripts
+import ohi.andre.consolelauncher.managers.termux.TermuxAppScripts.shellQuote
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.widgets.AndroidWidgetDrawerManager
 import ohi.andre.consolelauncher.managers.ui.AppDrawerPaneManager
-import ohi.andre.consolelauncher.managers.ui.SearchModuleCarousel
+import ohi.andre.consolelauncher.managers.ui.ClockTabDock
+import ohi.andre.consolelauncher.managers.ui.FileConsoleController
+import ohi.andre.consolelauncher.managers.ui.FocusOverlayController
+import ohi.andre.consolelauncher.managers.ui.HackOverlayController
+import ohi.andre.consolelauncher.managers.ui.LuaSurfaceAction
 import ohi.andre.consolelauncher.managers.ui.OverlayLayoutManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine.UpdateListener
@@ -189,26 +203,24 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Toolbar
 import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.tuils.AsciiArtTextView
 import ohi.andre.consolelauncher.tuils.asciifx.AsciiEffects
-import ohi.andre.consolelauncher.tuils.CrtOverlayDrawable
-import ohi.andre.consolelauncher.tuils.CyberpunkBackdropDrawable
-import ohi.andre.consolelauncher.tuils.CyberpunkIconFrameDrawable
-import ohi.andre.consolelauncher.tuils.FrameManager
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.CrtOverlayDrawable
+import ohi.andre.consolelauncher.tuils.frame.CyberpunkBackdropDrawable
+import ohi.andre.consolelauncher.tuils.frame.CyberpunkIconFrameDrawable
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import ohi.andre.consolelauncher.tuils.MusicVisualizerView
 import ohi.andre.consolelauncher.tuils.OutlineEditText
 import ohi.andre.consolelauncher.tuils.OutlineTextView
 import ohi.andre.consolelauncher.tuils.StableHorizontalScrollView
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.TerminalTrayToggleView
 import ohi.andre.consolelauncher.tuils.LongClickMovementMethod
-import ohi.andre.consolelauncher.tuils.LongClickableSpan
 import ohi.andre.consolelauncher.tuils.LauncherPillStyle
-import ohi.andre.consolelauncher.tuils.TuiWidgetDecorator
-import ohi.andre.consolelauncher.tuils.TuiWidgetDecorator.decorateWidget
+import ohi.andre.consolelauncher.tuils.frame.TuiWidgetDecorator
+import ohi.andre.consolelauncher.tuils.frame.TuiWidgetDecorator.decorateWidget
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.UIUtils
 import ohi.andre.consolelauncher.tuils.interfaces.CommandExecuter
@@ -239,18 +251,14 @@ import android.net.wifi.WifiManager
 import android.widget.ProgressBar
 import android.view.GestureDetector.OnDoubleTapListener
 import android.view.ViewParent
-import ohi.andre.consolelauncher.managers.FileManager
+import ohi.andre.consolelauncher.managers.file.FileManager
 import java.util.HashMap
 import java.util.LinkedHashMap
 import java.util.Map
 import java.lang.reflect.Method
 import java.util.ArrayList
-import ohi.andre.consolelauncher.managers.HTMLExtractManager
-import ohi.andre.consolelauncher.managers.RssManager
-import ohi.andre.consolelauncher.managers.podcast.PodcastEpisode
-import ohi.andre.consolelauncher.managers.podcast.PodcastManager
-import ohi.andre.consolelauncher.managers.podcast.PodcastRecent
-import ohi.andre.consolelauncher.managers.podcast.PodcastShow
+import ohi.andre.consolelauncher.managers.net.HTMLExtractManager
+import ohi.andre.consolelauncher.managers.net.RssManager
 import ohi.andre.consolelauncher.profile.ProfilePaneController
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
@@ -311,28 +319,22 @@ class UIManager(
     private var swipeUpAppsDrawer: Boolean
     private var gestureDetector: GestureDetectorCompat? = null
     private var appDrawerPaneManager: AppDrawerPaneManager? = null
+    private var hackOverlayController: HackOverlayController? = null
+    private var focusOverlayController: FocusOverlayController? = null
+    private var fileConsoleController: FileConsoleController? = null
     private var androidWidgetDrawerManager: AndroidWidgetDrawerManager? = null
-    private val currentOverlayNotifications = ArrayList<NotificationService.Notification>()
-    private var currentNotificationIndex = 0
-    /** The app group whose notifications the list shows, or null for the top-level list. */
-    private var openNotificationGroup: String? = null
-    private var notificationReplyFocusKey: String? = null
+    private var clockTabDock: ClockTabDock? = null
+    private val currentOverlayNotifications: ArrayList<NotificationService.Notification>
+        get() = notificationsModule.currentOverlayNotifications
     private val termuxBuffer = StringBuilder()
-    private var notificationCompactForKeyboard = false
-    private var timerTabVisible = false
-    private var stopwatchTabVisible = false
-    private var timerTabDockReady = false
-    private var stopwatchTabDockReady = false
     private var podcastTab: ImageView? = null
     private var podcastTabDockReady = false
-    private var podcastSessionActive = false
-    private var podcastFocusChromeActive = false
-    private var podcastChromeAnim: AnimatorSet? = null
-    private var podcastWindowAnim: AnimatorSet? = null
-    var isPomodoroOverlayVisible: Boolean = false
-        private set
-    var isLockdownOverlayVisible: Boolean = false
-        private set
+    private var podcastPillArmed = false
+    private var podcastPillState: Pair<Boolean, Boolean>? = null
+    val isPomodoroOverlayVisible: Boolean
+        get() = focusOverlayController?.isPomodoroOverlayVisible == true
+    val isLockdownOverlayVisible: Boolean
+        get() = focusOverlayController?.isLockdownOverlayVisible == true
     private var termuxOverlay: View? = null
     private var termuxOverlayBasePaddingLeft = 0
     private var termuxOverlayBasePaddingTop = 0
@@ -398,81 +400,7 @@ class UIManager(
     private var luaAppLastStatus: String? = null
     private var luaAppTickGeneration = 0
     private val termuxAnsiPattern = Pattern.compile("\\u001B\\[[0-?]*[ -/]*[@-~]")
-    private var fileOverlay: View? = null
-    private var fileOverlayBasePaddingLeft = 0
-    private var fileOverlayBasePaddingTop = 0
-    private var fileOverlayBasePaddingRight = 0
-    private var fileOverlayBasePaddingBottom = 0
-    private var fileWindowBorder: View? = null
-    private var fileWindowLabel: TextView? = null
-    private var fileClose: TextView? = null
-    private var filePath: TextView? = null
-    private var fileOutput: TextView? = null
-    private var filePrefix: TextView? = null
-    private var fileInput: EditText? = null
-    private var fileScroll: ScrollView? = null
-    private var fileInputGroup: View? = null
-    private var fileTools: View? = null
-    private var fileRefresh: TextView? = null
-    private var fileUp: TextView? = null
-    private var fileOpen: TextView? = null
-    private var filePaste: TextView? = null
-    private var podcastOverlay: View? = null
     private var profilePaneController: ProfilePaneController? = null
-    private var podcastOverlayBasePaddingLeft = 0
-    private var podcastOverlayBasePaddingTop = 0
-    private var podcastOverlayBasePaddingRight = 0
-    private var podcastOverlayBasePaddingBottom = 0
-    private var podcastWindowBorder: View? = null
-    private var podcastWindowLabel: TextView? = null
-    private var podcastClose: TextView? = null
-    private var podcastTabs: View? = null
-    private var podcastTabShows: TextView? = null
-    private var podcastAdd: TextView? = null
-    private var podcastRefresh: TextView? = null
-    private var podcastPlayShow: TextView? = null
-    private var podcastContentPanel: View? = null
-    private var podcastContentLabel: TextView? = null
-    private var podcastContentBack: TextView? = null
-    private var podcastContent: LinearLayout? = null
-    private var podcastScroll: ScrollView? = null
-    private var podcastPaneActions: LinearLayout? = null
-    private var podcastPlayerControls: LinearLayout? = null
-    private var podcastPlayerProgress: TextView? = null
-    private var podcastPlayerSeek: SeekBar? = null
-    private var podcastPlayerTransport: View? = null
-    private var podcastPlayerPrev: TextView? = null
-    private var podcastPlayerRewind: TextView? = null
-    private var podcastPlayerPlay: TextView? = null
-    private var podcastPlayerForward: TextView? = null
-    private var podcastPlayerNext: TextView? = null
-    private var podcastNowPlaying: View? = null
-    private var podcastArtwork: ImageView? = null
-    private var podcastPlayerArt: ImageView? = null
-    private var podcastPlayerEpisodeTitle: TextView? = null
-    private var podcastPlayerShowName: TextView? = null
-    private var podcastNowTitle: TextView? = null
-    private var podcastNowMeta: TextView? = null
-    private var podcastNowProgress: TextView? = null
-    private var podcastSeek: SeekBar? = null
-    private var podcastTransport: View? = null
-    private var podcastPrev: TextView? = null
-    private var podcastRewind: TextView? = null
-    private var podcastPlay: TextView? = null
-    private var podcastForward: TextView? = null
-    private var podcastNext: TextView? = null
-    private var podcastMode = PODCAST_MODE_SHOWS
-    private var podcastTagFilter: String? = null
-    private var podcastEpisodeQuery = ""
-    private var podcastLastRenderedMode = -1
-    private var podcastRenderGeneration = 0
-    private var pendingPodcastScrollRestore = 0
-    private var podcastSeekDragging = false
-    private var podcastArtworkUrl: String? = null
-    private var podcastStatus: String? = null
-    private val podcastImageCache = object : LruCache<String, Bitmap>(6 * 1024 * 1024) {
-        override fun sizeOf(key: String, value: Bitmap): Int = value.byteCount
-    }
     private var suggestionsContainer: View? = null
     private var suggestionsVisibilityBeforeTermux = View.VISIBLE
     private var termuxConsoleOpen = false
@@ -489,11 +417,6 @@ class UIManager(
     private var terminalOutputBorder: View? = null
     private var terminalTrayToggle: TextView? = null
     private var crtOverlayDrawable: CrtOverlayDrawable? = null
-    private var hackOverlay: View? = null
-    private var hackOverlayBasePaddingLeft = 0
-    private var hackOverlayBasePaddingTop = 0
-    private var hackOverlayBasePaddingRight = 0
-    private var hackOverlayBasePaddingBottom = 0
     private var terminalTrayExpanded = false
     private val terminalOutputAutoHideRunnable = Runnable {
         if (this.isOutputAutoHideEnabled && terminalTrayExpanded) {
@@ -517,15 +440,7 @@ class UIManager(
     private var moduleSuggestionsOriginalParent: ViewGroup? = null
     private var moduleSuggestionsOriginalParams: ViewGroup.LayoutParams? = null
     private var moduleSuggestionsOriginalIndex = -1
-    private val luaWidgetEngines = HashMap<String?, LuaWidgetEngine?>()
     private var activeModule: String? = ""
-    private var lastClockStateIntent: Intent? = null
-    private var lastPomodoroStateIntent: Intent? = null
-    private var lastLockdownStateIntent: Intent? = null
-    private var lastMusicSong: String? = null
-    private var lastMusicSinger: String? = null
-    private var lastMusicPlaying = false
-    private var lastMusicAppPackage: String? = null
 
     var preferences: SharedPreferences = context.getSharedPreferences(PREFS_NAME, 0)
 
@@ -565,7 +480,6 @@ class UIManager(
     private val labelTexts = arrayOfNulls<CharSequence>(labelViews.size)
     private var statusAppearance: ohi.andre.consolelauncher.presentation.HomeAppearance? = null
     private var unifiedStatusActive = false
-    private var unifiedStatusHost: ViewGroup? = null
     private var unifiedModulesToggle: ImageButton? = null
     private var unifiedModulesVisible = true
     private val unifiedModulesAutoHideRunnable = Runnable {
@@ -598,66 +512,6 @@ class UIManager(
     private var tuiNotesManager: NotesManager? = null
     private var notesManager: ohi.andre.consolelauncher.managers.NotesManager?
 
-    private var activeMusicSource: String? = "internal"
-    // Ticker must not removeCallbacks+repost on every MUSIC_CHANGED — that cancels the 1s delay.
-    private var musicTickerScheduled = false
-
-    private val musicTimeRunnable: Runnable = object : Runnable {
-        override fun run() {
-            var shouldContinue = false
-            var delayMs = 1000L
-            val musicWidget = mRootView!!.findViewById<View?>(R.id.music_module)
-            if (MusicService.SOURCE_PODCAST == activeMusicSource) {
-                val manager = mainPack.podcastManager
-                val current = manager.currentSong()
-                if (current != null && (manager.isPlaying() || manager.isPreparing())) {
-                    if (manager.isPlaying()) manager.saveCurrentProgress()
-                    shouldContinue = true
-                    val preparing = manager.isPreparing()
-                    delayMs = if (preparing) 120L else 1000L
-                    lastMusicSong = current.getTitle()
-                    lastMusicSinger = current.getSinger()
-                    lastMusicPlaying = manager.isPlaying()
-                    // Progress UI directly — broadcasting here used to restart this ticker.
-                    if (podcastOverlay != null && podcastOverlay!!.visibility == View.VISIBLE) {
-                        updatePodcastNowPlaying()
-                    }
-                    if (musicWidget != null && musicWidget.visibility == View.VISIBLE) {
-                        val songTitleView = musicWidget.findViewById<TextView?>(R.id.music_song_title)
-                        songTitleView?.text = musicTitlePrefix() + (current.getTitle() ?: "-").uppercase(Locale.getDefault())
-                        val singerView = musicWidget.findViewById<TextView?>(R.id.music_singer)
-                        singerView?.text = musicSubtitlePrefix() + (current.getSinger() ?: "-").uppercase(Locale.getDefault())
-                        setMusicVisualizerPlaying(manager.isPlaying())
-                    }
-                }
-            } else if (musicWidget != null && musicWidget.getVisibility() == View.VISIBLE) {
-                if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack.player != null && mainPack.player!!.isPlaying()) {
-                        shouldContinue = true
-                        val intent: Intent = Intent(ACTION_MUSIC_CHANGED)
-                        val index = mainPack.player!!.songIndex
-                        if (index != -1) {
-                            val song = mainPack.player!!.get(index)
-                            if (song != null) {
-                                intent.putExtra(SONG_TITLE, song.getTitle())
-                                intent.putExtra(SONG_SINGER, song.getSinger())
-                            }
-                        }
-                        intent.putExtra(SONG_DURATION, mainPack.player!!.getDuration())
-                        intent.putExtra(SONG_POSITION, mainPack.player!!.getCurrentPosition())
-                        intent.putExtra(MUSIC_PLAYING, mainPack.player!!.isPlaying())
-                        intent.putExtra(MusicService.MUSIC_SOURCE, MusicService.SOURCE_INTERNAL)
-                        LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
-                    }
-                }
-            }
-            if (shouldContinue) {
-                handler!!.postDelayed(this, delayMs)
-            } else {
-                musicTickerScheduled = false
-            }
-        }
-    }
 
     private val eventsRefreshRunnable: Runnable = object : Runnable {
         override fun run() {
@@ -672,113 +526,12 @@ class UIManager(
             scheduleEventsRefreshIfNeeded()
         }
     }
-    private val luaWidgetTickRunnable: Runnable = object : Runnable {
-        override fun run() {
-            tickActiveLuaWidget()
-        }
-    }
-
     private val fontRefreshRunnable: Runnable = object : Runnable {
         override fun run() {
             refreshLauncherTypeface()
         }
     }
 
-    private val hackHideRunnable: Runnable = object : Runnable {
-        override fun run() {
-            val overlay = mRootView!!.findViewById<View?>(R.id.hack_overlay)
-            if (overlay != null) {
-                overlay.animate().cancel()
-                overlay.setVisibility(View.GONE)
-                overlay.setAlpha(1f)
-            }
-        }
-    }
-
-    private val hackLines: Array<String> = arrayOf(
-        mContext.getString(R.string.surface_breach_target_localhost_mode_theatrical_501ed),
-        mContext.getString(R.string.surface_boot_attaching_remote_shell_a4ecf),
-        mContext.getString(R.string.surface_boot_syncing_fake_intrusion_assets_c0461),
-        mContext.getString(R.string.surface_auth_replaying_cached_credentials_ff954),
-        mContext.getString(R.string.surface_auth_probing_token_vault_a1_159da),
-        mContext.getString(R.string.surface_auth_probing_token_vault_a2_f7dd0),
-        mContext.getString(R.string.surface_auth_probing_token_vault_a3_90360),
-        mContext.getString(R.string.surface_trace_walking_local_package_graph_26e0b),
-        mContext.getString(R.string.surface_trace_reading_launcher_aliases_62296),
-        mContext.getString(R.string.surface_trace_reading_launcher_contacts_8d904),
-        mContext.getString(R.string.surface_trace_reading_launcher_app_groups_97704),
-        mContext.getString(R.string.surface_mem_dumping_volatile_session_tokens_06915),
-        mContext.getString(R.string.surface_mem_scanning_keyboard_buffer_57074),
-        mContext.getString(R.string.surface_mem_scanning_clipboard_buffer_adbc9),
-        mContext.getString(R.string.surface_net_tunneling_through_relay_07_37b98),
-        mContext.getString(R.string.surface_net_tunneling_through_relay_11_c3345),
-        mContext.getString(R.string.surface_net_handshaking_with_mirror_node_b8bec),
-        mContext.getString(R.string.surface_proc_escalating_pseudo_root_privileges_c36c9),
-        mContext.getString(R.string.surface_proc_masking_shell_signature_9d67a),
-        mContext.getString(R.string.surface_proc_detaching_watchdog_threads_79bd4),
-        mContext.getString(R.string.surface_i_o_indexing_aliases_apps_contacts_f7518),
-        mContext.getString(R.string.surface_i_o_reading_wallpaper_palette_cache_b75c8),
-        mContext.getString(R.string.surface_i_o_reading_notification_mirror_bf032),
-        mContext.getString(R.string.surface_cryp_brute_forcing_theme_entropy_43e64),
-        mContext.getString(R.string.surface_cryp_brute_forcing_dashed_border_seed_72e74),
-        mContext.getString(R.string.surface_cryp_deriving_surface_accent_offsets_8557f),
-        mContext.getString(R.string.surface_sync_mirroring_notification_buffer_574fb),
-        mContext.getString(R.string.surface_sync_mirroring_playback_metadata_e919a),
-        mContext.getString(R.string.surface_sync_mirroring_quick_launch_slots_19159),
-        mContext.getString(R.string.surface_warn_firewall_politely_ignored_01d0b),
-        mContext.getString(R.string.surface_warn_device_insists_everything_is_fine_4c272),
-        mContext.getString(R.string.surface_mesh_propagating_into_nearby_terminals_f7abe),
-        mContext.getString(R.string.surface_mesh_seeding_ghost_sessions_9a742),
-        mContext.getString(R.string.surface_mesh_flooding_loopback_channel_7c336),
-        mContext.getString(R.string.surface_db_harvesting_battery_telemetry_fc93c),
-        mContext.getString(R.string.surface_db_harvesting_session_hints_636b4),
-        mContext.getString(R.string.surface_db_harvesting_stale_command_history_ffba7),
-        mContext.getString(R.string.surface_vid_spoofing_viewport_overlays_cc228),
-        mContext.getString(R.string.surface_vid_injecting_terminal_rain_12859),
-        mContext.getString(R.string.surface_vid_pinning_cinematic_contrast_f7b43),
-        mContext.getString(R.string.surface_aux_scrambling_keyboard_handshake_a188a),
-        mContext.getString(R.string.surface_aux_bouncing_cursor_driver_55683),
-        mContext.getString(R.string.surface_aux_destabilizing_glyph_cache_7fe2d),
-        mContext.getString(R.string.surface_fs_mounting_storage_emulated_0_re_t_ui_52e6f),
-        mContext.getString(R.string.surface_fs_enumerating_ui_xml_b7351),
-        mContext.getString(R.string.surface_fs_enumerating_theme_xml_67346),
-        mContext.getString(R.string.surface_fs_enumerating_suggestions_xml_b4f36),
-        mContext.getString(R.string.surface_fs_enumerating_behavior_xml_705a2),
-        mContext.getString(R.string.surface_mod_patching_fake_subsystem_notifications_b0995),
-        mContext.getString(R.string.surface_mod_patching_fake_subsystem_music_760a7),
-        mContext.getString(R.string.surface_mod_patching_fake_subsystem_wallpaper_5b40a),
-        mContext.getString(R.string.surface_mod_patching_fake_subsystem_battery_b3009),
-        mContext.getString(R.string.surface_ping_127_0_0_1_replied_in_0ms_8329b),
-        mContext.getString(R.string.surface_ping_127_0_0_1_replied_in_0ms_8329b),
-        mContext.getString(R.string.surface_ping_127_0_0_1_replied_in_0ms_8329b),
-        mContext.getString(R.string.surface_scan_port_22_open_a2126),
-        mContext.getString(R.string.surface_scan_port_80_filtered_a7a85),
-        mContext.getString(R.string.surface_scan_port_443_open_c0202),
-        mContext.getString(R.string.surface_scan_port_1337_aesthetically_required_d7959),
-        mContext.getString(R.string.surface_seed_generating_panic_checksum_8f_2c_91_79931),
-        mContext.getString(R.string.surface_seed_generating_panic_checksum_8f_2c_92_78c06),
-        mContext.getString(R.string.surface_seed_generating_panic_checksum_8f_2c_93_a69e4),
-        mContext.getString(R.string.surface_pipe_rerouting_stdout_to_dramatic_overlay_e0640),
-        mContext.getString(R.string.surface_pipe_rerouting_stderr_to_dramatic_overlay_e9649),
-        mContext.getString(R.string.surface_pipe_rerouting_common_sense_to_dev_null_0de7e),
-        mContext.getString(R.string.surface_ovrd_replacing_launcher_calmness_with_urgency_e58e2),
-        mContext.getString(R.string.surface_ovrd_amplifying_green_phosphor_output_5232f),
-        mContext.getString(R.string.surface_ovrd_preserving_user_music_module_because_priorities_ceff2),
-        mContext.getString(R.string.surface_hook_intercepting_idle_state_23263),
-        mContext.getString(R.string.surface_hook_intercepting_wallpaper_refresh_da0db),
-        mContext.getString(R.string.surface_hook_intercepting_harmless_command_execution_adcd5),
-        mContext.getString(R.string.surface_task_assembling_unauthorized_vibes_4749e),
-        mContext.getString(R.string.surface_task_replaying_synthetic_intrusion_frames_d923b),
-        mContext.getString(R.string.surface_task_marking_sequence_irreversible_2ffa6),
-        mContext.getString(R.string.surface_task_sequence_actually_reversible_d7cf9),
-        mContext.getString(R.string.surface_lock_pretending_to_lock_subsystems_b0d7d),
-        mContext.getString(R.string.surface_lock_pretending_to_exfiltrate_secrets_fdce3),
-        mContext.getString(R.string.surface_lock_pretending_to_know_what_any_of_this_means_e6784),
-        mContext.getString(R.string.surface_null_dereferencing_cinematic_stakes_7489a),
-        mContext.getString(R.string.surface_null_recovering_from_fake_catastrophe_adc60),
-        mContext.getString(R.string.surface_done_dramatic_effect_complete_3a5b9)
-    )
-    private val hackSequenceRunnables = ArrayList<Runnable>()
 
     private var weatherDelay = 0
 
@@ -1003,67 +756,86 @@ class UIManager(
 
     private class PagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    private var suggestionsManager: SuggestionsManager? = null
-    private val searchOnlyMode: Boolean
-        get() = LauncherMode.usesSearch()
-
-    private var terminalHome: ohi.andre.consolelauncher.managers.termux.TerminalHomeView? = null
-    private var terminalSearchOpen = false
-    private var terminalHomeDim: View? = null
-
-    private fun configureTerminalHome() {
-        if (!LauncherMode.isTerminal() || terminalHome != null) return
-        val tray = terminalTrayContainer ?: return
-        val parent = tray.parent as? FrameLayout ?: return
-        val home = ohi.andre.consolelauncher.managers.termux.TerminalHomeView(mContext!!)
-        terminalHome = home
-        parent.addView(home, parent.indexOfChild(tray), FrameLayout.LayoutParams(-1, -1))
-        terminalHomeDim = View(mContext).apply {
-            setBackgroundColor(0x99000000.toInt())
-            setOnClickListener { showTerminalSearch(false) }
-            visibility = View.GONE
-        }.also { parent.addView(it, parent.indexOfChild(tray), FrameLayout.LayoutParams(-1, -1)) }
-        mRootView?.findViewById<View>(R.id.terminal_home_add_tab)?.setOnClickListener {
-            showTerminalSearch(false); home.showAddTerminal()
-        }
-        mRootView?.findViewById<View>(R.id.terminal_home_settings_tab)?.setOnClickListener {
-            showTerminalSearch(false); openSettingsSurface(null)
-        }
-        persistentInputContainer?.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
-            if (bottom - top != oldBottom - oldTop) applyDisplayMarginsForConfigurationOnMainThread()
-        }
-        val inputContainer = persistentInputContainer as? LinearLayout
-        if (inputContainer != null) {
-            val keys = android.view.LayoutInflater.from(mContext).inflate(R.layout.termux_special_keys, inputContainer, false)
-            keys.visibility = View.GONE
-            (keys.layoutParams as LinearLayout.LayoutParams).topMargin = Tuils.dpToPx(mContext, 2)
-            val inputGroup = inputContainer.findViewById<View>(R.id.input_group)
-            inputContainer.addView(keys, inputContainer.indexOfChild(inputGroup) + 1)
-            home.bindSpecialKeys(keys)
-            home.onTerminalFocusChanged = { focused ->
-                val terminalFocused = focused && !terminalSearchOpen
-                inputGroup.visibility = if (terminalFocused) View.GONE else View.VISIBLE
-                inputContainer.findViewById<View>(R.id.search_mode_tabs)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
-                keys.visibility = if (terminalFocused && keyboardVisible) View.VISIBLE else View.GONE
-                applyDisplayMarginsForConfigurationOnMainThread()
-            }
-        }
-        showTerminalSearch(false)
-        applyDisplayMarginsForConfigurationOnMainThread()
-        home.resume()
+    private val modeHost = object : ohi.andre.consolelauncher.managers.modes.HomeModeHost {
+        override val context: Context get() = mContext
+        override val root: ViewGroup? get() = mRootView as? ViewGroup
+        override val pack: MainPack get() = mainPack
+        override val weatherDetails: String? get() = lastWeatherDetails
+        override val weatherCondition: String? get() = lastWeatherCondition
+        override val weatherSymbol: String? get() = lastWeatherSymbol
+        override val notifications: List<NotificationService.Notification> get() = currentOverlayNotifications
+        override val music: ohi.andre.consolelauncher.managers.modes.HomeModeHost.Music?
+            get() = musicModule.song?.takeIf { it.isNotBlank() }?.let { ohi.andre.consolelauncher.managers.modes.HomeModeHost.Music(it, musicModule.singer, musicModule.playing) }
+        override fun onMain(action: () -> Unit) = runOnMainThread(action)
+        override fun executeResolved(command: String?, resolved: Any?) { mExecuter.execute(command, resolved) }
+        override fun executeSearchCommand(command: String) = executeFromSearch(command)
+        override fun hideKeyboard() = hideHomeKeyboard()
+        override fun raiseKeyboard() = openKeyboard()
+        override fun closeSearchModules() { searchSurface.closeModules(backToSearch = false) }
+        override val tray: View? get() = terminalTrayContainer
+        override val inputBar: View? get() = persistentInputContainer
+        override val keyboardUp: Boolean get() = keyboardVisible
+        override fun applyDisplayMargins() = applyDisplayMarginsForConfigurationOnMainThread()
+        override fun launchSettings() = openSettingsSurface(null)
+        override fun configureSearchLayout(closeDrawers: Boolean) = configureSearchOnlyLayout(closeDrawers)
+        override fun activateInput() = activateTerminalInput(true)
+        override fun refreshSuggestions() = refreshStockSuggestions()
+        override fun dropKeyboard() = closeKeyboard()
+        override fun applySectionMargins(view: View?, marginMm: IntArray, metrics: DisplayMetrics?, extraBottomPx: Int, extraTopPx: Int) =
+            applySectionDisplayMargins(view, marginMm, metrics, extraBottomPx, extraTopPx)
     }
 
-    private fun showTerminalSearch(show: Boolean) {
-        if (!show) searchModules?.close(backToSearch = false)
-        terminalSearchOpen = show
-        terminalHome?.releaseInput()
-        configureSearchOnlyLayout(closeDrawers = true)
-        terminalHomeDim?.visibility = if (show) View.VISIBLE else View.GONE
-        if (android.os.Build.VERSION.SDK_INT >= 31) {
-            terminalHome?.setRenderEffect(if (show) android.graphics.RenderEffect.createBlurEffect(18f, 18f, android.graphics.Shader.TileMode.CLAMP) else null)
+    /** The modes with a home of their own. A new one only needs its class and an entry here. */
+    private val homeModes: ohi.andre.consolelauncher.managers.modes.HomeModes by lazy {
+        ohi.andre.consolelauncher.managers.modes.HomeModes(mapOf(
+            LauncherMode.SEARCH to ohi.andre.consolelauncher.managers.modes.SearchHomeMode(),
+            LauncherMode.DOT to ohi.andre.consolelauncher.managers.modes.DotHomeMode(modeHost),
+            LauncherMode.MONO to ohi.andre.consolelauncher.managers.modes.MonoHomeMode(modeHost),
+            LauncherMode.TERMINAL to ohi.andre.consolelauncher.managers.modes.TerminalHomeMode(modeHost),
+        ))
+    }
+
+    private val searchSurface: ohi.andre.consolelauncher.managers.modes.SearchSurface by lazy {
+        ohi.andre.consolelauncher.managers.modes.SearchSurface(object : ohi.andre.consolelauncher.managers.modes.SearchSurfaceHost {
+            override val context: Context get() = mContext
+            override val root: ViewGroup? get() = mRootView as? ViewGroup
+            override val tray: View? get() = terminalTrayContainer
+            override val appearance get() = statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+            override val drawersOpen: Boolean get() = isAppsDrawerOpen || isAndroidWidgetDrawerOpen
+            override val searchInput: View? get() = mTerminalAdapter?.inputView
+            override val suggestions: SuggestionsManager? get() = suggestionsManager
+            override fun hideDrawers() {
+                appDrawerPaneManager?.hide()
+                androidWidgetDrawerManager?.hide()
+            }
+            override fun renderModuleInto(moduleId: String, container: ViewGroup) {
+                if (homeModulesContainer !== container) { classicModulesContainer = homeModulesContainer; homeModulesContainer = container }
+                showHomeModule(moduleId)
+            }
+            override fun moduleCarouselClosed() {
+                closeHomeModule()
+                homeModulesContainer = classicModulesContainer
+            }
+            override fun activateInput() = activateTerminalInput(true)
+            override fun dropKeyboard() = closeKeyboard()
+        }) { homeModes.active }
+    }
+
+    private var suggestionsManager: SuggestionsManager? = null
+    private val searchOnlyMode: Boolean
+        get() = homeModes.active.usesSearchLayout
+
+    /**
+     * Puts the keyboard away for a home that manages its own (see [HomeMode.managesOwnKeyboard]). After
+     * `mode` it can still belong to the old layout's input, so it goes by window as well. Mono types in its own input line.
+     */
+    private fun hideHomeKeyboard() {
+        runCatching { closeKeyboard() }
+        (mContext as? Activity)?.window?.let { window ->
+            val hide = { androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+                .hide(androidx.core.view.WindowInsetsCompat.Type.ime()) }
+            hide(); window.decorView.post { hide() }
         }
-        terminalHome?.importantForAccessibility = if (show) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
-        if (show) { activateTerminalInput(true); refreshStockSuggestions() } else closeKeyboard()
     }
 
     private var terminalView: TextView? = null
@@ -1075,24 +847,19 @@ class UIManager(
 
     var pack: MainPack? = null
 
-    private val clearOnLock: Boolean
-
     private val mRootView: View?
 
     private val viewPager: ViewPager2
     private var homeModulesContainer: ViewGroup? = null
     // Search and Terminal modes show dock modules in a carousel over the blurred wallpaper; while it is open,
     // module rendering targets the carousel instead of Classic's home page.
-    private var searchModules: SearchModuleCarousel? = null
     private var classicModulesContainer: ViewGroup? = null
-    private var searchModulesExtra: String? = null
-    val isSearchModulesOpen: Boolean get() = searchModules?.isOpen == true
+    val isSearchModulesOpen: Boolean get() = searchSurface.isModuleOpen
     private var mainContainer: View? = null
     private var headerContainer: ViewGroup? = null
     private var unifiedBottomConsole: ViewGroup? = null
     private var unifiedDockHost: ViewGroup? = null
     private var unifiedModuleScroll: ScrollView? = null
-    private var unifiedModuleHost: ViewGroup? = null
     private var headerOriginalParent: ViewGroup? = null
     private var headerOriginalParams: ViewGroup.LayoutParams? = null
     private var headerOriginalIndex = -1
@@ -1116,20 +883,7 @@ class UIManager(
     private var imeBottomOffset = 0
     private var imeInsetVisible = false
 
-    private val genericBorderCornerRadius: Int
-    private var useDashed: Boolean
     private var margins: Array<IntArray?>
-
-    private val INPUT_BGCOLOR_INDEX = 10
-    private val OUTPUT_BGCOLOR_INDEX = 11
-    private val SUGGESTIONS_BGCOLOR_INDEX = 12
-    private val TOOLBAR_BGCOLOR_INDEX = 13
-
-    private val OUTPUT_MARGINS_INDEX = 1
-    private val INPUTAREA_MARGINS_INDEX = 2
-    private val INPUTFIELD_MARGINS_INDEX = 3
-    private val TOOLBAR_MARGINS_INDEX = 4
-    private val SUGGESTIONS_MARGINS_INDEX = 5
 
     private val mExecuter: CommandExecuter
 
@@ -1183,7 +937,7 @@ class UIManager(
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     inputTouchInProgress = false
-                    if (event.actionMasked == MotionEvent.ACTION_UP && LauncherMode.isTerminal() && !terminalSearchOpen) showTerminalSearch(true)
+                    if (event.actionMasked == MotionEvent.ACTION_UP) homeModes.active.onInputEngaged()
                     inputView.post { applyDisplayMarginsForConfigurationOnMainThread() }
                 }
             }
@@ -1191,7 +945,7 @@ class UIManager(
         }
         inputView.setOnFocusChangeListener { _, hasFocus ->
             suggestionsManager?.setSearchInputActive(keyboardVisible)
-            if (LauncherMode.isTerminal() && terminalHome != null && hasFocus && inputTouchInProgress && !terminalSearchOpen) showTerminalSearch(true)
+            if (hasFocus && inputTouchInProgress) homeModes.active.onInputEngaged()
             if (searchOnlyMode && hasFocus) refreshStockSuggestions()
             if (!inputTouchInProgress) applyDisplayMarginsForConfigurationOnMainThread()
         }
@@ -1200,9 +954,8 @@ class UIManager(
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                if (!s.isNullOrEmpty() && inputView.hasFocus() && isSearchModulesOpen) searchModules?.close(backToSearch = false)
-                if (LauncherMode.isTerminal() && terminalHome != null && !terminalSearchOpen && inputView.hasFocus() && !s.isNullOrEmpty())
-                    showTerminalSearch(true)
+                if (!s.isNullOrEmpty() && inputView.hasFocus() && isSearchModulesOpen) searchSurface.closeModules(backToSearch = false)
+                if (inputView.hasFocus() && !s.isNullOrEmpty()) homeModes.active.onInputEngaged()
             }
         })
         if (inputView is OutlineEditText) {
@@ -1211,7 +964,7 @@ class UIManager(
             outlineInput.setIdleCursorVisible(true)
         }
         val openTerminalInput = View.OnClickListener {
-            if (LauncherMode.isTerminal() && !terminalSearchOpen) showTerminalSearch(true)
+            homeModes.active.onInputEngaged()
             activateTerminalInput(true)
             refreshStockSuggestions()
         }
@@ -1257,15 +1010,7 @@ class UIManager(
 
             ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleSurface(toolbarView!!,appearance)
 
-            if (appDrawerView != null) {
-                appDrawerView.setColorFilter(XMLPrefsManager.getColor(Theme.toolbar_icon_color), PorterDuff.Mode.SRC_IN)
-                if (XMLPrefsManager.getBoolean(Behavior.swipe_up_apps_drawer)) {
-                    appDrawerView.setVisibility(View.VISIBLE)
-                    appDrawerView.setOnClickListener(View.OnClickListener { v: View? -> showAppsDrawer() })
-                } else {
-                    appDrawerView.setVisibility(View.GONE)
-                }
-            }
+            configureAppsDrawerToolbarButton(appDrawerView)
             configureAndroidWidgetDrawerToolbarButton(androidWidgetDrawerView)
             if (termuxWorkspaceView != null) {
                 configureTermuxWorkspaceToolbarButton(termuxWorkspaceView)
@@ -1368,7 +1113,8 @@ class UIManager(
         }
 
 
-        configureTerminalHome()
+        homeModes.active.install()
+        applyPixelGrid()
         scheduleTypefaceRefreshes()
     }
 
@@ -1436,6 +1182,19 @@ class UIManager(
         val button = mRootView?.findViewById<ImageButton?>(R.id.termux_workspace_view)
         configureTermuxWorkspaceToolbarButton(button)
         refreshToolbarWeightSum()
+    }
+
+    fun refreshAppsDrawerToolbarButton() {
+        configureAppsDrawerToolbarButton(mRootView?.findViewById<ImageButton?>(R.id.app_drawer_view))
+        refreshToolbarWeightSum()
+        if (duoLayoutActive) attachDuoSwitchButton(activeDuoLayoutMode)
+    }
+
+    private fun configureAppsDrawerToolbarButton(button: ImageButton?) {
+        if (button == null) return
+        button.setColorFilter(XMLPrefsManager.getColor(Theme.toolbar_icon_color), PorterDuff.Mode.SRC_IN)
+        button.visibility = if (XMLPrefsManager.getBoolean(Toolbar.show_apps_drawer_button)) View.VISIBLE else View.GONE
+        button.setOnClickListener { showAppsDrawer() }
     }
 
     fun refreshAndroidWidgetDrawerToolbarButton() {
@@ -1509,6 +1268,13 @@ class UIManager(
         return max(1, count)
     }
 
+    /** Runs a command typed in search opened over another app, as if it were typed here. */
+    internal fun executeFromSearch(command: String) {
+        homeModes.active.beforeSearchCommand(command)
+        if (mTerminalAdapter?.executeInput(command) != true) mExecuter.execute(command, null)
+        homeModes.active.afterSearchCommand()
+    }
+
     private fun executeToolbarShortcut(command: String?) {
         val normalized = if (command == null) Tuils.EMPTYSTRING else command.trim { it <= ' ' }
         if (normalized.length == 0) {
@@ -1556,10 +1322,8 @@ class UIManager(
             headerContainer?.post { applyTerminalTrayState(false) }
         }
         unifiedBottomConsole = rootView.findViewById<ViewGroup?>(R.id.unified_bottom_console)
-        unifiedStatusHost = rootView.findViewById<ViewGroup?>(R.id.unified_status_host)
         unifiedDockHost = rootView.findViewById<ViewGroup?>(R.id.unified_dock_host)
         unifiedModuleScroll = rootView.findViewById<ScrollView?>(R.id.unified_module_scroll)
-        unifiedModuleHost = rootView.findViewById<ViewGroup?>(R.id.unified_module_host)
         landscapeSplitContainer = rootView.findViewById<View?>(R.id.landscape_split_container)
         landscapeLeftPane = rootView.findViewById<ViewGroup?>(R.id.landscape_left_pane)
         landscapeRightPane = rootView.findViewById<ViewGroup?>(R.id.landscape_right_pane)
@@ -2015,17 +1779,6 @@ class UIManager(
         }
     }
 
-    fun applyImeBottomOffset(keyboardOffset: Int, imeVisible: Boolean) {
-        applyWindowInsets(
-            systemInsetLeft,
-            systemInsetTop,
-            systemInsetRight,
-            systemInsetBottom,
-            keyboardOffset,
-            imeVisible
-        )
-    }
-
     fun applyWindowInsets(
         left: Int,
         top: Int,
@@ -2041,19 +1794,9 @@ class UIManager(
             systemInsetBottom = max(0, bottom)
             imeInsetVisible = imeVisible
             imeBottomOffset = if (imeInsetVisible) max(0, keyboardOffset) else 0
-            if (isPodcastSurfaceVisible && imeVisible) {
-                // Focus panes own the launcher viewport; the IME must not resize them.
-                closeKeyboard()
-                mTerminalAdapter?.inputView?.clearFocus()
-                imeInsetVisible = false
-                imeBottomOffset = 0
-            }
             applyDisplayMarginsForConfiguration(currentConfiguration)
             applyTermuxImeBottomPadding()
 
-            if (isPodcastSurfaceVisible) {
-                applyPodcastPaneGeometry()
-            }
             updateKeyboardLayoutState(
                 imeInsetVisible || imeBottomOffset > 0,
                 if (mRootView != null) mRootView.getHeight() else 0
@@ -2077,7 +1820,7 @@ class UIManager(
         val layoutStateChanged =
             !hasLastLayoutState || keyboardVisible != newKeyboardVisible || lastObservedRootHeight != rootHeight
         keyboardVisible = newKeyboardVisible
-        if (LauncherMode.isTerminal()) terminalHome?.updateKeyboardVisibility(newKeyboardVisible)
+        homeModes.active.onKeyboardChanged(newKeyboardVisible)
         hasLastLayoutState = true
         lastObservedRootHeight = rootHeight
         if (!layoutStateChanged) {
@@ -2095,7 +1838,7 @@ class UIManager(
             }
         }
         suggestionsManager?.setSearchInputActive(keyboardVisible)
-        setNotificationWidgetCompact(mRootView!!, keyboardVisible)
+        notificationsModule.setNotificationWidgetCompact(keyboardVisible)
         updateUnifiedBottomModuleBounds()
         applyTerminalTrayState(false)
         if (keyboardVisible && XMLPrefsManager.getBoolean(Behavior.auto_scroll)) {
@@ -2180,12 +1923,7 @@ class UIManager(
         if(duoLayoutActive) ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.finishDuoLayout(mRootView as ViewGroup,
             ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),
             ohi.andre.consolelauncher.presentation.LauncherHomeSnapshot.Insets(systemInsetLeft,systemInsetTop,systemInsetRight,systemInsetBottom),captureTrayPresentationState())
-        if (LauncherMode.isTerminal()) {
-            val bottomChrome = persistentInputContainer?.height ?: 0
-            val bottomClearance = bottomChrome + searchInset + Tuils.mmToPx(metrics, bottomMargins[3])
-            terminalHome?.setSearchBarClearance(bottomClearance, bottomChrome)
-            applySectionDisplayMargins(terminalHome, topMargins, metrics, imeBottomOffset, systemInsetTop)
-        }
+        homeModes.active.onDisplayMargins(topMargins, bottomMargins, metrics, imeBottomOffset, searchInset, systemInsetTop)
         applyTerminalOverlayDisplayMargins(topMargins, bottomMargins, metrics)
     }
 
@@ -2238,40 +1976,8 @@ class UIManager(
             overlayDisplayMarginBottom + if (duoLayoutActive) 0 else imeBottomOffset
         )
         applyTermuxImeBottomPadding()
-        OverlayLayoutManager.applyPaddingWithBase(
-            fileOverlay,
-            fileOverlayBasePaddingLeft,
-            fileOverlayBasePaddingTop,
-            fileOverlayBasePaddingRight,
-            fileOverlayBasePaddingBottom,
-            overlayDisplayMarginLeft,
-            overlayDisplayMarginTop,
-            overlayDisplayMarginRight,
-            overlayDisplayMarginBottom
-        )
-        OverlayLayoutManager.applyPaddingWithBase(
-            podcastOverlay,
-            podcastOverlayBasePaddingLeft,
-            podcastOverlayBasePaddingTop,
-            podcastOverlayBasePaddingRight,
-            podcastOverlayBasePaddingBottom,
-            overlayDisplayMarginLeft,
-            overlayDisplayMarginTop,
-            overlayDisplayMarginRight,
-            overlayDisplayMarginBottom
-        )
-        applyPodcastPaneGeometry()
-        OverlayLayoutManager.applyPaddingWithBase(
-            hackOverlay,
-            hackOverlayBasePaddingLeft,
-            hackOverlayBasePaddingTop,
-            hackOverlayBasePaddingRight,
-            hackOverlayBasePaddingBottom,
-            overlayDisplayMarginLeft,
-            overlayDisplayMarginTop,
-            overlayDisplayMarginRight,
-            overlayDisplayMarginBottom
-        )
+        fileConsoleController?.applyDisplayMargins(overlayDisplayMarginLeft, overlayDisplayMarginTop, overlayDisplayMarginRight, overlayDisplayMarginBottom)
+        hackOverlayController?.applyDisplayMargins(overlayDisplayMarginLeft, overlayDisplayMarginTop, overlayDisplayMarginRight, overlayDisplayMarginBottom)
     }
 
     private fun styleTerminalTrayToggle() {
@@ -2366,11 +2072,21 @@ class UIManager(
         }
     }
 
+    private fun moveTopSectionUp(distance: Int) {
+        val header = headerContainer ?: return
+        val params = header.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        if (params.topMargin != -distance) {
+            params.topMargin = -distance
+            header.layoutParams = params
+        }
+    }
+
     private fun applyTerminalTrayState(refocusInput: Boolean) {
         if (terminalContainer == null) {
             return
         }
 
+        if (searchOnlyMode || landscapeLayoutActive) moveTopSectionUp(0)
         if (searchOnlyMode) {
             configureSearchOnlyLayout()
             if (refocusInput) mTerminalAdapter?.requestInputFocus()
@@ -2477,7 +2193,7 @@ class UIManager(
             calculateHeaderOnlyTerminalTrayHeight(),
             !this.isOutputAutoHideEnabled && (this.isOutputTrayNativeMode || this.isOutputTrayAutoMode),
             ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.minimumOpen(terminalOutputChromeHeight(),
-                max(UIUtils.dpToPx(mContext!!, 18), terminalView?.lineHeight ?: 0))
+                max(UIUtils.dpToPx(mContext!!, 18), terminalView?.lineHeight ?: 0), !TextUtils.isEmpty(activeModule))
         )
         val targetHeight = constrainTerminalOutputHeight(
             fittedHeight,
@@ -2491,6 +2207,12 @@ class UIManager(
             params.height = targetHeight
             terminalContainer!!.setLayoutParams(params)
         }
+        // With the output down to its tab, notification rows that still don't fit push the status rows off screen.
+        moveTopSectionUp(
+            if (homeModules[activeModule]?.pushesStatusRowsUp != true) 0
+            else ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.topSectionOverlap(
+                mRootView!!, rootHeight, persistentBottomChromeHeight(), targetHeight)
+        )
 
         updateTerminalTrayToggleText()
         if (terminalTrayExpanded && refocusInput && mTerminalAdapter != null) {
@@ -2503,84 +2225,10 @@ class UIManager(
 
     // Output, typing and theme refreshes re-apply this layout too; only a real layout change ([closeDrawers]) may close
     // a drawer the user opened, such as apps -ls in Search or Terminal mode.
-    private fun configureSearchOnlyLayout(closeDrawers: Boolean = false) {
-        val root=mRootView as? ViewGroup ?: return
-        if (!closeDrawers && (isAppsDrawerOpen || isAndroidWidgetDrawerOpen)) return
-        ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.configureSearch(root,
-            (statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()))
-        appDrawerPaneManager?.hide()
-        androidWidgetDrawerManager?.hide()
-        val tray = terminalTrayContainer ?: return
-        mRootView?.findViewById<View>(R.id.search_mode_tabs)?.visibility = View.VISIBLE
-        if (LauncherMode.isTerminal()) {
-            tray.visibility = View.VISIBLE
-            mRootView?.findViewById<View>(R.id.search_mode_results_scroll)?.visibility = if (terminalSearchOpen) View.VISIBLE else View.GONE
-            (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
-                params.height = if (terminalSearchOpen) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
-                tray.layoutParams = params
-            }
-        }
-        val clock = mRootView?.findViewById<TextView>(R.id.search_mode_clock_tab) ?: return
-        val add = mRootView?.findViewById<ImageButton>(R.id.terminal_home_add_tab)
-        val settings = mRootView?.findViewById<ImageButton>(R.id.terminal_home_settings_tab)
-        for (button in listOfNotNull(add, settings)) {
-            button.visibility = if (LauncherMode.isTerminal()) View.VISIBLE else View.GONE
-            button.setColorFilter(clock.currentTextColor)
-            button.background = clock.background?.constantState?.newDrawable()?.mutate()
-            (button.layoutParams as? LinearLayout.LayoutParams)?.bottomMargin = (clock.layoutParams as? LinearLayout.LayoutParams)?.bottomMargin ?: 0
-        }
-        TerminalBorderRuntime.bind(mRootView?.findViewById<View>(R.id.input_group), clock, add, settings)
-        if (LauncherMode.isTerminal()) {
-            val terminalFocused = !terminalSearchOpen && keyboardVisible && terminalHome?.hasTerminalFocus == true
-            mRootView?.findViewById<View>(R.id.search_mode_tabs)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
-            mRootView?.findViewById<View>(R.id.input_group)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
-        }
-    }
+    private fun configureSearchOnlyLayout(closeDrawers: Boolean = false) = searchSurface.configure(closeDrawers)
 
     /** Opens [module] (or the last one) under the MODULES chips in the results; says so when the dock has no modules. */
-    fun openSearchModules(module: String?, toggle: Boolean = false): Boolean {
-        if (!searchOnlyMode) return false
-        val id = module?.let { ModuleManager.normalize(it) }?.takeIf { ModuleManager.isKnown(mContext, it) }
-        val slot = searchModules ?: SearchModuleCarousel(mContext as Activity,
-            dock = { (ModuleManager.getDock(mContext).filterNotNull().filter { it.isNotEmpty() } + listOfNotNull(searchModulesExtra)).distinct() },
-            render = { target, container ->
-                if (homeModulesContainer !== container) { classicModulesContainer = homeModulesContainer; homeModulesContainer = container }
-                showHomeModule(target)
-            },
-            changed = {
-                suggestionsManager?.refreshSearchResults()
-                // Bring the open module into view. Not fullScroll: outside touch mode it moves focus.
-                mRootView?.findViewById<ScrollView>(R.id.search_mode_results_scroll)?.let { results ->
-                    results.post { searchModules?.view?.takeIf { it.isAttachedToWindow }?.let { module ->
-                        val bottom = generateSequence(module) { it.parent as? View }.takeWhile { it !== results }.sumOf { it.top } + module.height
-                        results.scrollTo(0, (bottom - results.height + results.paddingBottom).coerceAtLeast(0))
-                    } }
-                }
-            },
-            closed = { backToSearch ->
-                closeHomeModule()
-                homeModulesContainer = classicModulesContainer
-                searchModulesExtra = null
-                // Opening the module put the keyboard away; closing it returns to the search as it was.
-                if (backToSearch) activateTerminalInput(true)
-            },
-            behind = { listOfNotNull(terminalHome) }
-        ).also { slot ->
-            searchModules = slot
-            suggestionsManager?.openModule = { slot.current?.takeIf { slot.isOpen }?.let { it to slot.view } }
-        }
-        if (toggle && id != null && slot.isOpen && slot.current == id) { slot.close(); return true }
-        searchModulesExtra = id?.takeIf { it !in ModuleManager.getDock(mContext) }
-        // The module opens in the results layer: Terminal mode shows its search overlay for it.
-        if (LauncherMode.isTerminal() && !terminalSearchOpen) showTerminalSearch(true)
-        // The keyboard would leave the module little room; the search bar stays.
-        closeKeyboard()
-        if (!slot.open(id)) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.search_modules_empty))
-            return false
-        }
-        return true
-    }
+    fun openSearchModules(module: String?, toggle: Boolean = false): Boolean = searchSurface.openModule(module, toggle)
 
     private fun calculateExpandedTerminalTrayHeight(rootHeight: Int, collapsedHeight: Int): Int {
         val limit=ohi.andre.consolelauncher.presentation.TerminalTrayPresentation.expandedLimit(rootHeight,collapsedHeight,keyboardVisible,
@@ -2693,7 +2341,7 @@ class UIManager(
             if (bottom - top != oldBottom - oldTop) view.post { applyTerminalTrayState(false) }
         }
 
-        ensureSystemLuaModules()
+        luaModules.ensureSystemLuaModules()
         activeModule = ""
         ModuleManager.setActiveModule(mContext, "")
         homeModulesContainer!!.removeAllViews()
@@ -2918,197 +2566,11 @@ class UIManager(
         }
     }
 
-    private fun renderTermuxWorkspaceAnsi(value: String?): SpannableStringBuilder {
-        val out = SpannableStringBuilder()
-        if (TextUtils.isEmpty(value)) {
-            return out
-        }
-        val baseForeground = ThemeColorResolver.color(Theme.workspace_output_text_color)
-        val baseBackground = terminalWindowBackground()
-        val style = TermuxAnsiStyle()
-        var spanStart = 0
-        var index = 0
-        val text = value!!
-        while (index < text.length) {
-            val ch = text[index]
-            if (ch == '\u001B' && index + 1 < text.length && text[index + 1] == '[') {
-                val end = findTermuxAnsiSequenceEnd(text, index + 2)
-                if (end > index) {
-                    applyTermuxAnsiSpan(out, spanStart, out.length, style, baseForeground, baseBackground)
-                    if (text[end] == 'm') {
-                        updateTermuxAnsiStyle(style, text.substring(index + 2, end))
-                    }
-                    spanStart = out.length
-                    index = end + 1
-                    continue
-                }
-            }
-            if (ch != '\r') {
-                out.append(ch)
-            }
-            index++
-        }
-        applyTermuxAnsiSpan(out, spanStart, out.length, style, baseForeground, baseBackground)
-        return out
-    }
-
     private fun handleTermuxWorkspaceExternalCommand(rawCommand: String?) {
         ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceActivity.open(mContext, rawCommand)
     }
 
-    private fun findTermuxAnsiSequenceEnd(text: String, start: Int): Int {
-        var index = start
-        while (index < text.length) {
-            val code = text[index].code
-            if (code in 0x40..0x7e) {
-                return index
-            }
-            index++
-        }
-        return -1
-    }
-
-    private fun updateTermuxAnsiStyle(style: TermuxAnsiStyle, params: String) {
-        val codes = parseTermuxAnsiCodes(params)
-        if (codes.isEmpty()) {
-            style.reset()
-            return
-        }
-        var index = 0
-        while (index < codes.size) {
-            when (val code = codes[index]) {
-                0 -> style.reset()
-                1 -> style.bold = true
-                22 -> style.bold = false
-                7 -> style.reverse = true
-                27 -> style.reverse = false
-                39 -> style.foreground = null
-                49 -> style.background = null
-                in 30..37 -> style.foreground = termuxAnsiColor(code - 30, false, false)
-                in 90..97 -> style.foreground = termuxAnsiColor(code - 90, true, false)
-                in 40..47 -> style.background = termuxAnsiColor(code - 40, false, true)
-                in 100..107 -> style.background = termuxAnsiColor(code - 100, true, true)
-                38, 48 -> {
-                    val foreground = code == 38
-                    val parsed = parseTermuxExtendedAnsiColor(codes, index + 1, !foreground)
-                    if (parsed != null) {
-                        if (foreground) {
-                            style.foreground = parsed.first
-                        } else {
-                            style.background = parsed.first
-                        }
-                        index = parsed.second
-                    }
-                }
-            }
-            index++
-        }
-    }
-
-    private fun parseTermuxAnsiCodes(params: String): List<Int> {
-        if (params.isEmpty()) {
-            return listOf(0)
-        }
-        val codes = ArrayList<Int>()
-        val parts = params.replace(':', ';').split(";")
-        for (part in parts) {
-            codes.add(part.toIntOrNull() ?: 0)
-        }
-        return codes
-    }
-
-    private fun parseTermuxExtendedAnsiColor(codes: List<Int>, start: Int, background: Boolean): Pair<Int, Int>? {
-        if (start >= codes.size) {
-            return null
-        }
-        return when (codes[start]) {
-            5 -> {
-                if (start + 1 >= codes.size) null
-                else Pair(termuxAnsi256Color(codes[start + 1], background), start + 1)
-            }
-            2 -> {
-                if (start + 3 >= codes.size) null
-                else Pair(
-                    Color.rgb(
-                        codes[start + 1].coerceIn(0, 255),
-                        codes[start + 2].coerceIn(0, 255),
-                        codes[start + 3].coerceIn(0, 255)
-                    ),
-                    start + 3
-                )
-            }
-            else -> null
-        }
-    }
-
-    private fun applyTermuxAnsiSpan(
-        out: SpannableStringBuilder,
-        start: Int,
-        end: Int,
-        style: TermuxAnsiStyle,
-        baseForeground: Int,
-        baseBackground: Int
-    ) {
-        if (start >= end) {
-            return
-        }
-        var foreground = style.foreground ?: baseForeground
-        var background = style.background
-        if (style.reverse) {
-            val originalForeground = foreground
-            foreground = background ?: Color.BLACK
-            background = originalForeground
-        }
-        if (foreground != baseForeground || style.reverse || style.foreground != null) {
-            out.setSpan(ForegroundColorSpan(foreground), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-        if (background != null && background != baseBackground) {
-            out.setSpan(BackgroundColorSpan(background), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-        if (style.bold) {
-            out.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-    }
-
-    private fun termuxAnsiColor(index: Int, bright: Boolean, background: Boolean): Int {
-        return ThemeColorResolver.ansi(index, bright)
-    }
-
-    private fun termuxAnsi256Color(code: Int, background: Boolean): Int {
-        val clean = code.coerceIn(0, 255)
-        if (clean < 16) {
-            return termuxAnsiColor(clean % 8, clean >= 8, background)
-        }
-        if (clean in 16..231) {
-            val value = clean - 16
-            val red = value / 36
-            val green = (value / 6) % 6
-            val blue = value % 6
-            return Color.rgb(termuxAnsiCubeValue(red), termuxAnsiCubeValue(green), termuxAnsiCubeValue(blue))
-        }
-        val gray = 8 + (clean - 232) * 10
-        return Color.rgb(gray, gray, gray)
-    }
-
-    private fun termuxAnsiCubeValue(value: Int): Int {
-        return if (value <= 0) 0 else 55 + value * 40
-    }
-
-    private class TermuxAnsiStyle {
-        var foreground: Int? = null
-        var background: Int? = null
-        var bold: Boolean = false
-        var reverse: Boolean = false
-
-        fun reset() {
-            foreground = null
-            background = null
-            bold = false
-            reverse = false
-        }
-    }
-
-    private class TermuxWorkspaceGeometry(
+    internal class TermuxWorkspaceGeometry(
         val cols: Int,
         val rows: Int
     )
@@ -3185,8 +2647,7 @@ class UIManager(
         moduleSuggestionsModule = module
         pendingModuleSuggestionsScrollX = restoreX
         group.removeAllViews()
-        // Music chips only while actually playing; pause/stop used to leave prev/play/next up.
-        if (ModuleManager.MUSIC == activeModule && !lastMusicPlaying) {
+        if (homeModules[activeModule]?.showsSuggestions == false) {
             hideModuleSuggestionsStrip()
             return
         }
@@ -3328,6 +2789,77 @@ class UIManager(
         }
     }
 
+    private val moduleHost = object : HomeModuleHost {
+        override val context: Context get() = mContext
+        override fun renderText(moduleId: String?, text: CharSequence?) = showTextModule(moduleId, text)
+        override fun bodyTextColor() = notificationWidgetTextColor()
+        override fun accentTextColor() = moduleNameTextColor()
+        override fun bodyTextSize() = moduleBodyTextSize()
+        override fun appearance() = statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
+        override fun applyBodyTypeface(view: TextView, moduleId: String?, fontMode: String?) = applyModuleBodyTypeface(view, moduleId, fontMode)
+        override val root: View? get() = mRootView
+        override val moduleContainer: ViewGroup? get() = homeModulesContainer
+        override val handler: Handler? get() = this@UIManager.handler
+        override val activeModuleId: String? get() = activeModule
+        override val windowFocused: Boolean get() = launcherWindowFocused
+        override fun presentModule(moduleId: String) = showHomeModule(moduleId)
+        override fun closeModule() = closeHomeModule()
+        override fun refreshSuggestions() = refreshSuggestionsForActiveModule()
+        override fun refreshContextVisibility() = updateContextContainerVisibility(mRootView)
+        override fun refreshDockSelection() = updateModuleDockSelection()
+        override fun repaintTextModule(moduleId: String?) = repaintActiveTextModule(moduleId)
+        override fun executeCommand(command: String?) = executeLuaWidgetCommand(command)
+        override fun launchActivity(intent: Intent) = startActivityAfterChromeHidden(intent)
+        override fun bindCloseButton(close: TextView) {
+            close.setOnClickListener { closeHomeModule() }
+            close.setTextColor(moduleNameTextColor())
+            close.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
+            close.setTextSize(moduleHeaderTextSize().toFloat())
+        }
+        override fun styleCloseButton(close: TextView?, target: FrameTarget) = styleModuleClose(close, target)
+        override fun addCommandButtons(parent: LinearLayout, commands: List<Pair<String, String>>) = luaModules.layout.addLuaButtonGrid(
+            parent, commands.mapTo(ArrayList()) { (label, command) -> LuaSurfaceAction(label) { executeLuaWidgetCommand(command) } })
+    }
+
+    private val musicModule: MusicModule by lazy {
+        MusicModule(moduleHost, { mainPack }, { homeModes.active.onDataChanged() }, {
+            syncPodcastPill()
+        })
+    }
+
+    private val luaModules: LuaModules by lazy { LuaModules(moduleHost) { value -> actionLuaApp(value) } }
+
+    private val notificationsModule by lazy {
+        NotificationsModule(moduleHost) { notifications ->
+            suggestionsManager?.setSearchNotifications(notifications)
+            homeModes.active.onDataChanged()
+        }
+    }
+
+    /** Built-in Home modules. A new one only needs its class and an entry here. */
+    private val homeModules by lazy {
+        HomeModules(listOf(
+            musicModule, notificationsModule, TimerModule(), CalendarModule(), ReminderModule(), NotesModule(), RssModule { mainPack.rssManager },
+            WeatherModule(
+                reading = {
+                    WeatherModule.Reading(lastWeatherText.takeUnless { TextUtils.isEmpty(it) } ?: labelTexts[Label.weather.ordinal],
+                        lastWeatherSymbol, lastWeatherUpdateMillis)
+                },
+                ensureUpdating = {
+                    if (weatherManager == null) {
+                        weatherDelay = XMLPrefsManager.getInt(Behavior.weather_update_time) * 1000
+                        weatherManager = WeatherManager(
+                            mContext!!,
+                            weatherDelay.toLong(),
+                            labelSizes[Label.weather.ordinal],
+                            statusUpdateListener
+                        ).also { it.start() }
+                    }
+                },
+            ),
+        ))
+    }
+
     private fun showHomeModule(module: String?) {
         if (homeModulesContainer == null) return
 
@@ -3339,51 +2871,21 @@ class UIManager(
         val dockScrollX = consumeModuleDockScrollX()
         if (handler != null) {
             handler!!.removeCallbacks(eventsRefreshRunnable)
-            handler!!.removeCallbacks(luaWidgetTickRunnable)
+            luaModules.cancelTick()
         }
-        // Opening the notifications module always starts at the list.
-        if (ModuleManager.NOTIFICATIONS == id && ModuleManager.NOTIFICATIONS != activeModule) {
-            ModuleManager.notificationExpanded = false
-            openNotificationGroup = null
-        }
+        if (id != activeModule) homeModules[id]?.onOpening()
         activeModule = id
         ModuleManager.setActiveModule(mContext, id)
         updateModuleDockSelection()
         applyTerminalTrayState(false)
         homeModulesContainer!!.removeAllViews()
 
-        if (showLuaModuleIfSource(id)) {
+        val builtIn = homeModules[id]
+        if (luaModules.showLuaModuleIfSource(id)) {
             // Rendered above.
-        } else if (ModuleManager.MUSIC == id) {
-            showMusicModule()
-        } else if (ModuleManager.NOTIFICATIONS == id) {
-            showNotificationsModule()
-        } else if (ModuleManager.TIMER == id) {
-            showTextModule(ModuleManager.TIMER, buildTimerModuleText())
-        } else if (ModuleManager.CALENDAR == id) {
-            showTextModule(ModuleManager.CALENDAR, buildCalendarModuleText())
-        } else if (ModuleManager.REMINDER == id) {
-            showTextModule(ModuleManager.REMINDER, buildReminderModuleText())
-        } else if (ModuleManager.NOTES == id) {
-            showTextModule(ModuleManager.NOTES, buildNotesModuleText())
-        } else if (ModuleManager.RSS == id) {
-            showTextModule(ModuleManager.RSS, buildRssModuleText())
-        } else if (ModuleManager.WEATHER_NATIVE == id) {
-            if (weatherManager == null) {
-                weatherDelay = XMLPrefsManager.getInt(Behavior.weather_update_time) * 1000
-                weatherManager = WeatherManager(
-                    mContext!!,
-                    weatherDelay.toLong(),
-                    labelSizes[Label.weather.ordinal],
-                    statusUpdateListener
-                ).also { it.start() }
-            }
-            showTextModule(id, buildWeatherModuleText())
+        } else if (builtIn != null) {
+            builtIn.show(moduleHost)
         } else {
-            val source = ModuleManager.getModuleSource(mContext, id)
-            if (ModuleManager.isLuaSource(source)) {
-                renderLuaWidgetModule(id, false, false)
-            }
             refreshLauncherModuleTextIfNeeded(id)
             val text = ModuleManager.getScriptText(mContext, id)
             showTextModule(id, if (TextUtils.isEmpty(text)) mContext.getString(R.string.surface_no_module_output_yet_ba2f9) else text)
@@ -3397,36 +2899,6 @@ class UIManager(
         } else {
             updateUnifiedBottomModuleBounds()
         }
-    }
-
-    private fun ensureSystemLuaModules() {
-        try {
-            LuaWidgetManager.ensureSystemTimerWidget()
-            val timerSource =
-                LuaWidgetManager.SOURCE_PREFIX + LuaWidgetManager.SYSTEM_TIMER_WIDGET_ID
-            val currentSource = ModuleManager.getModuleSource(mContext, ModuleManager.TIMER)
-            if (TextUtils.isEmpty(currentSource) || TextUtils.equals(currentSource, timerSource)) {
-                ModuleManager.setScriptModule(mContext, ModuleManager.TIMER, timerSource)
-            }
-        } catch (e: Exception) {
-            Tuils.log(e)
-        }
-    }
-
-    private fun showLuaModuleIfSource(id: String?): Boolean {
-        val source = ModuleManager.getModuleSource(mContext, id)
-        if (!ModuleManager.isLuaSource(source)) {
-            return false
-        }
-        val result = renderLuaWidgetModule(id, false, false)
-        val widgetId = ModuleManager.luaWidgetId(source)
-        if (result != null) {
-            showLuaWidgetModule(id, widgetId, result)
-        } else {
-            val text = ModuleManager.getScriptText(mContext, id)
-            showTextModule(id, if (TextUtils.isEmpty(text)) mContext.getString(R.string.surface_no_module_output_yet_ba2f9) else text)
-        }
-        return true
     }
 
     private fun refreshLauncherModuleTextIfNeeded(module: String?) {
@@ -3445,555 +2917,7 @@ class UIManager(
         }
     }
 
-    private fun showMusicModule() {
-        val musicWidget = ohi.andre.consolelauncher.presentation.ModulePanelPresentation.inflate(mContext,homeModulesContainer,ohi.andre.consolelauncher.presentation.ModulePanelPresentation.Kind.MUSIC)
-        homeModulesContainer!!.addView(musicWidget)
-        musicWidget.setVisibility(View.VISIBLE)
-        val close = musicWidget.findViewById<TextView?>(R.id.music_module_close)
-        if (close != null) {
-            close.setOnClickListener(View.OnClickListener { v: View? -> closeHomeModule() })
-            close.setTextColor(moduleNameTextColor())
-            close.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            close.setTextSize(moduleHeaderTextSize().toFloat())
-        }
-        styleMusicWidget(musicWidget)
-        updateMusicModuleText(musicWidget)
-        scheduleInternalMusicTickerIfNeeded()
-    }
-
-    private fun showNotificationsModule() {
-        ensureNotificationServiceForModule()
-        val notificationWidget = ohi.andre.consolelauncher.presentation.ModulePanelPresentation.inflate(mContext,homeModulesContainer,ohi.andre.consolelauncher.presentation.ModulePanelPresentation.Kind.NOTIFICATIONS)
-        homeModulesContainer!!.addView(notificationWidget)
-        notificationWidget.setVisibility(View.VISIBLE)
-        notificationWidget.setClickable(true)
-        notificationWidget.setFocusable(true)
-        val notificationBorder =
-            notificationWidget.findViewById<View?>(R.id.notification_module_border)
-        val notificationLabel =
-            notificationWidget.findViewById<View?>(R.id.notification_module_label)
-        if (notificationLabel != null) {
-            notificationLabel.setOnClickListener(View.OnClickListener { v: View? -> openNotificationShade() })
-        }
-        val prev = notificationWidget.findViewById<TextView?>(R.id.notification_module_prev)
-        if (prev != null) {
-            prev.setOnClickListener(View.OnClickListener { v: View? -> previousNotificationPage() })
-            prev.setTextColor(moduleNameTextColor())
-            prev.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        }
-        val next = notificationWidget.findViewById<TextView?>(R.id.notification_module_next)
-        if (next != null) {
-            next.setOnClickListener(View.OnClickListener { v: View? -> nextNotificationPage() })
-            next.setTextColor(moduleNameTextColor())
-            next.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        }
-        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_module_clear)
-        if (clear != null) {
-            clear.setOnClickListener(View.OnClickListener { v: View? -> dismissCurrentNotification() })
-            clear.setTextColor(moduleNameTextColor())
-            clear.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        }
-        val settings = notificationWidget.findViewById<ImageButton?>(R.id.notification_module_settings)
-        if (settings != null) {
-            settings.setOnClickListener(View.OnClickListener { v: View? -> showNotificationSettingsPopup(settings) })
-            styleNotificationSettingsButton(settings)
-        }
-        val close = notificationWidget.findViewById<TextView?>(R.id.notification_module_close)
-        if (close != null) {
-            close.setOnClickListener(View.OnClickListener { v: View? -> closeHomeModule() })
-            close.setTextColor(moduleNameTextColor())
-            close.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            close.setTextSize(moduleHeaderTextSize().toFloat())
-        }
-        styleNotificationWidget(notificationWidget)
-        LocalBroadcastManager.getInstance(mContext!!.getApplicationContext()).sendBroadcast(
-            Intent(
-                ACTION_REQUEST_NOTIFICATION_FEED
-            )
-        )
-    }
-
-    private fun ensureNotificationServiceForModule() {
-        if (!Tuils.hasNotificationAccess(mContext)) {
-            return
-        }
-        try {
-            NotificationService.requestListenerRebind(mContext)
-        } catch (e: Exception) {
-            Tuils.log(e)
-        }
-    }
-
-    private fun repaintActiveLuaWidgetModule(
-        module: String?,
-        widgetId: String?,
-        result: LuaWidgetEngine.RenderResult
-    ) {
-        if (homeModulesContainer == null) {
-            return
-        }
-        homeModulesContainer!!.removeAllViews()
-        showLuaWidgetModule(module, widgetId, result)
-        refreshSuggestionsForActiveModule()
-    }
-
-    /** Uses the module renderer while making every generated action inert. */
-    fun buildLuaPreview(module: String, result: LuaWidgetEngine.RenderResult): View {
-        val panel = LinearLayout(mContext).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12), Tuils.dpToPx(mContext, 12))
-            ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel(mContext, this)
-        }
-        addLuaText(panel, result.title?.takeIf { it.isNotBlank() } ?: LuaWidgetManager.getName(module), module)
-        if (TextUtils.isEmpty(result.layoutJson) || !renderLuaLayout(panel, module, result.layoutJson)) {
-            addLuaBodyText(panel, result.body?.takeIf { it.isNotEmpty() } ?: "No module output", module)
-        }
-        addLuaResultActions(panel, module, module, result)
-        for (suggestion in result.suggestions) addLuaText(panel, suggestion?.label, module)
-        fun makeInert(view: View) {
-            view.setOnClickListener(null)
-            view.isClickable = false
-            view.isLongClickable = false
-            if (view is ViewGroup) for (index in 0 until view.childCount) makeInert(view.getChildAt(index))
-        }
-        makeInert(panel)
-        return panel
-    }
-
-    private fun showLuaWidgetModule(
-        module: String?,
-        widgetId: String?,
-        result: LuaWidgetEngine.RenderResult
-    ) {
-        val moduleView = ohi.andre.consolelauncher.presentation.ModulePanelPresentation.inflate(mContext,homeModulesContainer,ohi.andre.consolelauncher.presentation.ModulePanelPresentation.Kind.TEXT)
-        homeModulesContainer!!.addView(moduleView)
-
-        val label = moduleView.findViewById<TextView?>(R.id.module_text_label)
-        val close = moduleView.findViewById<TextView?>(R.id.module_text_close)
-        val scroll = moduleView.findViewById<ScrollView?>(R.id.module_text_border)
-        val body = moduleView.findViewById<TextView?>(R.id.module_text_body)
-
-        if (label != null) {
-            val title = if (TextUtils.isEmpty(result.title)) ModuleManager.displayTitle(
-                mContext,
-                module
-            ) else result.title
-            label.setText(title)
-            label.setOnClickListener(View.OnClickListener {
-                renderLuaWidgetModule(module, true, true)
-            })
-        }
-        if (close != null) {
-            close.setOnClickListener(View.OnClickListener { v: View? -> closeHomeModule() })
-            close.setTextColor(moduleNameTextColor())
-            close.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            close.setTextSize(moduleHeaderTextSize().toFloat())
-        }
-
-        if (scroll != null) {
-            scroll.removeAllViews()
-            val content = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext)
-            content.setOrientation(LinearLayout.VERTICAL)
-            content.setLayoutParams(
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-            scroll.addView(content)
-
-            if (!TextUtils.isEmpty(result.error)) {
-                addLuaText(content, mContext.getString(R.string.surface_lua_error_95ede, result.error), module)
-                if (!TextUtils.isEmpty(result.errorStage)) {
-                    addLuaText(content, mContext.getString(R.string.surface_stage_6da98, result.errorStage), module)
-                }
-            } else if (!TextUtils.isEmpty(result.layoutJson)
-                && renderLuaLayout(content, module, result.layoutJson)
-            ) {
-                // The declarative layout rendered itself.
-            } else {
-                addLuaBodyText(
-                    content,
-                    if (TextUtils.isEmpty(result.body)) mContext.getString(R.string.surface_no_widget_output_yet_c383d) else result.body,
-                    module
-                )
-            }
-            addLuaResultActions(content, module, widgetId, result)
-        } else if (body != null) {
-            body.setText(if (TextUtils.isEmpty(result.body)) mContext.getString(R.string.surface_no_widget_output_yet_c383d) else result.body)
-            body.setTextColor(notificationWidgetTextColor())
-            body.setTextSize(moduleBodyTextSize().toFloat())
-            applyModuleBodyTypeface(body, module)
-        }
-
-        decorateWidget(
-            moduleView,
-            R.id.module_text_border,
-            R.id.module_text_label,
-            R.id.module_text_close,
-            notificationWidgetBorderColor(),
-            moduleNameTextColor(),
-            FrameTarget.MODULES
-        )
-        styleModuleClose(close)
-    }
-
-    private fun addLuaBodyText(parent: LinearLayout, text: String?, module: String? = null) {
-        if (TextUtils.isEmpty(text)) {
-            addLuaText(parent, "", module)
-            return
-        }
-        addLuaText(parent, text, module)
-    }
-
-    private fun addLuaText(
-        parent: LinearLayout,
-        text: String?,
-        module: String? = null,
-        fontMode: String? = null
-    ) {
-        val view = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.paragraph(mContext)
-        view.setText(text)
-        view.setTextColor(notificationWidgetTextColor())
-        view.setTextSize(moduleBodyTextSize().toFloat())
-        view.setIncludeFontPadding(true)
-        view.setLineSpacing(Tuils.dpToPx(mContext, 2).toFloat(), 1f)
-        applyModuleBodyTypeface(view, module, fontMode)
-        view.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        parent.addView(view)
-    }
-
-    private fun addLuaResultActions(
-        parent: LinearLayout,
-        module: String?,
-        widgetId: String?,
-        result: LuaWidgetEngine.RenderResult
-    ) {
-        val actions = ArrayList<LuaSurfaceAction>()
-        var index = 1
-        for (button in result.buttons) {
-            val actionIndex = index
-            if (!TextUtils.isEmpty(button)) {
-                actions.add(
-                    LuaSurfaceAction(button!!) {
-                        clickLuaWidget(module, actionIndex)
-                    }
-                )
-            }
-            index += 1
-        }
-        for (action in result.valueActions) {
-            if (action == null || TextUtils.isEmpty(action.label)) continue
-            actions.add(
-                LuaSurfaceAction(action.label!!) {
-                    actionLuaWidget(module, action.value)
-                }
-            )
-        }
-        if (result.dialogOpen) {
-            var dialogIndex = 1
-            for (item in result.dialogItems) {
-                val choiceIndex = dialogIndex
-                if (!TextUtils.isEmpty(item)) {
-                    val label = if (choiceIndex == result.dialogSelected) "* " + item else item
-                    actions.add(
-                        LuaSurfaceAction(label!!) {
-                            dialogLuaWidget(module, choiceIndex)
-                        }
-                    )
-                }
-                dialogIndex += 1
-            }
-            actions.add(LuaSurfaceAction("cancel") { dialogLuaWidget(module, -1) })
-        }
-        for (action in result.commands) {
-            if (action == null || TextUtils.isEmpty(action.label) || TextUtils.isEmpty(action.command)) {
-                continue
-            }
-            actions.add(
-                LuaSurfaceAction(action.label!!) {
-                    executeLuaWidgetCommand(action.command)
-                }
-            )
-        }
-        if (result.expandable) {
-            val expanded = result.expanded
-            actions.add(
-                LuaSurfaceAction(if (expanded) "collapse" else "expand") {
-                    if (expanded) setLuaWidgetExpanded(module, false)
-                    else setLuaWidgetExpanded(module, true)
-                }
-            )
-        }
-        addLuaButtonGrid(parent, actions)
-    }
-
-    private fun addLuaButtonGrid(parent: LinearLayout, actions: MutableList<LuaSurfaceAction>) {
-        if (actions.isEmpty()) {
-            return
-        }
-        val topSpacer = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.space(mContext,8)
-        topSpacer.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                Tuils.dpToPx(mContext, 8)
-            )
-        )
-        parent.addView(topSpacer)
-
-        var row: LinearLayout? = null
-        for (i in actions.indices) {
-            if (i % 2 == 0) {
-                row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.ROW)
-                row.setOrientation(LinearLayout.HORIZONTAL)
-                row.setLayoutParams(
-                    LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                )
-                parent.addView(row)
-            }
-            val button = luaSurfaceButton(actions[i])
-            row!!.addView(button)
-        }
-    }
-
-    private fun luaSurfaceButton(action: LuaSurfaceAction): TextView {
-        val button = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.action(mContext)
-        button.setText(action.label)
-        button.setSingleLine(false)
-        button.setGravity(Gravity.CENTER)
-        button.setMinHeight(Tuils.dpToPx(mContext, 36))
-        button.setPadding(
-            Tuils.dpToPx(mContext, 10),
-            Tuils.dpToPx(mContext, 7),
-            Tuils.dpToPx(mContext, 10),
-            Tuils.dpToPx(mContext, 7)
-        )
-        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.action(button,
-            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
-        val lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-        val margin = Tuils.dpToPx(mContext, 4)
-        lp.setMargins(margin, margin, margin, margin)
-        button.setLayoutParams(lp)
-        button.setOnClickListener(View.OnClickListener { action.run.run() })
-        return button
-    }
-
-    private fun renderLuaLayout(
-        parent: LinearLayout,
-        module: String?,
-        rawJson: String?,
-        appSurface: Boolean = false
-    ): Boolean {
-        if (TextUtils.isEmpty(rawJson)) {
-            return false
-        }
-        try {
-            val trimmed = rawJson!!.trim { it <= ' ' }
-            if (trimmed.startsWith("[")) {
-                renderLuaLayoutArray(parent, module, JSONArray(trimmed), appSurface)
-            } else {
-                renderLuaLayoutObject(parent, module, JSONObject(trimmed), appSurface)
-            }
-            return true
-        } catch (e: Exception) {
-            addLuaText(parent, mContext.getString(R.string.surface_layout_error_b5bcf, e.message), module)
-            return true
-        }
-    }
-
-    private fun renderLuaLayoutArray(
-        parent: LinearLayout,
-        module: String?,
-        array: JSONArray,
-        appSurface: Boolean
-    ) {
-        for (i in 0..<array.length()) {
-            val item = array.opt(i)
-            if (item is JSONObject) {
-                renderLuaLayoutObject(parent, module, item, appSurface)
-            } else if (item is JSONArray) {
-                renderLuaLayoutCompact(parent, module, item, appSurface)
-            } else if (item != null) {
-                addLuaText(parent, item.toString(), module)
-            }
-        }
-    }
-
-    private fun renderLuaLayoutCompact(
-        parent: LinearLayout,
-        module: String?,
-        array: JSONArray,
-        appSurface: Boolean
-    ) {
-        if (array.length() == 0) {
-            return
-        }
-        val type = array.optString(0, "text")
-        val obj = JSONObject()
-        obj.put("type", type)
-        if ("button" == type) {
-            obj.put("label", array.optString(1, ""))
-            if (array.length() > 2) obj.put("command", array.optString(2, ""))
-        } else {
-            obj.put("text", array.optString(1, ""))
-        }
-        renderLuaLayoutObject(parent, module, obj, appSurface)
-    }
-
-    private fun renderLuaLayoutObject(
-        parent: LinearLayout,
-        module: String?,
-        obj: JSONObject,
-        appSurface: Boolean
-    ) {
-        val type = obj.optString("type", obj.optString("kind", "text")).lowercase(Locale.US)
-        if ("column" == type || "container" == type) {
-            val column = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.COLUMN)
-            column.setOrientation(LinearLayout.VERTICAL)
-            column.setLayoutParams(
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-            parent.addView(column)
-            renderLuaLayoutChildren(column, module, obj.optJSONArray("children"), appSurface)
-            return
-        }
-        if ("row" == type) {
-            val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.ROW)
-            row.setOrientation(LinearLayout.HORIZONTAL)
-            row.setLayoutParams(
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            )
-            parent.addView(row)
-            val children = obj.optJSONArray("children")
-            if (children != null) {
-                for (i in 0..<children.length()) {
-                    val child = children.optJSONObject(i) ?: continue
-                    val childBox = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.WEIGHTED_COLUMN)
-                    childBox.setOrientation(LinearLayout.VERTICAL)
-                    val lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-                    val margin = Tuils.dpToPx(mContext, 3)
-                    lp.setMargins(margin, margin, margin, margin)
-                    childBox.setLayoutParams(lp)
-                    row.addView(childBox)
-                    renderLuaLayoutObject(childBox, module, child, appSurface)
-                }
-            }
-            return
-        }
-        if ("button" == type || "action" == type || "command" == type || "module" == type) {
-            addLuaButtonGrid(
-                parent,
-                mutableListOf(luaLayoutSurfaceAction(module, obj, appSurface))
-            )
-            return
-        }
-        if ("progress" == type) {
-            addLuaText(parent, formatLuaLayoutProgress(obj), module, MODULE_TEXT_FONT_MONO)
-            return
-        }
-        if ("divider" == type) {
-            addLuaText(parent, "----------------", module, MODULE_TEXT_FONT_MONO)
-            return
-        }
-        if ("pre" == type || "ascii" == type || "code" == type) {
-            addLuaText(parent, obj.optString("text", obj.optString("label", "")), module, MODULE_TEXT_FONT_MONO)
-            return
-        }
-        if ("spacer" == type) {
-            val spacer = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.space(mContext,max(1,obj.optInt("size",8)))
-            spacer.setLayoutParams(
-                LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    Tuils.dpToPx(mContext, max(1, obj.optInt("size", 8)))
-                )
-            )
-            parent.addView(spacer)
-            return
-        }
-        val text = obj.optString("text", obj.optString("label", ""))
-        addLuaText(parent, text, module)
-    }
-
-    private fun renderLuaLayoutChildren(
-        parent: LinearLayout,
-        module: String?,
-        children: JSONArray?,
-        appSurface: Boolean
-    ) {
-        if (children == null) {
-            return
-        }
-        for (i in 0..<children.length()) {
-            val child = children.opt(i)
-            if (child is JSONObject) {
-                renderLuaLayoutObject(parent, module, child, appSurface)
-            } else if (child is JSONArray) {
-                renderLuaLayoutCompact(parent, module, child, appSurface)
-            }
-        }
-    }
-
-    private fun luaLayoutSurfaceAction(
-        module: String?,
-        obj: JSONObject,
-        appSurface: Boolean
-    ): LuaSurfaceAction {
-        val label = obj.optString("label", obj.optString("text", "button"))
-        val localValue = obj.optString("action", obj.optString("value", label))
-        val hasLocalAction = obj.has("action") || obj.has("value") || "action" == obj.optString(
-            "type",
-            obj.optString("kind", "")
-        ).lowercase(Locale.US)
-        val command = commandFromLuaLayoutObject(obj)
-        return LuaSurfaceAction(label) {
-            if (!TextUtils.isEmpty(command)) {
-                executeLuaWidgetCommand(command)
-            } else if (appSurface) {
-                actionLuaApp(localValue)
-            } else if (hasLocalAction) {
-                actionLuaWidget(module, localValue)
-            }
-        }
-    }
-
-    private fun commandFromLuaLayoutObject(obj: JSONObject): String {
-        if (!TextUtils.isEmpty(obj.optString("command", ""))) {
-            return obj.optString("command")
-        }
-        if (!TextUtils.isEmpty(obj.optString("module", ""))) {
-            return "module -show " + obj.optString("module")
-        }
-        return ""
-    }
-
-    private fun formatLuaLayoutProgress(obj: JSONObject): String {
-        val label = obj.optString("label", obj.optString("text", mContext.getString(R.string.surface_progress_1b902)))
-        val value = obj.optDouble("value", obj.optDouble("progress", 0.0))
-        val maxValue = obj.optDouble("max", 1.0)
-        val pct = if (maxValue <= 0.0) 0.0 else min(1.0, max(0.0, value / maxValue))
-        val width = max(4, min(32, obj.optInt("width", 12)))
-        val filled = Math.round(pct * width).toInt()
-        val out = StringBuilder(label).append(" [")
-        for (i in 0..<width) {
-            out.append(if (i < filled) '█' else '░')
-        }
-        out.append("] ").append(Math.round(pct * 100.0)).append('%')
-        return out.toString()
-    }
+    fun buildLuaPreview(module: String, result: LuaWidgetEngine.RenderResult): View = luaModules.buildLuaPreview(module, result)
 
     private fun executeLuaWidgetCommand(command: String?) {
         if (TextUtils.isEmpty(command) || mTerminalAdapter == null) {
@@ -4013,20 +2937,12 @@ class UIManager(
         if (label != null) {
             label.setText(ModuleManager.displayTitle(mContext, module))
         }
-        if (ModuleManager.CALENDAR == ModuleManager.normalize(module) && scroll != null) {
-            scroll.removeAllViews()
-            body?.setVisibility(View.GONE)
-            scroll.addView(buildCalendarModuleView())
-        } else if (ModuleManager.RSS == ModuleManager.normalize(module) && body != null && scroll != null) {
-            renderRssModuleLines(text, body, scroll, module)
+        if (body != null && scroll != null && homeModules[ModuleManager.normalize(module)]?.renderBody(moduleHost, text, body, scroll) == true) {
+            // Drawn by the module.
         } else if (shouldRenderScriptSegments(module) && body != null && scroll != null) {
             renderScriptModuleSegments(module, text?.toString(), body, scroll)
         } else if (body != null) {
-            if (ModuleManager.RSS == ModuleManager.normalize(module) && text is Spanned) {
-                body.setText(text, TextView.BufferType.SPANNABLE)
-            } else {
-                body.setText(text)
-            }
+            body.setText(text)
             body.setTextColor(notificationWidgetTextColor())
             body.setTextSize(moduleBodyTextSize().toFloat())
             applyModuleBodyTypeface(body, module)
@@ -4049,105 +2965,6 @@ class UIManager(
             FrameTarget.MODULES
         )
         styleModuleClose(close)
-    }
-
-    private fun renderRssModuleLines(
-        text: CharSequence?,
-        body: TextView,
-        scroll: ScrollView,
-        module: String?
-    ) {
-        scroll.removeAllViews()
-        body.setVisibility(View.GONE)
-
-        val content = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext)
-        content.setOrientation(LinearLayout.VERTICAL)
-        content.setLayoutParams(
-            FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        scroll.addView(content)
-
-        val value = text ?: Tuils.EMPTYSTRING
-        val raw = value.toString()
-        var start = 0
-        while (start <= raw.length) {
-            val next = raw.indexOf('\n', start)
-            val end = if (next == -1) raw.length else next
-            addRssModuleLine(content, value.subSequence(start, end), module)
-            if (next == -1) {
-                break
-            }
-            start = next + 1
-        }
-
-        constrainRssModuleScroll(scroll, content)
-    }
-
-    private fun addRssModuleLine(
-        parent: LinearLayout,
-        text: CharSequence,
-        module: String?
-    ) {
-        val view = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.paragraph(mContext)
-        if (text is Spanned) {
-            view.setText(text, TextView.BufferType.SPANNABLE)
-        } else {
-            view.setText(text)
-        }
-        view.setTextColor(notificationWidgetTextColor())
-        view.setTextSize(moduleBodyTextSize().toFloat())
-        view.setIncludeFontPadding(true)
-        view.setLineSpacing(Tuils.dpToPx(mContext, 2).toFloat(), 1f)
-        applyModuleBodyTypeface(view, module)
-
-        val span = firstRssModuleSpan(text)
-        if (span != null) {
-            view.setOnClickListener { v -> span.onClick(v) }
-            view.setOnTouchListener { v, event ->
-                when (event.actionMasked) {
-                    MotionEvent.ACTION_DOWN -> {
-                        v.parent?.requestDisallowInterceptTouchEvent(true)
-                        true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        v.parent?.requestDisallowInterceptTouchEvent(false)
-                        v.performClick()
-                        true
-                    }
-                    MotionEvent.ACTION_CANCEL -> {
-                        v.parent?.requestDisallowInterceptTouchEvent(false)
-                        true
-                    }
-                    else -> true
-                }
-            }
-            view.setClickable(true)
-            view.setFocusable(true)
-        }
-
-        view.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        parent.addView(view)
-    }
-
-    private fun firstRssModuleSpan(text: CharSequence): LongClickableSpan? {
-        if (text !is Spanned) {
-            return null
-        }
-        val spans = text.getSpans(0, text.length, LongClickableSpan::class.java)
-        return if (spans.isEmpty()) null else spans[0]
-    }
-
-    private fun constrainRssModuleScroll(scroll: ScrollView, content: LinearLayout) {
-        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.limitTextScroll(scroll,
-            ohi.andre.consolelauncher.presentation.ModulePanelPresentation.ScrollPolicy(RSS_MODULE_VISIBLE_LINES,true))
     }
 
     private fun shouldRenderScriptSegments(module: String?): Boolean {
@@ -4214,10 +3031,8 @@ class UIManager(
         val id=ModuleManager.normalize(module)
         val source=ModuleManager.getModuleSource(mContext,id)
         val events=ModuleManager.EVENTS==id && ModuleManager.isLauncherSource(source)
-        val rss=ModuleManager.RSS==id
-        if((!events && !rss) || scroll==null || body==null) return
-        val lines=if(rss) min(RSS_MODULE_VISIBLE_LINES,max(1,countVisibleLines(body.text.toString())))
-            else countVisibleLines(buildCalendarModuleText())
+        if(!events || scroll==null || body==null) return
+        val lines=countVisibleLines(CalendarModule.monthText(mContext))
         ohi.andre.consolelauncher.presentation.ModulePanelPresentation.limitTextScroll(scroll,
             ohi.andre.consolelauncher.presentation.ModulePanelPresentation.ScrollPolicy(lines,false))
     }
@@ -4245,134 +3060,9 @@ class UIManager(
             statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),useThemeTypeface)
     }
 
-    private fun buildCalendarModuleView(): View {
-        val locale = ConfigurationCompat.getLocales(mContext.resources.configuration)[0] ?: Locale.getDefault()
-        val calendar = Calendar.getInstance(locale)
-        val today = Calendar.getInstance(locale)
-        val months = DateFormatSymbols(locale).shortMonths
-        val weekdays = CalendarLabels.weekdays(calendar, locale)
-        val month = calendar.get(Calendar.MONTH)
-        val year = calendar.get(Calendar.YEAR)
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val firstDay = CalendarLabels.leadingCells(calendar)
-        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val currentDay =
-            if (today.get(Calendar.MONTH) == month && today.get(Calendar.YEAR) == year) today.get(Calendar.DAY_OF_MONTH) else -1
-
-        val content = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.CALENDAR)
-        content.setOrientation(LinearLayout.VERTICAL)
-        val calendarInset = Tuils.dpToPx(mContext, 2)
-        content.setPadding(calendarInset, 0, calendarInset, 0)
-        content.setLayoutParams(
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-
-        val title = calendarTextView(months[month] + " " + year, true, false)
-        title.setGravity(Gravity.START or Gravity.CENTER_VERTICAL)
-        title.setPadding(0, 0, 0, 0)
-        content.addView(title)
-
-        val header = calendarRow()
-        for (weekday in weekdays) {
-            header.addView(calendarCell(weekday, true, false))
-        }
-        content.addView(header)
-
-        var day = 1
-        for (week in 0 until 6) {
-            val row = calendarRow()
-            for (dow in 0..6) {
-                if ((week == 0 && dow < firstDay) || day > daysInMonth) {
-                    row.addView(calendarCell("", false, false))
-                } else {
-                    row.addView(
-                        calendarCell(
-                            String.format(locale, "%02d", day),
-                            false,
-                            day == currentDay
-                        )
-                    )
-                    day += 1
-                }
-            }
-            content.addView(row)
-            if (day > daysInMonth) {
-                break
-            }
-        }
-        addCalendarModuleButtons(content)
-        return content
-    }
-
-    private fun addCalendarModuleButtons(parent: LinearLayout) {
-        val actions = ArrayList<LuaSurfaceAction>()
-        actions.add(
-            LuaSurfaceAction("today") {
-                executeLuaWidgetCommand("module -show calendar")
-            }
-        )
-        actions.add(
-            LuaSurfaceAction("timer") {
-                executeLuaWidgetCommand("module -show timer")
-            }
-        )
-        addLuaButtonGrid(parent, actions)
-    }
-
-    private fun calendarRow(): LinearLayout {
-        val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.group(mContext,ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.GroupKind.CALENDAR_ROW)
-        row.setOrientation(LinearLayout.HORIZONTAL)
-        row.setBaselineAligned(false)
-        row.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        )
-        return row
-    }
-
-    private fun calendarCell(text: String, bold: Boolean, today: Boolean): TextView {
-        val cell = calendarTextView(if (today) "[$text]" else text, bold || today, today)
-        ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.calendarCell(cell)
-        cell.setGravity(Gravity.CENTER)
-        cell.setMinHeight(0)
-        cell.setPadding(0, 0, 0, 0)
-        val lp = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-        cell.setLayoutParams(lp)
-        return cell
-    }
-
-    private fun calendarTextView(text: String, bold: Boolean, highlight: Boolean): TextView {
-        val view = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.calendarText(mContext)
-        view.setText(text)
-        view.setSingleLine(true)
-        view.setIncludeFontPadding(false)
-        view.setTextSize(moduleBodyTextSize().toFloat())
-        view.setTextColor(if (highlight) moduleNameTextColor() else notificationWidgetTextColor())
-        view.setTag(R.id.module_text_font_mode, MODULE_TEXT_FONT_THEME)
-        view.setTypeface(
-            Tuils.getTypeface(mContext),
-            if (bold) Typeface.BOLD else Typeface.NORMAL
-        )
-        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.body(view,
-            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),true)
-        return view
-    }
-
     private fun moduleBodyUsesThemeTypeface(module: String?): Boolean {
         val id = ModuleManager.normalize(module)
-        if (ModuleManager.TIMER == id
-            || ModuleManager.CALENDAR == id
-            || ModuleManager.REMINDER == id
-            || ModuleManager.EVENTS == id
-            || ModuleManager.NOTES == id
-            || ModuleManager.RSS == id
-            || "focus_sprint" == id
-        ) {
+        if (homeModules[id]?.usesThemeTypeface == true || ModuleManager.EVENTS == id || "focus_sprint" == id) {
             return true
         }
 
@@ -4404,11 +3094,11 @@ class UIManager(
 
     private fun closeHomeModule() {
         // A module's own close button in the carousel closes the carousel (which then closes the module).
-        if (isSearchModulesOpen) { searchModules?.close(); return }
+        if (isSearchModulesOpen) { searchSurface.closeModules(); return }
         val dockScrollX = consumeModuleDockScrollX()
         if (handler != null) {
             handler!!.removeCallbacks(eventsRefreshRunnable)
-            handler!!.removeCallbacks(luaWidgetTickRunnable)
+            luaModules.cancelTick()
         }
         activeModule = ""
         ModuleManager.setActiveModule(mContext, "")
@@ -4434,12 +3124,8 @@ class UIManager(
         }
     }
 
-    private fun refreshActiveModuleIfNeeded() {
-        if (ModuleManager.TIMER == activeModule) {
-            showHomeModule(ModuleManager.TIMER)
-        } else if (ModuleManager.REMINDER == activeModule) {
-            showHomeModule(ModuleManager.REMINDER)
-        }
+    private fun redrawActiveModuleFor(event: HomeModuleEvent) {
+        if (homeModules[activeModule]?.refreshOn?.contains(event) == true) showHomeModule(activeModule)
     }
 
     private fun scheduleEventsRefreshIfNeeded() {
@@ -4461,207 +3147,12 @@ class UIManager(
         handler!!.postDelayed(eventsRefreshRunnable, delay)
     }
 
-    private fun scheduleLuaWidgetTickIfNeeded(
-        module: String?,
-        result: LuaWidgetEngine.RenderResult?
-    ) {
-        if (handler == null) {
-            return
-        }
-        handler!!.removeCallbacks(luaWidgetTickRunnable)
-        val id = ModuleManager.normalize(module)
-        if ((id != activeModule) || result == null || result.tickIntervalMs <= 0L) {
-            return
-        }
-        val source = ModuleManager.getModuleSource(mContext, id)
-        if (!ModuleManager.isLuaSource(source)) {
-            return
-        }
-        handler!!.postDelayed(luaWidgetTickRunnable, result.tickIntervalMs)
-    }
-
-    private fun tickActiveLuaWidget() {
-        val id = ModuleManager.normalize(activeModule)
-        if (TextUtils.isEmpty(id)) {
-            return
-        }
-        val source = ModuleManager.getModuleSource(mContext, id)
-        val widgetId = ModuleManager.luaWidgetId(source)
-        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            return
-        }
-        if (applyLuaWidgetUnavailablePayload(
-                id,
-                widgetId,
-                true,
-                id == activeModule,
-                id == activeModule
-            )
-        ) {
-            return
-        }
-
-        val result = getLuaWidgetEngine(widgetId).tick()
-        val active = id == activeModule
-        applyLuaWidgetResult(id, widgetId, result, active, active, false)
-    }
-
-    private fun updateMusicModuleText(musicWidget: View) {
-        val title = musicWidget.findViewById<TextView?>(R.id.music_song_title)
-        val singer = musicWidget.findViewById<TextView?>(R.id.music_singer)
-        val visualizer = musicWidget.findViewById<MusicVisualizerView?>(R.id.music_visualizer)
-        val textColor = musicWidgetTextColor()
-        if (title != null) {
-            title.setText(
-                if (!TextUtils.isEmpty(lastMusicSong)) musicTitlePrefix() + lastMusicSong!!.uppercase(
-                    Locale.getDefault()
-                ) else musicTitlePrefix() + "-"
-            )
-            title.setTextColor(textColor)
-        }
-        if (singer != null) {
-            singer.setText(
-                if (!TextUtils.isEmpty(lastMusicSinger)) musicSubtitlePrefix() + lastMusicSinger!!.uppercase(
-                    Locale.getDefault()
-                ) else musicSubtitlePrefix() + "-"
-            )
-            singer.setTextColor(textColor)
-        }
-        updateMusicAppRow(musicWidget, textColor)
-        if (visualizer != null) {
-            visualizer.setBarColor(textColor)
-            visualizer.setPlaying(lastMusicPlaying)
-        }
-    }
-
-    private fun musicTitlePrefix(): String =
-        if (MusicService.SOURCE_PODCAST == activeMusicSource) mContext.getString(R.string.surface_episode_791bf) else mContext.getString(R.string.surface_title_edd45)
-
-    private fun musicSubtitlePrefix(): String =
-        if (MusicService.SOURCE_PODCAST == activeMusicSource) mContext.getString(R.string.surface_show_06f63) else mContext.getString(R.string.surface_singer_e58b5)
-
-    private fun buildTimerModuleText(): String {
-        val out = StringBuilder()
-        val clockManager = ClockManager.getInstance(mContext!!.getApplicationContext())
-        out.append(clockManager.timerStatus).append('\n')
-        out.append(clockManager.stopwatchStatus).append('\n')
-
-        val pomodoro = PomodoroManager.getInstance(mContext!!.getApplicationContext())
-        if (pomodoro.isRunning) {
-            out.append(mContext.getString(R.string.surface_pomodoro_0fb35))
-                .append(pomodoro.currentType.name.lowercase())
-                .append(" ")
-                .append(ClockManager.formatDuration(pomodoro.remainingMillis))
-                .append('\n')
-        } else {
-            out.append(mContext.getString(R.string.surface_pomodoro_idle_46ab6))
-        }
-        out.append(mContext.getString(R.string.surface_commands_timer_stopwatch_pomodoro_83ad1))
-        return out.toString()
-    }
-
-    private fun buildReminderModuleText(): String {
-        return mContext.getString(R.string.surface_open_reminder_e9efa, ReminderManager.formatPreview(mContext!!))
-    }
-
-    private fun buildNotesModuleText(): String {
-        val records = ohi.andre.consolelauncher.managers.NotesManager.loadRecords(mContext)
-        if (records.size == 0) {
-            return (mContext.getString(R.string.surface_no_notes_add_notes_add_todo_follow_up_open_editor_notes_3d1ec))
-        }
-
-        val out = StringBuilder()
-        out.append(mContext.resources.getQuantityString(R.plurals.surface_notes_count, records.size, records.size)).append('\n')
-        val limit = min(records.size, 6)
-        for (count in 0..<limit) {
-            val record = records.get(count)
-            if (record == null || TextUtils.isEmpty(record.text)) continue
-            out.append(count + 1).append(". ")
-            if (record.lock) out.append(mContext.getString(R.string.surface_locked_f6608))
-            out.append(shortenModuleLine(record.text, 96)).append('\n')
-        }
-        val remaining = records.size - limit
-        if (remaining > 0) {
-            out.append(mContext.resources.getQuantityString(R.plurals.surface_more_count, remaining, remaining)).append('\n')
-        }
-        out.append(mContext.getString(R.string.surface_commands_notes_notes_add_notes_ls_86691))
-        return out.toString().trim { it <= ' ' }
-    }
-
-    private fun buildRssModuleText(): CharSequence? {
-        return mainPack.rssManager?.buildModuleText() ?: mContext.getString(R.string.surface_rss_manager_unavailable_7da59)
-    }
-
-    private fun buildWeatherModuleText(): String {
-        var weather = lastWeatherText
-        if (TextUtils.isEmpty(weather)) {
-            weather = labelTexts[Label.weather.ordinal]
-        }
-        if (TextUtils.isEmpty(weather)) {
-            return mContext.getString(R.string.surface_no_weather_yet_e6067)
-        }
-
-        val out = StringBuilder()
-        val ascii = WeatherResponseParser.ascii(lastWeatherSymbol)
-        if (ascii.isNotEmpty()) out.append(ascii).append('\n')
-        XMLPrefsManager.get(Behavior.weather_location)?.trim()?.takeIf { it.isNotEmpty() }?.let {
-            out.append(mContext.getString(R.string.surface_location_c47d5)).append(it).append('\n')
-        }
-        out.append(weather.toString().trim { it <= ' ' })
-        if (lastWeatherUpdateMillis > 0) {
-            val calendar = Calendar.getInstance()
-            calendar.setTimeInMillis(lastWeatherUpdateMillis)
-            out.append(mContext.getString(R.string.surface_updated_aea3f))
-                .append(
-                    String.format(
-                        Locale.US, "%02d.%02d",
-                        calendar.get(Calendar.HOUR_OF_DAY),
-                        calendar.get(Calendar.MINUTE)
-                    )
-                )
-        }
-        out.append(mContext.getString(R.string.surface_data_met_norway_https_api_met_no_doc_license_6815e))
-        return out.toString()
-    }
-
-    private fun shortenModuleLine(value: String?, max: Int): String {
-        if (value == null) return ""
-        val cleaned = value.replace("\\s+".toRegex(), " ").trim { it <= ' ' }
-        if (cleaned.length <= max) return cleaned
-        return cleaned.substring(0, max(0, max - 3)).trim { it <= ' ' } + "..."
-    }
-
-    private fun buildCalendarModuleText(): String {
-        val locale = ConfigurationCompat.getLocales(mContext.resources.configuration)[0] ?: Locale.getDefault()
-        val calendar = Calendar.getInstance(locale)
-        val months = DateFormatSymbols(locale).shortMonths
-        val month = calendar.get(Calendar.MONTH)
-        val year = calendar.get(Calendar.YEAR)
-        calendar.set(Calendar.DAY_OF_MONTH, 1)
-        val firstDay = CalendarLabels.leadingCells(calendar)
-        val max = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-        val today = Calendar.getInstance(locale).get(Calendar.DAY_OF_MONTH)
-
-        val out = StringBuilder()
-        out.append(months[month]).append(' ').append(year).append('\n')
-        val weekdays = CalendarLabels.weekdays(calendar, locale)
-        val width = max(4, weekdays.maxOf { it.length } + 1)
-        out.append(weekdays.joinToString("") { it.padEnd(width) }).append('\n')
-        repeat(firstDay) { out.append(" ".repeat(width)) }
-        for (day in 1..max) {
-            val number = String.format(locale, "%02d", day)
-            out.append((if (day == today) "[$number]" else number).padEnd(width))
-            if ((firstDay + day) % 7 == 0) out.append('\n')
-        }
-        return out.toString()
-    }
-
     private fun handleModuleCommand(intent: Intent) {
         val command = intent.getStringExtra(EXTRA_MODULE_COMMAND)
         val module = intent.getStringExtra(EXTRA_MODULE_NAME)
 
         if ("rebuild" == command) {
-            searchModules?.refresh()
+            searchSurface.refreshModules()
             rebuildModuleDock()
             if (homeModulesContainer != null && !TextUtils.isEmpty(activeModule) && ModuleManager.getDock(
                     mContext
@@ -4674,7 +3165,7 @@ class UIManager(
         } else if ("search_toggle" == command) {
             openSearchModules(module, toggle = true)
         } else if ("close" == command) {
-            if (isSearchModulesOpen) searchModules?.close() else closeHomeModule()
+            if (isSearchModulesOpen) searchSurface.closeModules() else closeHomeModule()
         } else if ("update" == command) {
             if (!TextUtils.isEmpty(module) && module == activeModule) {
                 showHomeModule(module)
@@ -4682,29 +3173,15 @@ class UIManager(
             rebuildModuleDock()
         } else if ("refresh" == command) {
             refreshScriptModule(module)
-        } else if ("lua_click" == command) {
-            val index = intent.getIntExtra(EXTRA_WIDGET_ACTION_INDEX, 0)
-            clickLuaWidget(module, index)
-        } else if ("lua_action" == command) {
-            actionLuaWidget(module, intent.getStringExtra(EXTRA_WIDGET_ACTION_VALUE))
-        } else if ("lua_dialog" == command) {
-            val index = intent.getIntExtra(EXTRA_WIDGET_ACTION_INDEX, 0)
-            dialogLuaWidget(module, index)
-        } else if ("lua_expand" == command) {
-            setLuaWidgetExpanded(module, true)
-        } else if ("lua_collapse" == command) {
-            setLuaWidgetExpanded(module, false)
-        } else if ("lua_toggle" == command) {
-            toggleLuaWidgetExpanded(module)
         } else if ("library_remove" == command) {
             val id = ModuleManager.normalize(module)
-            luaWidgetEngines.remove(id)?.dispose()
+            luaModules.disposeEngine(id)
             if (activeModule == id) closeHomeModule()
             runCatching { ohi.andre.consolelauncher.managers.modules.ModuleLibrary.remove(mContext, id) }
                 .onFailure { Tuils.sendOutput(mContext, "Could not remove module: " + it.message) }
             rebuildModuleDock()
-        } else if ("lua_reload_widget" == command) {
-            reloadLuaWidget(module)
+        } else {
+            luaModules.handleCommand(command, module, intent)
         }
     }
 
@@ -4720,7 +3197,7 @@ class UIManager(
             return
         }
         if (ModuleManager.isLuaSource(source)) {
-            renderLuaWidgetModule(id, true, true)
+            luaModules.renderLuaWidgetModule(id, true, true)
             return
         }
         runTermuxScript(source, ArrayList<String?>(), id, false)
@@ -4745,238 +3222,6 @@ class UIManager(
         if (announce) {
             Tuils.sendOutput(mContext, mContext.getString(R.string.surface_module_refreshed_97f96, id))
         }
-    }
-
-    private fun renderLuaWidgetModule(
-        module: String?,
-        repaint: Boolean,
-        announce: Boolean
-    ): LuaWidgetEngine.RenderResult? {
-        val id = ModuleManager.normalize(module)
-        val source = ModuleManager.getModuleSource(mContext, id)
-        val widgetId = ModuleManager.luaWidgetId(source)
-        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            ModuleManager.setScriptText(
-                mContext, id, (mContext.getString(R.string.surface_title_body_lua_module_source_not_found_1535c, ModuleManager.displayName(mContext, id), widgetId))
-            )
-            return null
-        } else if (!applyLuaWidgetUnavailablePayload(id, widgetId, true, false, false)) {
-            val engine = getLuaWidgetEngine(widgetId)
-            val result = engine.render(announce)
-            applyLuaWidgetResult(id, widgetId, result, true, false, false)
-            if (repaint && id == activeModule) {
-                repaintActiveLuaWidgetModule(id, widgetId, result)
-            }
-            updateModuleDockSelection()
-            if (announce) {
-                Tuils.sendOutput(mContext, mContext.getString(R.string.surface_lua_module_refreshed_0d7bd, id))
-            }
-            return result
-        }
-
-        if (repaint && id == activeModule) {
-            repaintActiveTextModule(id)
-        }
-        updateModuleDockSelection()
-        if (announce) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_lua_module_refreshed_0d7bd, id))
-        }
-        return null
-    }
-
-    private fun clickLuaWidget(module: String?, index: Int) {
-        if (index <= 0) {
-            return
-        }
-        runLuaWidgetOperation(
-            module,
-            LuaWidgetOperation { engine: LuaWidgetEngine? -> engine!!.click(index) })
-    }
-
-    private fun actionLuaWidget(module: String?, value: String?) {
-        runLuaWidgetOperation(
-            module,
-            LuaWidgetOperation { engine: LuaWidgetEngine? -> engine!!.action(value) })
-    }
-
-    private fun dialogLuaWidget(module: String?, index: Int) {
-        runLuaWidgetOperation(
-            module,
-            LuaWidgetOperation { engine: LuaWidgetEngine? -> engine!!.dialog(index) })
-    }
-
-    private fun setLuaWidgetExpanded(module: String?, expanded: Boolean) {
-        runLuaWidgetOperation(
-            module,
-            LuaWidgetOperation { engine: LuaWidgetEngine? -> engine!!.setExpanded(expanded) })
-    }
-
-    private fun toggleLuaWidgetExpanded(module: String?) {
-        runLuaWidgetOperation(
-            module,
-            LuaWidgetOperation { obj: LuaWidgetEngine? -> obj!!.toggleExpanded() })
-    }
-
-    private fun reloadLuaWidget(widgetId: String?) {
-        val id = LuaWidgetManager.normalizeId(widgetId)
-        if (TextUtils.isEmpty(id)) {
-            return
-        }
-        luaWidgetEngines.remove(id)?.dispose()
-        val modules = modulesForLuaWidget(id)
-        if (modules.isEmpty()) {
-            return
-        }
-        for (module in modules) {
-            renderLuaWidgetModule(module, module == activeModule, false)
-        }
-        updateModuleDockSelection()
-        refreshSuggestionsForActiveModule()
-    }
-
-    private fun runLuaWidgetOperation(module: String?, operation: LuaWidgetOperation) {
-        val id = ModuleManager.normalize(module)
-        if (TextUtils.isEmpty(id)) {
-            return
-        }
-        val source = ModuleManager.getModuleSource(mContext, id)
-        val widgetId = ModuleManager.luaWidgetId(source)
-        if (TextUtils.isEmpty(widgetId) || !LuaWidgetManager.exists(widgetId)) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_lua_module_source_not_found_ff7f6, id))
-            return
-        }
-        if (applyLuaWidgetUnavailablePayload(id, widgetId, false, true, true)) {
-            return
-        }
-
-        val result = operation.run(getLuaWidgetEngine(widgetId))
-        applyLuaWidgetResult(id, widgetId, result, true, true, true)
-    }
-
-    private fun applyLuaWidgetUnavailablePayload(
-        module: String,
-        widgetId: String?,
-        stopTicks: Boolean,
-        repaint: Boolean,
-        updateDock: Boolean
-    ): Boolean {
-        if (LuaWidgetManager.isEnabled(widgetId) && LuaWidgetManager.isTrusted(widgetId)) {
-            return false
-        }
-
-        if (stopTicks) {
-            handler!!.removeCallbacks(luaWidgetTickRunnable)
-        }
-        val payload = if (LuaWidgetManager.isEnabled(widgetId))
-            LuaWidgetManager.consentPayload(widgetId)
-        else
-            LuaWidgetManager.disabledPayload(widgetId)
-        ModuleManager.setScriptText(mContext, module, payload)
-        if (repaint && module == activeModule) {
-            repaintActiveTextModule(module)
-        }
-        if (updateDock) {
-            updateModuleDockSelection()
-        }
-        return true
-    }
-
-    private fun applyLuaWidgetResult(
-        module: String,
-        widgetId: String?,
-        result: LuaWidgetEngine.RenderResult,
-        scheduleTicks: Boolean,
-        repaint: Boolean,
-        updateDock: Boolean
-    ) {
-        ModuleManager.setScriptText(
-            mContext,
-            module,
-            LuaWidgetManager.modulePayload(widgetId, result)
-        )
-        if (scheduleTicks) {
-            scheduleLuaWidgetTickIfNeeded(module, result)
-        }
-        if (repaint && module == activeModule) {
-            repaintActiveLuaWidgetModule(module, widgetId, result)
-        }
-        if (updateDock) {
-            updateModuleDockSelection()
-        }
-    }
-
-    private fun interface LuaWidgetOperation {
-        fun run(engine: LuaWidgetEngine?): LuaWidgetEngine.RenderResult
-    }
-
-    private fun getLuaWidgetEngine(widgetId: String?): LuaWidgetEngine {
-        val id = LuaWidgetManager.normalizeId(widgetId)
-        val version = LuaWidgetManager.version(id)
-        var engine = luaWidgetEngines.get(id)
-        if (engine == null || engine.version() != version) {
-            engine?.dispose()
-            engine = LuaWidgetEngine(
-                mContext,
-                id,
-                LuaWidgetManager.readScript(id),
-                version,
-                UpdateListener { updatedWidgetId: String?, result: LuaWidgetEngine.RenderResult ->
-                    val modules = modulesForLuaWidget(updatedWidgetId)
-                    if (modules.isEmpty()) {
-                        return@UpdateListener
-                    }
-                    for (module in modules) {
-                        if (!LuaWidgetManager.isEnabled(updatedWidgetId)) {
-                            ModuleManager.setScriptText(
-                                mContext,
-                                module,
-                                LuaWidgetManager.disabledPayload(updatedWidgetId)
-                            )
-                            handler!!.removeCallbacks(luaWidgetTickRunnable)
-                        } else if (!LuaWidgetManager.isTrusted(updatedWidgetId)) {
-                            ModuleManager.setScriptText(
-                                mContext,
-                                module,
-                                LuaWidgetManager.consentPayload(updatedWidgetId)
-                            )
-                            handler!!.removeCallbacks(luaWidgetTickRunnable)
-                        } else {
-                            ModuleManager.setScriptText(
-                                mContext,
-                                module,
-                                LuaWidgetManager.modulePayload(updatedWidgetId, result)
-                            )
-                        }
-                        if (module == activeModule) {
-                            if (LuaWidgetManager.isEnabled(updatedWidgetId)
-                                && LuaWidgetManager.isTrusted(updatedWidgetId)
-                            ) {
-                                repaintActiveLuaWidgetModule(module, updatedWidgetId, result)
-                            } else {
-                                repaintActiveTextModule(module)
-                            }
-                            scheduleLuaWidgetTickIfNeeded(module, result)
-                        }
-                    }
-                    updateModuleDockSelection()
-                })
-            luaWidgetEngines.put(id, engine)
-        }
-        return engine
-    }
-
-    private fun modulesForLuaWidget(widgetId: String?): MutableList<String> {
-        val modules = ArrayList<String>()
-        val normalizedWidget = LuaWidgetManager.normalizeId(widgetId)
-        for (module in ModuleManager.listAll(mContext)) {
-            val source = ModuleManager.getModuleSource(mContext, module)
-            if (ModuleManager.isLuaSource(source)
-                && TextUtils.equals(normalizedWidget, ModuleManager.luaWidgetId(source))
-            ) {
-                modules.add(ModuleManager.normalize(module))
-            }
-        }
-        return modules
     }
 
     private fun repaintActiveTextModule(id: String?) {
@@ -5439,331 +3684,23 @@ class UIManager(
             return
         }
         termuxAppLastStatus = mContext.getString(R.string.surface_key_9a5bb, clean)
-        dispatchTermuxAppScript("key", buildTermuxAppControlScript(app, clean), true)
+        dispatchTermuxAppScript("key", TermuxAppScripts.buildTermuxAppControlScript(app, clean, ::calculateTermuxAppGeometry), true)
         scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
         scheduleTermuxConsoleFocusCapture(true)
     }
 
-    private fun setupFileConsole(rootView: ViewGroup) {
-        fileOverlay = rootView.findViewById<View?>(R.id.file_overlay)
-        if (fileOverlay == null) {
-            return
-        }
-        fileOverlayBasePaddingLeft = fileOverlay!!.getPaddingLeft()
-        fileOverlayBasePaddingTop = fileOverlay!!.getPaddingTop()
-        fileOverlayBasePaddingRight = fileOverlay!!.getPaddingRight()
-        fileOverlayBasePaddingBottom = fileOverlay!!.getPaddingBottom()
-
-        fileWindowBorder = rootView.findViewById<View?>(R.id.file_window_border)
-        fileWindowLabel = rootView.findViewById<TextView?>(R.id.file_window_label)
-        fileClose = rootView.findViewById<TextView?>(R.id.file_close)
-        filePath = rootView.findViewById<TextView?>(R.id.file_path)
-        fileOutput = rootView.findViewById<TextView?>(R.id.file_output)
-        filePrefix = rootView.findViewById<TextView?>(R.id.file_prefix)
-        fileInput = rootView.findViewById<EditText?>(R.id.file_input)
-        fileScroll = rootView.findViewById<ScrollView?>(R.id.file_scroll)
-        fileInputGroup = rootView.findViewById<View?>(R.id.file_input_group)
-        fileTools = rootView.findViewById<View?>(R.id.file_tools)
-        fileRefresh = rootView.findViewById<TextView?>(R.id.file_refresh)
-        fileUp = rootView.findViewById<TextView?>(R.id.file_up)
-        fileOpen = rootView.findViewById<TextView?>(R.id.file_open)
-        filePaste = rootView.findViewById<TextView?>(R.id.file_paste)
-
-        styleFileConsole()
-
-        if (fileClose != null) {
-            fileClose!!.setOnClickListener(View.OnClickListener { v: View? -> closeFileConsole() })
-        }
-
-        if (fileInput != null) {
-            applyRetuiKeyboardTheme(fileInput, "files")
-            fileInput!!.setOnEditorActionListener(OnEditorActionListener { v: TextView?, actionId: Int, event: KeyEvent? ->
-                val enter =
-                    event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_UP
-                if (actionId == EditorInfo.IME_ACTION_GO || enter) {
-                    val command = fileInput!!.getText().toString()
-                    fileInput!!.setText(Tuils.EMPTYSTRING)
-                    executeFileConsoleCommand(command)
-                    true
-                } else {
-                    false
-                }
-            })
-        }
-
-        if (fileRefresh != null) {
-            fileRefresh!!.setOnClickListener(View.OnClickListener { v: View? ->
-                refreshFileConsole(
-                    true
-                )
-            })
-        }
-        if (fileUp != null) {
-            fileUp!!.setOnClickListener(View.OnClickListener { v: View? ->
-                executeFileConsoleCommand(
-                    "cd .."
-                )
-            })
-        }
-        if (fileOpen != null) {
-            fileOpen!!.setOnClickListener(View.OnClickListener { v: View? ->
-                if (fileInput != null) {
-                    fileInput!!.setText("open ")
-                    fileInput!!.setSelection(fileInput!!.getText().length)
-                    fileInput!!.requestFocus()
-                }
-            })
-        }
-        if (filePaste != null) {
-            filePaste!!.setOnClickListener(View.OnClickListener { v: View? ->
-                val text = Tuils.getTextFromClipboard(mContext)
-                if (text != null && text.length > 0 && fileInput != null) {
-                    val start = max(fileInput!!.getSelectionStart(), 0)
-                    val end = max(fileInput!!.getSelectionEnd(), 0)
-                    fileInput!!.getText().replace(min(start, end), max(start, end), text)
-                }
-            })
-        }
-    }
-
-    private fun setupPodcastSurface(rootView: ViewGroup) {
-        podcastOverlay = rootView.findViewById<View?>(R.id.podcast_overlay)
-        if (podcastOverlay == null) {
-            return
-        }
-
-        podcastOverlayBasePaddingLeft = podcastOverlay!!.paddingLeft
-        podcastOverlayBasePaddingTop = podcastOverlay!!.paddingTop
-        podcastOverlayBasePaddingRight = podcastOverlay!!.paddingRight
-        podcastOverlayBasePaddingBottom = podcastOverlay!!.paddingBottom
-
-        podcastWindowBorder = rootView.findViewById<View?>(R.id.podcast_window_border)
-        podcastWindowLabel = rootView.findViewById<TextView?>(R.id.podcast_window_label)
-        podcastClose = rootView.findViewById<TextView?>(R.id.podcast_close)
-        podcastTabs = rootView.findViewById<View?>(R.id.podcast_tabs)
-        podcastTabShows = rootView.findViewById<TextView?>(R.id.podcast_tab_shows)
-        podcastAdd = rootView.findViewById<TextView?>(R.id.podcast_add)
-        podcastRefresh = rootView.findViewById<TextView?>(R.id.podcast_refresh)
-        podcastPlayShow = rootView.findViewById<TextView?>(R.id.podcast_play_show)
-        podcastContentPanel = rootView.findViewById<View?>(R.id.podcast_content_panel)
-        podcastContentLabel = rootView.findViewById<TextView?>(R.id.podcast_content_label)
-        podcastContentBack = rootView.findViewById<TextView?>(R.id.podcast_content_back)
-        podcastContent = rootView.findViewById<LinearLayout?>(R.id.podcast_content)
-        podcastScroll = rootView.findViewById<ScrollView?>(R.id.podcast_scroll)
-        podcastPaneActions = rootView.findViewById<LinearLayout?>(R.id.podcast_pane_actions)
-        podcastPlayerControls = rootView.findViewById<LinearLayout?>(R.id.podcast_player_controls)
-        podcastPlayerProgress = rootView.findViewById<TextView?>(R.id.podcast_player_progress)
-        podcastPlayerSeek = rootView.findViewById<SeekBar?>(R.id.podcast_player_seek)
-        podcastPlayerTransport = rootView.findViewById<View?>(R.id.podcast_player_transport)
-        podcastPlayerPrev = rootView.findViewById<TextView?>(R.id.podcast_player_prev)
-        podcastPlayerRewind = rootView.findViewById<TextView?>(R.id.podcast_player_rewind)
-        podcastPlayerPlay = rootView.findViewById<TextView?>(R.id.podcast_player_play)
-        podcastPlayerForward = rootView.findViewById<TextView?>(R.id.podcast_player_forward)
-        podcastPlayerNext = rootView.findViewById<TextView?>(R.id.podcast_player_next)
-        podcastNowPlaying = rootView.findViewById<View?>(R.id.podcast_now_playing)
-        podcastArtwork = rootView.findViewById<ImageView?>(R.id.podcast_artwork)
-        podcastNowTitle = rootView.findViewById<TextView?>(R.id.podcast_now_title)
-        podcastNowMeta = rootView.findViewById<TextView?>(R.id.podcast_now_meta)
-        podcastNowProgress = rootView.findViewById<TextView?>(R.id.podcast_now_progress)
-        podcastSeek = rootView.findViewById<SeekBar?>(R.id.podcast_seek)
-        podcastTransport = rootView.findViewById<View?>(R.id.podcast_transport)
-        podcastPrev = rootView.findViewById<TextView?>(R.id.podcast_prev)
-        podcastRewind = rootView.findViewById<TextView?>(R.id.podcast_rewind)
-        podcastPlay = rootView.findViewById<TextView?>(R.id.podcast_play)
-        podcastForward = rootView.findViewById<TextView?>(R.id.podcast_forward)
-        podcastNext = rootView.findViewById<TextView?>(R.id.podcast_next)
-        podcastTabs?.visibility = View.GONE
-
-        stylePodcastSurface()
-        setupPodcastPaneActions()
-
-        podcastClose?.setOnClickListener(View.OnClickListener { minimizePodcastSurface() })
-        bindPodcastCloseGesture()
-        podcastTabShows?.setOnClickListener(View.OnClickListener {
-            podcastMode = PODCAST_MODE_SHOWS
-            renderPodcastSurface(null)
-        })
-        podcastAdd?.setOnClickListener(View.OnClickListener { showPodcastAddDialog() })
-        podcastRefresh?.setOnClickListener(View.OnClickListener {
-            renderPodcastSurface(mContext.getString(R.string.surface_refreshing_selected_podcast_7f1bc))
-            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
-        })
-        podcastPlayShow?.setOnClickListener(View.OnClickListener {
-            podcastMode = PODCAST_MODE_RECENTS
-            renderPodcastSurface(null)
-        })
-        podcastContentBack?.setOnClickListener(View.OnClickListener {
-            navigatePodcastToShows()
-        })
-        podcastNowPlaying?.setOnClickListener(View.OnClickListener {
-            podcastMode = PODCAST_MODE_PLAYER
-            renderPodcastSurface(null)
-        })
-        podcastPlay?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.toggle()
-            updatePodcastNowPlaying()
-        })
-        podcastPrev?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.previous()
-            updatePodcastNowPlaying()
-        })
-        podcastNext?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.next()
-            updatePodcastNowPlaying()
-        })
-        podcastRewind?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.seekBy(-30000)
-            updatePodcastNowPlaying()
-        })
-        podcastForward?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.seekBy(30000)
-            updatePodcastNowPlaying()
-        })
-        podcastPlayerPlay?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.toggle()
-            updatePodcastNowPlaying()
-        })
-        podcastPlayerPrev?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.previous()
-            updatePodcastNowPlaying()
-        })
-        podcastPlayerNext?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.next()
-            updatePodcastNowPlaying()
-        })
-        podcastPlayerRewind?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.seekBy(-30000)
-            updatePodcastNowPlaying()
-        })
-        podcastPlayerForward?.setOnClickListener(View.OnClickListener {
-            mainPack.podcastManager.seekBy(30000)
-            updatePodcastNowPlaying()
-        })
-        podcastPlayerSeek?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    podcastPlayerProgress?.text = PodcastManager.formatMillis(progress)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                podcastSeekDragging = true
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                podcastSeekDragging = false
-                val target = seekBar?.progress ?: return
-                mainPack.podcastManager.seekTo(target)
-                updatePodcastNowPlaying()
-            }
-        })
-        podcastSeek?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    podcastNowProgress?.text = PodcastManager.formatMillis(progress)
-                }
-            }
-
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                podcastSeekDragging = true
-            }
-
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                podcastSeekDragging = false
-                val target = seekBar?.progress ?: return
-                mainPack.podcastManager.seekTo(target)
-                updatePodcastNowPlaying()
-            }
-        })
-    }
-
-    private fun bindPodcastCloseGesture() {
-        val button = podcastClose ?: return
-        var popup: PopupWindow? = null
-        var targetBounds: Rect? = null
-        var longPressed = false
-        var closed = false
-
-        fun dismissTarget() {
-            popup?.dismiss()
-            popup = null
-            targetBounds = null
-        }
-
-        val showTarget = Runnable {
-            longPressed = true
-            val textColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
-            val closeTarget = TextView(mContext).apply {
-                text = "X"
-                gravity = Gravity.CENTER
-                setTextColor(textColor)
-                setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-                textSize = PODCAST_TEXT_LARGE
-                contentDescription = mContext.getString(R.string.surface_slide_here_to_close_podcasts_bf03e)
-                background = TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), textColor, true)
-            }
-            val width = button.width.coerceAtLeast(Tuils.dpToPx(mContext, 48))
-            val height = button.height.coerceAtLeast(Tuils.dpToPx(mContext, 36))
-            val gap = Tuils.dpToPx(mContext, 8)
-            val xOffset = (button.width - width) / 2
-            popup = PopupWindow(closeTarget, width, height, false).apply {
-                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-                isOutsideTouchable = false
-                isClippingEnabled = false
-                elevation = Tuils.dpToPx(mContext, 8).toFloat()
-                showAsDropDown(button, xOffset, -button.height - height - gap)
-            }
-            val location = IntArray(2)
-            button.getLocationOnScreen(location)
-            targetBounds = Rect(
-                location[0] + xOffset,
-                location[1] - height - gap,
-                location[0] + xOffset + width,
-                location[1] - gap
-            )
-            button.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
-        }
-
-        button.setOnTouchListener { view, event ->
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                    dismissTarget()
-                    longPressed = false
-                    closed = false
-                    view.isPressed = true
-                    view.parent?.requestDisallowInterceptTouchEvent(true)
-                    view.postDelayed(showTarget, ViewConfiguration.getLongPressTimeout().toLong())
-                    true
-                }
-                MotionEvent.ACTION_MOVE -> {
-                    if (longPressed && targetBounds?.contains(event.rawX.toInt(), event.rawY.toInt()) == true) {
-                        closed = true
-                        dismissTarget()
-                        closePodcastSurface(true)
-                    }
-                    true
-                }
-                MotionEvent.ACTION_UP -> {
-                    view.removeCallbacks(showTarget)
-                    view.isPressed = false
-                    view.parent?.requestDisallowInterceptTouchEvent(false)
-                    if (!longPressed && !closed) view.performClick()
-                    dismissTarget()
-                    true
-                }
-                MotionEvent.ACTION_CANCEL -> {
-                    view.removeCallbacks(showTarget)
-                    view.isPressed = false
-                    view.parent?.requestDisallowInterceptTouchEvent(false)
-                    dismissTarget()
-                    true
-                }
-                else -> true
-            }
-        }
-    }
-
     init {
+        clockTabDock = ClockTabDock(
+            mContext,
+            rootView,
+            { preferences },
+            { systemInsetLeft },
+            { systemInsetTop },
+            { systemInsetRight },
+            { systemInsetBottom },
+            { podcastLandscapePresentation() },
+            { root -> styleClockOverlay(root) }
+        )
         this.mRootView = rootView
         this.mainPack = mainPack
         this.mExecuter = executer
@@ -5781,8 +3718,7 @@ class UIManager(
         filter.addAction(ACTION_WEATHER_GOT_LOCATION)
         filter.addAction(ACTION_WEATHER_DELAY)
         filter.addAction(ACTION_WEATHER_MANUAL_UPDATE)
-        filter.addAction(ACTION_MUSIC_CHANGED)
-        filter.addAction(ACTION_NOTIFICATION_FEED)
+        homeModules.broadcasts.forEach(filter::addAction)
         filter.addAction(ACTION_CLOCK_STATE)
         filter.addAction(ACTION_POMODORO_STATE)
         filter.addAction(ACTION_LOCKDOWN_STATE)
@@ -5790,7 +3726,6 @@ class UIManager(
         filter.addAction(ACTION_TMUX_WORKSPACE)
         filter.addAction(ACTION_LUA_APP)
         filter.addAction(ACTION_FILE_CONSOLE)
-        filter.addAction(ACTION_PODCAST_SURFACE)
         filter.addAction(ACTION_PROFILE_SURFACE)
         filter.addAction(ACTION_TERMUX_RESULT)
         filter.addAction(ACTION_MODULE_COMMAND)
@@ -5808,21 +3743,18 @@ class UIManager(
                     appDrawerPaneManager?.refresh()
                 } else if (action == ACTION_UPDATE_HINT) {
                     mTerminalAdapter!!.setDefaultHint()
-                    refreshFileConsole(false)
+                    fileConsoleController?.refreshFileConsole(false)
                 } else if (action == ACTION_ROOT) {
                     mTerminalAdapter!!.onRoot()
                 } else if (action == ACTION_CLOCK_STATE) {
-                    lastClockStateIntent = Intent(intent)
-                    updateClockOverlay(intent)
-                    refreshActiveModuleIfNeeded()
+                    clockTabDock?.updateClockOverlay(intent)
+                    redrawActiveModuleFor(HomeModuleEvent.CLOCK)
                 } else if (action == ACTION_POMODORO_STATE) {
-                    lastPomodoroStateIntent = Intent(intent)
-                    updatePomodoroOverlay(intent)
-                    refreshActiveModuleIfNeeded()
+                    focusOverlayController?.updatePomodoroOverlay(intent)
+                    redrawActiveModuleFor(HomeModuleEvent.CLOCK)
                 } else if (action == ACTION_LOCKDOWN_STATE) {
-                    lastLockdownStateIntent = Intent(intent)
-                    updateLockdownOverlay(intent)
-                    refreshActiveModuleIfNeeded()
+                    focusOverlayController?.updateLockdownOverlay(intent)
+                    redrawActiveModuleFor(HomeModuleEvent.CLOCK)
                 } else if (action == ACTION_TERMUX_CONSOLE) {
                     openTermuxConsole(intent.getStringExtra(EXTRA_TERMUX_COMMAND))
                 } else if (action == ACTION_TMUX_WORKSPACE) {
@@ -5831,9 +3763,6 @@ class UIManager(
                     openLuaApp(intent.getStringExtra(EXTRA_LUA_APP_ID))
                 } else if (action == ACTION_FILE_CONSOLE) {
                     openFileConsole(intent.getStringExtra(EXTRA_FILE_COMMAND))
-                } else if (action == ACTION_PODCAST_SURFACE) {
-                    openPodcastSurface(intent.getStringExtra(EXTRA_PODCAST_COMMAND))
-
                 } else if (action == ACTION_PROFILE_SURFACE) {
                     openProfileSurface()
                 } else if (action == ACTION_TERMUX_RESULT) {
@@ -5866,7 +3795,7 @@ class UIManager(
                     // clear that card after it lands.
                     if (searchOnlyMode) terminalContainer?.post { suggestionsManager?.requestSuggestion(Tuils.EMPTYSTRING) }
                 } else if (action == ACTION_HACK) {
-                    playHackOverlay()
+                    hackOverlayController?.playHackOverlay()
                 } else if (action == ACTION_WEATHER) {
                     val c = Calendar.getInstance()
 
@@ -5890,9 +3819,7 @@ class UIManager(
                             ) + "." + c.get(Calendar.MINUTE) + Tuils.SPACE + "(" + lastLatitude + ", " + lastLongitude + ")"
                         Tuils.sendOutput(context, message, TerminalManager.CATEGORY_OUTPUT)
                     }
-                    if (ModuleManager.WEATHER_NATIVE == activeModule) {
-                        showHomeModule(activeModule)
-                    }
+                    redrawActiveModuleFor(HomeModuleEvent.WEATHER)
                 } else if (action == ACTION_WEATHER_DELAY) {
                     val c = Calendar.getInstance()
                     c.setTimeInMillis(System.currentTimeMillis() + 1000 * 10)
@@ -5920,125 +3847,10 @@ class UIManager(
                         statusUpdateListener
                     )
                     weatherManager!!.start()
-                } else if (action == ACTION_MUSIC_CHANGED) {
-                    Log.d("TUI-Music", "UIManager received music change broadcast")
-                    var song = intent.getStringExtra(SONG_TITLE)
-                    val singer = intent.getStringExtra(SONG_SINGER)
-                    var isPlaying = intent.getBooleanExtra(MUSIC_PLAYING, false)
-                    val source = intent.getStringExtra(MusicService.MUSIC_SOURCE)
-                    val pkg = intent.getStringExtra("package")
-
-                    val preferredPkg = preferredPackage()
-                    val isPreferred = TextUtils.isEmpty(preferredPkg) || preferredPkg == pkg
-
-                    // Source logic: external always wins if it is playing.
-                    // Internal only wins if it's playing and external is not.
-                    if (source != null) {
-                        if (MusicService.SOURCE_EXTERNAL == source) {
-                            // Strictly filter external source if a preferred app is set
-                            if (!isPreferred) {
-                                isPlaying = false
-                                song = null
-                            }
-                            activeMusicSource = source
-                        } else if (MusicService.SOURCE_INTERNAL == source && MusicService.SOURCE_EXTERNAL == activeMusicSource) {
-                            // Don't let internal idle broadcast override external metadata
-                            if (!isPlaying) return
-                            activeMusicSource = source
-                        } else {
-                            activeMusicSource = source
-                        }
-                    }
-
-                    Log.d(
-                        "TUI-Music",
-                        "UIManager update UI: " + song + ", isPlaying=" + isPlaying + " source=" + activeMusicSource + " pkg=" + pkg
-                    )
-
-                    val hasContent = (song != null && !song.isEmpty() && (song != "-"))
-                    val showMusicWidget = isPlaying || hasContent
-                    lastMusicSong = song
-                    lastMusicSinger = singer
-                    lastMusicPlaying = isPlaying
-                    lastMusicAppPackage =
-                        if (MusicService.SOURCE_EXTERNAL == activeMusicSource
-                            && isPreferred
-                            && showMusicWidget
-                            && !TextUtils.isEmpty(pkg)
-                        ) pkg else null
-
-                    // Gone widget left activeModule=MUSIC, so prev/play/next chips stayed up.
-                    if (!showMusicWidget && ModuleManager.MUSIC == activeModule) {
-                        closeHomeModule()
-                        scheduleInternalMusicTickerIfNeeded()
-                        return
-                    }
-
-                    if (isPlaying && autoShowWidget() && ModuleManager.MUSIC != activeModule) {
-                        showHomeModule(ModuleManager.MUSIC)
-                    }
-
-                    val musicWidget = rootView.findViewById<View?>(R.id.music_module)
-                    if (musicWidget != null) {
-                        musicWidget.setVisibility(if (showMusicWidget) View.VISIBLE else View.GONE)
-                    }
-                    updateContextContainerVisibility(rootView)
-
-                    val widgetBorderColor = musicWidgetBorderColor()
-                    val widgetTextColor = musicWidgetTextColor()
-
-                    val visualizerView =
-                        rootView.findViewById<MusicVisualizerView?>(R.id.music_visualizer)
-                    if (visualizerView != null) {
-                        visualizerView.setBarColor(widgetTextColor)
-                        visualizerView.setPlaying(isPlaying)
-                    }
-
-                    val songTitleView = rootView.findViewById<TextView?>(R.id.music_song_title)
-                    if (songTitleView != null) {
-                        songTitleView.setText(if (song != null) musicTitlePrefix() + song.uppercase(Locale.getDefault()) else musicTitlePrefix() + "-")
-                        songTitleView.setTextColor(widgetTextColor)
-                    }
-
-                    val singerView = rootView.findViewById<TextView?>(R.id.music_singer)
-                    if (singerView != null) {
-                        singerView.setText(
-                            if (singer != null) musicSubtitlePrefix() + singer.uppercase(
-                                Locale.getDefault()
-                            ) else musicSubtitlePrefix() + "-"
-                        )
-                        singerView.setTextColor(widgetTextColor)
-                    }
-
-                    updateMusicAppRow(rootView, widgetTextColor)
-
-                    decorateWidget(
-                        rootView,
-                        R.id.music_module_border,
-                        R.id.music_module_label,
-                        R.id.music_module_close,
-                        widgetBorderColor,
-                        widgetTextColor,
-                        FrameTarget.MUSIC
-                    )
-                    styleModuleClose(rootView.findViewById<TextView?>(R.id.music_module_close), FrameTarget.MUSIC)
-                    sizeMusicVisualizer(rootView)
-                    if (MusicService.SOURCE_PODCAST == source && podcastOverlay != null && podcastOverlay!!.visibility == View.VISIBLE) {
-                        // Progress ticks must not rebuild the whole player surface.
-                        updatePodcastNowPlaying()
-                    }
-                    if (ModuleManager.MUSIC == activeModule) {
-                        refreshSuggestionsForActiveModule()
-                    }
-                    scheduleInternalMusicTickerIfNeeded()
-                } else if (action == ACTION_NOTIFICATION_FEED) {
-                    val notifications =
-                        intent.getParcelableArrayListExtra<NotificationService.Notification?>(
-                            EXTRA_NOTIFICATION_LIST
-                        )
-                    updateNotificationWidget(rootView, notifications)
+                } else if (homeModules.handlesBroadcast(action)) {
+                    homeModules.onBroadcast(intent)
                 } else if (action == ACTION_CLOCK_STATE) {
-                    updateClockOverlay(intent)
+                    clockTabDock?.updateClockOverlay(intent)
                     val message = intent.getStringExtra(ClockManager.EXTRA_MESSAGE)
                     if (!TextUtils.isEmpty(message)) {
                         Tuils.sendOutput(context, message, TerminalManager.CATEGORY_OUTPUT)
@@ -6064,10 +3876,35 @@ class UIManager(
         ohi.andre.consolelauncher.presentation.HomeChromePresentation.styleRoot(rootView,
             ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),canApplyTheme)
 
-        styleHackOverlay(rootView)
+        focusOverlayController = FocusOverlayController(
+            mContext!!,
+            rootView,
+            { closeKeyboard() },
+            { launcherWindowFocused },
+            { pauseAsciiAnimation() },
+            { resumeAsciiAnimation() }
+        )
+        hackOverlayController = HackOverlayController(mContext!!, rootView, { handler }, { closeKeyboard() })
+        hackOverlayController?.styleHackOverlay(rootView)
         setupTermuxConsole(rootView)
-        setupFileConsole(rootView)
-        setupPodcastSurface(rootView)
+        fileConsoleController = FileConsoleController(
+            mContext!!,
+            rootView,
+            { mainPack },
+            { command -> mExecuter.execute(command, null) },
+            { input, mode -> applyRetuiKeyboardTheme(input, mode) },
+            { input, mode -> sendRetuiKeyboardTheme(input, mode) },
+            { button, color -> styleTermuxToolButton(button, color) },
+            { action -> runOnMainThread(action) },
+            {
+                closeTermuxConsole(false)
+                profilePaneController?.hide()
+            },
+            { hideHomeSuggestionsForTermux() },
+            { restoreHomeSuggestionsAfterTermux() },
+            { mTerminalAdapter?.focusInputEnd() }
+        )
+        fileConsoleController?.setupFileConsole()
         profilePaneController = ProfilePaneController(mContext!!, rootView) { closeProfileSurface() }
         setupResponsiveLandscapeLayout(rootView)
 
@@ -6082,8 +3919,6 @@ class UIManager(
             }
             updateKeyboardLayoutState(keyboardVisible, rootView.getHeight())
         })
-
-        clearOnLock = XMLPrefsManager.getBoolean(Behavior.clear_on_lock)
 
         lockOnDbTap = XMLPrefsManager.getBoolean(Behavior.double_tap_lock)
         doubleTapCmd = XMLPrefsManager.get(Behavior.double_tap_cmd)
@@ -6256,9 +4091,6 @@ class UIManager(
 
         statusAppearance=ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
         val show=ohi.andre.consolelauncher.presentation.StatusPresentation.descriptors.map { statusAppearance!!.bool(it.visible) }.toBooleanArray()
-        genericBorderCornerRadius = Tuils.dpToPx(mContext, dashedBorderCornerRadius())
-
-        useDashed = dashedBorders()
 
         margins = Array<IntArray?>(6) { IntArray(4) }
         margins[0] =
@@ -6509,6 +4341,18 @@ class UIManager(
         scheduleTypefaceRefreshes()
     }
 
+    /** The hidden pixel grid: the whole home, CRT included, re-sampled onto whole cells in one pass. */
+    fun applyPixelGrid() {
+        val root = mRootView ?: return
+        ohi.andre.consolelauncher.tuils.PixelGrid.apply(mContext, listOf(root), pixelInk())
+        // 1-bit is its own screen filter: CRT scanlines would be thresholded into gaps through the text.
+        val oneBit = ohi.andre.consolelauncher.tuils.PixelGrid.supported() && ohi.andre.consolelauncher.tuils.PixelGrid.enabled(mContext) &&
+            ohi.andre.consolelauncher.tuils.PixelGrid.mode(mContext) == ohi.andre.consolelauncher.tuils.PixelGrid.Mode.ONE_BIT
+        crtOverlayDrawable?.let { crt -> root.foreground = if (oneBit) null else crt }
+    }
+
+    private fun pixelInk() = ohi.andre.consolelauncher.wallpaper.pixel.PixelLook.themeInk()
+
     private fun installCrtOverlay(rootView: ViewGroup) {
         if (!AppearanceSettings.crtFilter()) {
             return
@@ -6517,169 +4361,6 @@ class UIManager(
         overlay.setAccentColor(XMLPrefsManager.getColor(Theme.output_text_color))
         rootView.foreground = overlay
         crtOverlayDrawable = overlay
-    }
-
-    private fun styleMusicWidget(musicWidget: View?) {
-        if (musicWidget == null) return
-        decorateWidget(
-            musicWidget,
-            R.id.music_module_border,
-            R.id.music_module_label,
-            R.id.music_module_close,
-            musicWidgetBorderColor(),
-            musicWidgetTextColor(),
-            FrameTarget.MUSIC
-        )
-        styleModuleClose(musicWidget.findViewById<TextView?>(R.id.music_module_close), FrameTarget.MUSIC)
-
-        val musicAppearance=statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved()
-        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.musicContent(musicWidget,musicAppearance)
-        musicWidget.findViewById<TextView>(R.id.music_app_label)?.setOnClickListener { launchCurrentMusicApp() }
-        updateMusicAppRow(musicWidget, musicWidgetTextColor())
-
-        // Style control buttons
-        val prevBtn = musicWidget.findViewById<TextView?>(R.id.music_prev)
-        val nextBtn = musicWidget.findViewById<TextView?>(R.id.music_next)
-        val playPauseBtn = musicWidget.findViewById<TextView?>(R.id.music_play_pause)
-
-        if (prevBtn != null) {
-            prevBtn.setOnClickListener(View.OnClickListener { v: View? ->
-                if (MusicService.SOURCE_PODCAST == activeMusicSource) {
-                    mainPack.podcastManager.previous()
-                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack!!.player != null) mainPack!!.player!!.playPrev()
-                } else {
-                    val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
-                    intent.putExtra(MusicService.EXTRA_CONTROL_CMD, MusicService.CONTROL_PREV_INT)
-                    LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
-                }
-            })
-        }
-
-        if (nextBtn != null) {
-            nextBtn.setOnClickListener(View.OnClickListener { v: View? ->
-                if (MusicService.SOURCE_PODCAST == activeMusicSource) {
-                    mainPack.podcastManager.next()
-                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack!!.player != null) mainPack!!.player!!.playNext()
-                } else {
-                    val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
-                    intent.putExtra(MusicService.EXTRA_CONTROL_CMD, MusicService.CONTROL_NEXT_INT)
-                    LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
-                }
-            })
-        }
-
-        if (playPauseBtn != null) {
-            playPauseBtn.setOnClickListener(View.OnClickListener { v: View? ->
-                if (MusicService.SOURCE_PODCAST == activeMusicSource) {
-                    mainPack.podcastManager.toggle()
-                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack!!.player != null) {
-                        if (mainPack!!.player!!.isPlaying()) mainPack!!.player!!.pause()
-                        else mainPack!!.player!!.play()
-                    }
-                } else {
-                    val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
-                    intent.putExtra(
-                        MusicService.EXTRA_CONTROL_CMD,
-                        MusicService.CONTROL_PLAY_PAUSE_INT
-                    )
-                    LocalBroadcastManager.getInstance(mContext!!).sendBroadcast(intent)
-                }
-            })
-        }
-    }
-
-    private fun updateMusicAppRow(rootView: View?, textColor: Int) {
-        if (rootView == null) return
-        val row = rootView.findViewById<View?>(R.id.music_app_row)
-        val prefix = rootView.findViewById<TextView?>(R.id.music_app_prefix)
-        val label = rootView.findViewById<TextView?>(R.id.music_app_label)
-        if (row == null || prefix == null || label == null) return
-
-        val packageName = lastMusicAppPackage
-        val launchIntent =
-            if (!packageName.isNullOrEmpty()) mContext!!.getPackageManager()
-                .getLaunchIntentForPackage(packageName)
-            else null
-
-        if (packageName.isNullOrEmpty() || launchIntent == null) {
-            row.setVisibility(View.GONE)
-            label.setText(Tuils.EMPTYSTRING)
-            label.setOnClickListener(null)
-            label.setEnabled(false)
-            return
-        }
-
-        prefix.setTextColor(textColor)
-        label.setTextColor(textColor)
-        label.setText(resolveMusicAppLabel(packageName))
-        label.setEnabled(true)
-        label.setOnClickListener(View.OnClickListener { v: View? -> launchCurrentMusicApp() })
-        row.setVisibility(View.VISIBLE)
-    }
-
-    private fun resolveMusicAppLabel(packageName: String?): String {
-        val resolvedPackage = packageName ?: return Tuils.EMPTYSTRING
-        if (TextUtils.isEmpty(resolvedPackage)) return Tuils.EMPTYSTRING
-        return try {
-            val packageManager = mContext!!.getPackageManager()
-            val info = packageManager.getApplicationInfo(resolvedPackage, 0)
-            val label = info.loadLabel(packageManager)
-            if (label.length > 0) label.toString() else resolvedPackage
-        } catch (e: Exception) {
-            resolvedPackage
-        }
-    }
-
-    private fun launchCurrentMusicApp() {
-        val packageName = lastMusicAppPackage ?: return
-        if (packageName.isEmpty()) return
-        val intent = mContext!!.getPackageManager().getLaunchIntentForPackage(packageName)
-            ?: return
-        if (mContext !is Activity) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        startActivityAfterChromeHidden(intent)
-    }
-
-    private fun sizeMusicVisualizer(musicWidget: View) {
-        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.sizeVisualizer(musicWidget)
-    }
-
-    private fun styleHackOverlay(rootView: View) {
-        val overlay = rootView.findViewById<View?>(R.id.hack_overlay)
-        val hackText = rootView.findViewById<TextView?>(R.id.hack_text)
-        if (overlay == null || hackText == null) {
-            return
-        }
-        hackOverlay = overlay
-        hackOverlayBasePaddingLeft = overlay.getPaddingLeft()
-        hackOverlayBasePaddingTop = overlay.getPaddingTop()
-        hackOverlayBasePaddingRight = overlay.getPaddingRight()
-        hackOverlayBasePaddingBottom = overlay.getPaddingBottom()
-
-        val accent = ThemeColorResolver.color(Theme.overlay_panel_text_color)
-        val surface = ThemeColorResolver.color(Theme.overlay_panel_background_color)
-        val border = ThemeColorResolver.color(Theme.overlay_panel_border_color)
-
-        overlay.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext!!,
-                ThemeColorResolver.withMaxAlpha(surface, 232),
-                border,
-                1.5f,
-                0,
-                dashedBorders(),
-                target = FrameTarget.OVERLAYS
-            )
-        )
-        overlay.setOnClickListener(View.OnClickListener { v: View? -> dismissHackOverlay() })
-
-        hackText.setTextColor(accent)
-        hackText.setTypeface(Tuils.getTypeface(mContext))
-        hackText.setTextSize(11f)
     }
 
     private fun styleTermuxConsole() {
@@ -6907,321 +4588,8 @@ class UIManager(
         }
     }
 
-    private fun styleFileConsole() {
-        if (fileOverlay == null) {
-            return
-        }
-
-        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
-        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
-        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
-        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
-
-        if (fileWindowBorder != null) {
-            fileWindowBorder!!.setBackground(
-                TerminalBorderRuntime.panelDrawable(
-                    mContext!!,
-                    bgColor,
-                    borderColor,
-                    1.5f,
-                    outputCornerRadius(),
-                    dashedBorders(),
-                    target = FrameTarget.OVERLAYS
-                )
-            )
-        }
-
-        if (fileWindowLabel != null) {
-            fileWindowLabel!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            fileWindowLabel!!.setTextSize(outputHeaderTextSize().toFloat())
-            fileWindowLabel!!.setTextColor(textColor)
-            fileWindowLabel!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
-        }
-        if (fileClose != null) {
-            fileClose!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            fileClose!!.setTextSize(outputHeaderTextSize().toFloat())
-            fileClose!!.setTextColor(textColor)
-            fileClose!!.setBackground(TerminalBorderRuntime.tabDrawable(mContext!!, labelBg, FrameTarget.OVERLAYS))
-        }
-        TerminalBorderRuntime.bind(fileWindowBorder, fileWindowLabel, fileClose)
-        if (filePath != null) {
-            filePath!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            filePath!!.setTextColor(textColor)
-        }
-        if (fileOutput != null) {
-            fileOutput!!.setTypeface(Tuils.getTypeface(mContext))
-            fileOutput!!.setTextColor(textColor)
-            fileOutput!!.setTextIsSelectable(true)
-        }
-        if (filePrefix != null) {
-            filePrefix!!.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            filePrefix!!.setTextColor(textColor)
-        }
-        if (fileInput != null) {
-            fileInput!!.setTypeface(Tuils.getTypeface(mContext))
-            fileInput!!.setTextColor(ThemeColorResolver.color(Theme.workspace_input_text_color))
-            fileInput!!.setHintTextColor(ThemeColorResolver.color(Theme.field_hint_color))
-            Tuils.setCursorDrawableColor(fileInput!!, ThemeColorResolver.color(Theme.cursor_color))
-        }
-        if (fileInputGroup != null) {
-            fileInputGroup!!.setBackground(
-                TerminalBorderRuntime.panelDrawable(
-                    mContext!!,
-                    ThemeColorResolver.color(Theme.workspace_input_background_color),
-                    ThemeColorResolver.withMaxAlpha(borderColor, 180),
-                    1.2f,
-                    outputCornerRadius(),
-                    dashedBorders(),
-                    target = FrameTarget.OVERLAYS
-                )
-            )
-        }
-        if (fileTools != null) {
-            fileTools!!.setBackgroundColor(Color.TRANSPARENT)
-        }
-        styleTermuxToolButton(fileRefresh, textColor)
-        styleTermuxToolButton(fileUp, textColor)
-        styleTermuxToolButton(fileOpen, textColor)
-        styleTermuxToolButton(filePaste, textColor)
-    }
-
-    private fun stylePodcastSurface() {
-        if (podcastOverlay == null) {
-            return
-        }
-
-        val borderColor = ThemeColorResolver.color(Theme.workspace_panel_border_color)
-        val textColor = ThemeColorResolver.color(Theme.workspace_panel_text_color)
-        val bgColor = ThemeColorResolver.color(Theme.workspace_panel_background_color)
-        val labelBg = ThemeColorResolver.color(Theme.workspace_header_background_color)
-        val typeface = Tuils.getTypeface(mContext)
-
-        podcastWindowBorder?.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext,
-                bgColor,
-                borderColor,
-                1.5f,
-                outputCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.OVERLAYS
-            )
-        )
-
-        listOf(podcastWindowLabel, podcastClose).forEach { label ->
-            label?.setTypeface(typeface, Typeface.BOLD)
-            label?.textSize = PODCAST_TEXT_LARGE
-            label?.setTextColor(textColor)
-        }
-        podcastWindowLabel?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS))
-        podcastClose?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, textColor, true, FrameTarget.OVERLAYS))
-        TerminalBorderRuntime.bind(podcastWindowBorder, podcastWindowLabel, podcastClose)
-
-        listOf(podcastTabs, podcastTransport, podcastPlayerTransport).forEach { view ->
-            view?.setBackgroundColor(Color.TRANSPARENT)
-            styleTermuxToolButtons(view, textColor)
-        }
-        updatePodcastTabStyle()
-
-        podcastContentPanel?.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext,
-                ThemeColorResolver.color(Theme.workspace_output_background_color),
-                ThemeColorResolver.withMaxAlpha(borderColor, 210),
-                1.2f,
-                outputCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.OVERLAYS
-            )
-        )
-        listOf(podcastContentLabel, podcastContentBack).forEach { label ->
-            label?.setTypeface(typeface, Typeface.BOLD)
-            label?.textSize = PODCAST_TEXT_MEDIUM
-            label?.setTextColor(textColor)
-            label?.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS))
-        }
-        bindPodcastContentFrame()
-
-        podcastNowPlaying?.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext,
-                ThemeColorResolver.color(Theme.workspace_input_background_color),
-                ThemeColorResolver.withMaxAlpha(borderColor, 180),
-                1.2f,
-                outputCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.OVERLAYS
-            )
-        )
-
-        podcastArtwork?.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext,
-                Color.TRANSPARENT,
-                ThemeColorResolver.withMaxAlpha(borderColor, 160),
-                1f,
-                moduleCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.OVERLAYS
-            )
-        )
-
-        listOf(podcastNowTitle, podcastNowMeta, podcastNowProgress, podcastPlayerProgress).forEach { view ->
-            view?.setTypeface(typeface)
-            view?.setTextColor(textColor)
-        }
-
-        podcastPaneActions?.setBackgroundColor(Color.TRANSPARENT)
-        val actions = podcastPaneActions
-        if (actions != null) {
-            for (i in 0 until actions.childCount) {
-                stylePodcastPaneActionButton(actions.getChildAt(i) as? TextView)
-            }
-        }
-
-        podcastSeek?.progressTintList = ColorStateList.valueOf(textColor)
-        podcastSeek?.thumbTintList = ColorStateList.valueOf(textColor)
-        podcastSeek?.progressBackgroundTintList =
-            ColorStateList.valueOf(ThemeColorResolver.color(Theme.slider_track_color))
-        podcastPlayerSeek?.progressTintList = ColorStateList.valueOf(textColor)
-        podcastPlayerSeek?.thumbTintList = ColorStateList.valueOf(textColor)
-        podcastPlayerSeek?.progressBackgroundTintList =
-            ColorStateList.valueOf(ThemeColorResolver.color(Theme.slider_track_color))
-    }
-
-    private fun setupPodcastPaneActions() {
-        val row = podcastPaneActions ?: return
-        row.removeAllViews()
-        row.addView(podcastPaneActionButton("↻", mContext.getString(R.string.surface_refresh_selected_podcast_4b302)) {
-            renderPodcastSurface(mContext.getString(R.string.surface_refreshing_selected_podcast_7f1bc))
-            mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
-        })
-        row.addView(podcastPaneActionButton("+", mContext.getString(R.string.surface_add_podcast_24ba4)) { showPodcastAddDialog() })
-    }
-
-    private fun podcastPaneActionButton(label: String, description: String, action: Runnable): TextView {
-        val button = TextView(mContext)
-        button.text = label
-        button.contentDescription = description
-        button.gravity = Gravity.CENTER
-        button.setOnClickListener { action.run() }
-        stylePodcastPaneActionButton(button)
-        val params = LinearLayout.LayoutParams(
-            Tuils.dpToPx(mContext, 40),
-            Tuils.dpToPx(mContext, 40)
-        )
-        params.marginStart = Tuils.dpToPx(mContext, 8)
-        button.layoutParams = params
-        return button
-    }
-
-    private fun stylePodcastPaneActionButton(button: TextView?) {
-        val target = button ?: return
-        target.textSize = PODCAST_TEXT_MEDIUM
-        target.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        target.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
-        target.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
-    }
-
-    private fun applyPodcastPaneGeometry() =
-        applyFocusPaneGeometry(podcastOverlay, podcastWindowBorder)
-
-    private fun applyFocusPaneGeometry(overlay: View?, border: View?) {
-        overlay ?: return
-        border ?: return
-        // Don't size against the keyboard — short landscape + IME was crushing the pane.
-        val imeReserve = if (imeInsetVisible) imeBottomOffset else 0
-        val availableHeight = overlay.height - overlay.paddingTop - overlay.paddingBottom - imeReserve
-        val availableWidth = overlay.width - overlay.paddingLeft - overlay.paddingRight
-        if (availableHeight <= 0 || availableWidth <= 0) {
-            if (overlay.visibility == View.VISIBLE && launcherWindowFocused) {
-                overlay.postOnAnimation { applyFocusPaneGeometry(overlay, border) }
-            }
-            return
-        }
-
-        val landscape = podcastLandscapePresentation()
-        // Landscape keeps home chrome in-place — dim so status/dock don't bleed through the sides.
-        overlay.setBackgroundColor(
-            if (landscape) ThemeColorResolver.color(Theme.overlay_scrim_color) else Color.TRANSPARENT
-        )
-        val safeMargin = Tuils.dpToPx(mContext, if (landscape) 8 else 16)
-        val maxHeight = max(1, availableHeight - safeMargin)
-        val minHeight = min(
-            Tuils.dpToPx(mContext, if (landscape) PODCAST_PANE_LAND_MIN_HEIGHT_DP else PODCAST_PANE_MIN_HEIGHT_DP),
-            maxHeight
-        )
-        val fraction = if (landscape) PODCAST_PANE_LAND_HEIGHT_FRACTION else PODCAST_PANE_HEIGHT_FRACTION
-        val paneHeight = (availableHeight * fraction)
-            .roundToInt()
-            .coerceIn(minHeight, maxHeight)
-        val sideInset = if (landscape) Tuils.dpToPx(mContext, PODCAST_PANE_LAND_SIDE_INSET_DP) else 0
-
-        val borderParams = (border.layoutParams as? FrameLayout.LayoutParams)
-            ?: FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, paneHeight)
-        // CENTER_VERTICAL only — Gravity.CENTER + independent tab margins parked chrome on the screen corners.
-        val targetGravity = Gravity.CENTER_VERTICAL
-        if (borderParams.width != FrameLayout.LayoutParams.MATCH_PARENT ||
-            borderParams.height != paneHeight ||
-            borderParams.gravity != targetGravity ||
-            borderParams.leftMargin != sideInset ||
-            borderParams.rightMargin != sideInset ||
-            borderParams.topMargin != 0 ||
-            borderParams.bottomMargin != 0
-        ) {
-            borderParams.width = FrameLayout.LayoutParams.MATCH_PARENT
-            borderParams.height = paneHeight
-            borderParams.gravity = targetGravity
-            borderParams.setMargins(sideInset, 0, sideInset, 0)
-            border.layoutParams = borderParams
-        }
-    }
-
     private fun podcastLandscapePresentation(): Boolean =
         shouldUseResponsiveLandscape(currentConfiguration)
-
-    private fun updatePodcastTabStyle() {
-        val textColor = ThemeColorResolver.color(Theme.workspace_control_text_color)
-        val labelBg = terminalHeaderTabBackground()
-        val tabs = arrayOf(podcastTabShows to PODCAST_MODE_SHOWS, podcastPlayShow to PODCAST_MODE_RECENTS)
-        for ((tabView, mode) in tabs) {
-            val tab = tabView ?: continue
-            styleTermuxToolButton(tab, textColor)
-            tab.setBackgroundColor(Color.TRANSPARENT)
-            if (mode == podcastMode || (mode == PODCAST_MODE_SHOWS && podcastMode == PODCAST_MODE_SHOW_DETAIL)) {
-                tab.setBackground(TerminalBorderRuntime.tabDrawable(mContext, labelBg, FrameTarget.OVERLAYS))
-            }
-        }
-    }
-
-    private fun updatePodcastContentLabel() {
-        val label = podcastContentLabel ?: return
-        val next = when (podcastMode) {
-            PODCAST_MODE_RECENTS -> mContext.getString(R.string.surface_recents_1a978)
-            PODCAST_MODE_SHOW_DETAIL -> mContext.getString(R.string.surface_episodes_e5e52)
-            PODCAST_MODE_PLAYER -> mContext.getString(R.string.surface_player_5055e)
-            else -> mContext.getString(R.string.surface_shows_bd50a)
-        }
-        val backVisibility = if (podcastMode == PODCAST_MODE_SHOW_DETAIL || podcastMode == PODCAST_MODE_PLAYER) View.VISIBLE else View.GONE
-        val back = podcastContentBack
-        var changed = label.text != next || back?.visibility != backVisibility
-        if (label.text != next) {
-            label.text = next
-        }
-        back?.visibility = backVisibility
-        val labelParams = label.layoutParams as? FrameLayout.LayoutParams
-        val labelStart = Tuils.dpToPx(mContext, if (backVisibility == View.VISIBLE) 60 else 12)
-        if (labelParams != null && labelParams.leftMargin != labelStart) {
-            labelParams.leftMargin = labelStart
-            label.layoutParams = labelParams
-            changed = true
-        }
-        if (changed) bindPodcastContentFrame()
-    }
-
-    private fun bindPodcastContentFrame() {
-        TerminalBorderRuntime.bind(podcastContentPanel, podcastContentLabel, podcastContentBack)
-    }
 
     fun openTermuxConsole(command: String?) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
@@ -7233,8 +4601,7 @@ class UIManager(
             return
         }
 
-        closeFileConsole(false)
-        minimizePodcastSurface()
+        fileConsoleController?.closeFileConsole(false)
         profilePaneController?.hide()
         closeLuaAppSession(true)
         var normalized = if (command == null) Tuils.EMPTYSTRING else command.trim { it <= ' ' }
@@ -7296,8 +4663,7 @@ class UIManager(
             return
         }
 
-        closeFileConsole(false)
-        minimizePodcastSurface()
+        fileConsoleController?.closeFileConsole(false)
         profilePaneController?.hide()
         closeLuaAppSession(true)
         termuxAppSession = null
@@ -7334,356 +4700,7 @@ class UIManager(
     }
 
     fun openFileConsole(command: String?) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            runOnMainThread { openFileConsole(command) }
-            return
-        }
-
-        if (fileOverlay == null) {
-            return
-        }
-
-        closeTermuxConsole(false)
-        minimizePodcastSurface()
-        profilePaneController?.hide()
-        styleFileConsole()
-        fileOverlay!!.setVisibility(View.VISIBLE)
-        fileOverlay!!.bringToFront()
-        hideHomeSuggestionsForTermux()
-        refreshFileConsole(true)
-
-        val normalized = if (command == null) Tuils.EMPTYSTRING else command.trim { it <= ' ' }
-        if (normalized.length > 0) {
-            executeFileConsoleCommand(normalized)
-        }
-
-        if (fileInput != null) {
-            sendRetuiKeyboardTheme(fileInput, "files")
-            fileInput!!.requestFocus()
-            fileInput!!.postDelayed(Runnable {
-                val manager =
-                    mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-                if (manager != null) {
-                    sendRetuiKeyboardTheme(fileInput, "files")
-                    manager.showSoftInput(fileInput, InputMethodManager.SHOW_IMPLICIT)
-                }
-            }, 120)
-        }
-    }
-
-    private fun closeFileConsole(restoreSuggestions: Boolean = true) {
-        if (fileOverlay != null) {
-            fileOverlay!!.setVisibility(View.GONE)
-        }
-        if (restoreSuggestions) {
-            restoreHomeSuggestionsAfterTermux()
-        }
-        if (fileInput != null) {
-            val manager =
-                mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-            if (manager != null) {
-                manager.hideSoftInputFromWindow(fileInput!!.getWindowToken(), 0)
-            }
-            fileInput!!.clearFocus()
-        }
-        if (mTerminalAdapter != null && restoreSuggestions) {
-            mTerminalAdapter!!.focusInputEnd()
-        }
-    }
-
-    fun openPodcastSurface(command: String?) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            runOnMainThread { openPodcastSurface(command) }
-            return
-        }
-
-        if (podcastOverlay == null) {
-            return
-        }
-
-        closeTermuxConsole(false)
-        closeFileConsole(false)
-        closeLuaAppSession(true)
-        profilePaneController?.hide()
-        expandPodcastSurface()
-
-        val normalized = command?.trim { it <= ' ' }.orEmpty()
-        if (normalized.isNotEmpty()) {
-            executePodcastCommand(normalized)
-            return
-        }
-
-        renderPodcastSurface(null)
-    }
-
-    private fun expandPodcastSurface() {
-        podcastSessionActive = true
-        hidePodcastPill()
-        closeKeyboard()
-        mTerminalAdapter?.inputView?.clearFocus()
-        // Podcast keeps home chrome in-tree and slides it; never GONE it (that's for settings/termux).
-        if (launcherChromeHiddenForSurface) {
-            restoreLauncherChromeAfterSurface()
-        }
-        stylePodcastSurface()
-        val landscape = podcastLandscapePresentation()
-        if (landscape) {
-            // Landscape: no CRT beam — short panes + split layout fight scale pivots.
-            snapPodcastLandIdle()
-            podcastOverlay!!.alpha = 0f
-        } else {
-            snapPodcastCrtCollapsed()
-            podcastOverlay!!.alpha = 1f
-        }
-        podcastOverlay!!.visibility = View.VISIBLE
-        podcastOverlay!!.bringToFront()
-        applyPodcastPaneGeometry()
-        suggestionsContainer?.let { suggestions ->
-            if (suggestions.visibility == View.VISIBLE) {
-                suggestions.visibility = View.INVISIBLE
-            }
-        }
-        podcastOverlay!!.post {
-            if (landscape) {
-                resetPodcastFocusChromeImmediate()
-                playPodcastLandExpand()
-            } else {
-                setPodcastFocusChrome(true)
-                playPodcastCrtExpand()
-            }
-        }
-        podcastTab?.bringToFront()
-    }
-
-    private fun minimizePodcastSurface() {
-        if (podcastOverlay == null) {
-            return
-        }
-        if (!podcastSessionActive && !isPodcastSurfaceVisible) {
-            return
-        }
-        podcastSessionActive = true
-        capturePodcastSurfaceSession()
-        val afterCollapse = {
-            podcastOverlay?.visibility = View.GONE
-            podcastOverlay?.setBackgroundColor(Color.TRANSPARENT)
-            if (podcastLandscapePresentation()) snapPodcastLandIdle()
-            else snapPodcastCrtCollapsed()
-            if (suggestionsContainer != null && suggestionsContainer!!.visibility == View.INVISIBLE) {
-                suggestionsContainer!!.visibility = View.VISIBLE
-            }
-            showPodcastPill()
-            mTerminalAdapter?.focusInputEnd()
-            refreshSuggestionsSoon()
-        }
-        if (podcastLandscapePresentation()) {
-            resetPodcastFocusChromeImmediate()
-            playPodcastLandCollapse(afterCollapse)
-        } else {
-            setPodcastFocusChrome(false)
-            playPodcastCrtCollapse(afterCollapse)
-        }
-    }
-
-    private fun snapPodcastCrtCollapsed() {
-        val border = podcastWindowBorder ?: return
-        if (border.width > 0) {
-            border.pivotX = border.width / 2f
-            border.pivotY = border.height / 2f
-        }
-        border.scaleX = 0.06f
-        border.scaleY = 0.018f
-        border.alpha = 1f
-        podcastWindowLabel?.alpha = 0f
-        podcastClose?.alpha = 0f
-    }
-
-    private fun snapPodcastLandIdle() {
-        val border = podcastWindowBorder ?: return
-        border.scaleX = 1f
-        border.scaleY = 1f
-        border.alpha = 1f
-        podcastWindowLabel?.alpha = 1f
-        podcastClose?.alpha = 1f
-    }
-
-    private fun snapPodcastPresentationForCurrentOrientation() {
-        podcastWindowAnim?.cancel()
-        podcastWindowAnim = null
-        val border = podcastWindowBorder
-        if (border != null) {
-            border.animate().cancel()
-            border.scaleX = 1f
-            border.scaleY = 1f
-            border.alpha = 1f
-        }
-        podcastOverlay?.alpha = 1f
-        podcastWindowLabel?.alpha = 1f
-        podcastClose?.alpha = 1f
-        if (podcastLandscapePresentation()) {
-            resetPodcastFocusChromeImmediate()
-        } else if (isPodcastSurfaceVisible) {
-            setPodcastFocusChrome(true)
-        }
-    }
-
-    private fun playPodcastCrtExpand() {
-        val border = podcastWindowBorder ?: return
-        val tabs = listOfNotNull(podcastWindowLabel, podcastClose)
-        val prev = podcastWindowAnim
-        podcastWindowAnim = null
-        prev?.cancel()
-
-        if (border.width <= 0 || border.height <= 0) {
-            border.post { playPodcastCrtExpand() }
-            return
-        }
-        // Already snapped before VISIBLE — only fix pivot and run.
-        border.pivotX = border.width / 2f
-        border.pivotY = border.height / 2f
-        snapPodcastCrtCollapsed()
-
-        // CRT power-on: thin center beam → vertical fill.
-        val toBeam = AnimatorSet().apply {
-            duration = 90L
-            interpolator = AccelerateInterpolator()
-            playTogether(
-                ObjectAnimator.ofFloat(border, View.SCALE_X, 0.06f, 1f),
-                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.018f, 0.03f)
-            )
-        }
-        val toFull = AnimatorSet().apply {
-            duration = 210L
-            interpolator = DecelerateInterpolator()
-            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 1f))
-        }
-        val body = AnimatorSet().apply { playSequentially(toBeam, toFull) }
-        val set = AnimatorSet()
-        if (tabs.isEmpty()) {
-            set.play(body)
-        } else {
-            val fadeChrome = AnimatorSet().apply {
-                duration = 140L
-                startDelay = 100L
-                playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, 0f, 1f) })
-            }
-            set.playTogether(body, fadeChrome)
-        }
-        podcastWindowAnim = set
-        set.start()
-    }
-
-    private fun playPodcastCrtCollapse(onEnd: () -> Unit) {
-        val border = podcastWindowBorder
-        if (border == null || !isPodcastSurfaceVisible || border.width <= 0) {
-            onEnd()
-            return
-        }
-        val tabs = listOfNotNull(podcastWindowLabel, podcastClose)
-        val prev = podcastWindowAnim
-        podcastWindowAnim = null
-        prev?.cancel()
-        border.pivotX = border.width / 2f
-        border.pivotY = border.height / 2f
-
-        // CRT power-off: vertical collapse → horizontal beam → center dot.
-        val toBeam = AnimatorSet().apply {
-            duration = 160L
-            interpolator = AccelerateInterpolator()
-            play(ObjectAnimator.ofFloat(border, View.SCALE_Y, border.scaleY.coerceAtLeast(0.03f), 0.03f))
-        }
-        val toDot = AnimatorSet().apply {
-            duration = 90L
-            interpolator = AccelerateInterpolator()
-            playTogether(
-                ObjectAnimator.ofFloat(border, View.SCALE_X, border.scaleX.coerceAtLeast(0.06f), 0.06f),
-                ObjectAnimator.ofFloat(border, View.SCALE_Y, 0.03f, 0.018f)
-            )
-        }
-        val body = AnimatorSet().apply { playSequentially(toBeam, toDot) }
-        val set = AnimatorSet()
-        if (tabs.isEmpty()) {
-            set.play(body)
-        } else {
-            val fadeChrome = AnimatorSet().apply {
-                duration = 70L
-                playTogether(tabs.map { ObjectAnimator.ofFloat(it, View.ALPHA, it.alpha, 0f) })
-            }
-            set.play(fadeChrome).before(body)
-        }
-        set.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                // Skip if cancelled (field cleared/replaced before cancel).
-                if (podcastWindowAnim === animation) {
-                    podcastWindowAnim = null
-                    onEnd()
-                }
-            }
-        })
-        podcastWindowAnim = set
-        set.start()
-    }
-
-    private fun playPodcastLandExpand() {
-        val overlay = podcastOverlay ?: return
-        val border = podcastWindowBorder
-        podcastWindowAnim?.cancel()
-        podcastWindowAnim = null
-        snapPodcastLandIdle()
-        border?.translationY = Tuils.dpToPx(mContext, 18).toFloat()
-        overlay.alpha = 0f
-        val set = AnimatorSet().apply {
-            duration = 180L
-            interpolator = DecelerateInterpolator()
-            val parts = ArrayList<Animator>()
-            parts.add(ObjectAnimator.ofFloat(overlay, View.ALPHA, 0f, 1f))
-            if (border != null) {
-                parts.add(ObjectAnimator.ofFloat(border, View.TRANSLATION_Y, border.translationY, 0f))
-            }
-            playTogether(parts)
-        }
-        podcastWindowAnim = set
-        set.start()
-    }
-
-    private fun playPodcastLandCollapse(onEnd: () -> Unit) {
-        val overlay = podcastOverlay
-        if (overlay == null || !isPodcastSurfaceVisible) {
-            onEnd()
-            return
-        }
-        val border = podcastWindowBorder
-        podcastWindowAnim?.cancel()
-        podcastWindowAnim = null
-        val set = AnimatorSet().apply {
-            duration = 140L
-            interpolator = AccelerateInterpolator()
-            val parts = ArrayList<Animator>()
-            parts.add(ObjectAnimator.ofFloat(overlay, View.ALPHA, overlay.alpha, 0f))
-            if (border != null) {
-                parts.add(
-                    ObjectAnimator.ofFloat(
-                        border,
-                        View.TRANSLATION_Y,
-                        border.translationY,
-                        Tuils.dpToPx(mContext, 14).toFloat()
-                    )
-                )
-            }
-            playTogether(parts)
-        }
-        set.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                if (podcastWindowAnim === animation) {
-                    podcastWindowAnim = null
-                    border?.translationY = 0f
-                    overlay.alpha = 1f
-                    onEnd()
-                }
-            }
-        })
-        podcastWindowAnim = set
-        set.start()
+        fileConsoleController?.openFileConsole(command)
     }
 
     fun openProfileSurface() {
@@ -7692,9 +4709,8 @@ class UIManager(
             return
         }
         closeTermuxConsole(false)
-        closeFileConsole(false)
+        fileConsoleController?.closeFileConsole(false)
         closeLuaAppSession(true)
-        minimizePodcastSurface()
         profilePaneController?.show()
         hideHomeSuggestionsForTermux()
     }
@@ -7709,63 +4725,8 @@ class UIManager(
         }
     }
 
-    private fun closePodcastSurface(restoreSuggestions: Boolean = true) {
-        podcastSessionActive = false
-        clearPodcastImages()
-        hidePodcastPill()
-        setPodcastFocusChrome(false)
-        if (launcherChromeHiddenForSurface) {
-            restoreLauncherChromeAfterSurface()
-        }
-        if (suggestionsContainer != null && suggestionsContainer!!.visibility == View.INVISIBLE) {
-            suggestionsContainer!!.visibility = View.VISIBLE
-        }
-        if (restoreSuggestions) {
-            resetPodcastSurfaceSession()
-        } else {
-            capturePodcastSurfaceSession()
-        }
-        podcastOverlay?.visibility = View.GONE
-        podcastOverlay?.setBackgroundColor(Color.TRANSPARENT)
-        if (podcastLandscapePresentation()) snapPodcastLandIdle()
-        else snapPodcastCrtCollapsed()
-        if (restoreSuggestions) {
-            clearPodcastCommandFromInput()
-        }
-        if (mTerminalAdapter != null && restoreSuggestions) {
-            mTerminalAdapter!!.focusInputEnd()
-        }
-        if (restoreSuggestions) {
-            refreshSuggestionsSoon()
-        }
-    }
-
-    private fun clearPodcastImages() {
-        listOfNotNull(podcastArtwork, podcastPlayerArt).forEach {
-            it.tag = Tuils.EMPTYSTRING
-            it.setImageDrawable(null)
-        }
-        synchronized(podcastImageCache) { podcastImageCache.evictAll() }
-        podcastArtworkUrl = null
-    }
-
-    private fun clearPodcastCommandFromInput() {
-        val input = mTerminalAdapter?.input?.trim { it <= ' ' } ?: return
-        val lower = input.lowercase(Locale.getDefault())
-        if (lower == "podcast" || lower.startsWith("podcast ")) {
-            mTerminalAdapter!!.input = Tuils.EMPTYSTRING
-        }
-    }
-
     private fun restoreLauncherSurfaceSession() {
         val session = LauncherSurfaceSessionStore.snapshot()
-        val podcast = session.podcast
-        podcastMode = podcast.mode.takeIf { it in PODCAST_MODE_SHOWS..PODCAST_MODE_PLAYER }
-            ?: PODCAST_MODE_SHOWS
-        podcastTagFilter = podcast.tagFilter
-        podcastEpisodeQuery = podcast.episodeQuery
-        pendingPodcastScrollRestore = podcast.scrollY.coerceAtLeast(0)
-
         val termux = session.termux
         termuxBuffer.setLength(0)
         termuxBuffer.append(termux.consoleBuffer)
@@ -7778,44 +4739,7 @@ class UIManager(
     }
 
     private fun captureLauncherSurfaceSession() {
-        capturePodcastSurfaceSession()
         captureTermuxSurfaceSession(termuxAppSession?.id ?: retainedTermuxAppId)
-    }
-
-    private fun capturePodcastSurfaceSession() {
-        val scrollY = if (isPodcastSurfaceVisible && podcastLastRenderedMode >= 0) {
-            podcastScroll?.scrollY ?: pendingPodcastScrollRestore
-        } else {
-            pendingPodcastScrollRestore
-        }
-        pendingPodcastScrollRestore = scrollY.coerceAtLeast(0)
-        LauncherSurfaceSessionStore.savePodcast(
-            PodcastSurfaceSession(
-                podcastMode,
-                podcastTagFilter,
-                podcastEpisodeQuery,
-                pendingPodcastScrollRestore
-            )
-        )
-    }
-
-    private fun resetPodcastSurfaceSession() {
-        podcastMode = PODCAST_MODE_SHOWS
-        podcastTagFilter = null
-        podcastEpisodeQuery = ""
-        podcastStatus = null
-        podcastLastRenderedMode = -1
-        pendingPodcastScrollRestore = 0
-        LauncherSurfaceSessionStore.resetPodcast()
-    }
-
-    private fun restorePodcastScrollAfterRender(generation: Int, scrollY: Int) {
-        pendingPodcastScrollRestore = scrollY.coerceAtLeast(0)
-        podcastScroll?.post(Runnable {
-            if (generation != podcastRenderGeneration) return@Runnable
-            podcastScroll?.scrollTo(0, pendingPodcastScrollRestore)
-        })
-        scheduleTypefaceRefreshes()
     }
 
     private fun captureTermuxSurfaceSession(appId: String?) {
@@ -7868,1029 +4792,6 @@ class UIManager(
         termuxScroll?.post(Runnable { termuxScroll?.scrollTo(0, scrollY) })
     }
 
-    private fun executePodcastCommand(rawCommand: String?) {
-        val command = rawCommand?.trim { it <= ' ' }.orEmpty()
-        if (command.isEmpty()) {
-            return
-        }
-        val lower = command.lowercase(Locale.getDefault())
-        when {
-            lower == "exit" || lower == "close" -> closePodcastSurface()
-            lower == "minimize" || lower == "min" -> minimizePodcastSurface()
-            lower == "help" -> renderPodcastSurface(mContext.getString(R.string.surface_commands_add_https_feed_url_refresh_play_next_prev_rewind_8ce06))
-            lower == "refresh" || lower == "reload" -> {
-                renderPodcastSurface(mContext.getString(R.string.surface_refreshing_selected_podcast_7f1bc))
-                mainPack.podcastManager.refreshSelectedShow { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
-            }
-            lower == "play" -> renderPodcastSurface(mainPack.podcastManager.play())
-            lower == "next" -> renderPodcastSurface(mainPack.podcastManager.next())
-            lower == "prev" || lower == "previous" -> renderPodcastSurface(mainPack.podcastManager.previous())
-            lower == "rewind" || lower == "back" -> renderPodcastSurface(mContext.getString(R.string.surface_30s_1c6a4, mainPack.podcastManager.seekBy(-30000)))
-            lower == "forward" || lower == "fwd" -> renderPodcastSurface(mContext.getString(R.string.surface_30s_ffb4b, mainPack.podcastManager.seekBy(30000)))
-            lower.startsWith("speed ") -> {
-                val speed = command.substringAfter(' ').trim().removeSuffix("x").toFloatOrNull()
-                renderPodcastSurface(
-                    if (speed == null) mContext.getString(R.string.surface_playback_speed_must_be_a_number_from_0_5_to_2_0_eca60)
-                    else mainPack.podcastManager.setPlaybackSpeed(speed)
-                )
-            }
-            lower.startsWith("add ") -> {
-                val url = command.substring(4).trim { it <= ' ' }
-                renderPodcastSurface(mContext.getString(R.string.surface_adding_podcast_98f33))
-                mainPack.podcastManager.subscribe(url) { message ->
-                    podcastMode = PODCAST_MODE_SHOW_DETAIL
-                    renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_added_49c22))
-                }
-            }
-            else -> renderPodcastSurface(mContext.getString(R.string.surface_unknown_podcast_command_try_add_https_feed_url_refresh_pla_74479))
-        }
-    }
-
-    private fun showPodcastAddDialog() {
-        TuixtDialog.showValidatedForm(
-            mContext,
-            mContext.getString(R.string.surface_add_podcast_24c78),
-            listOf(
-                TuixtDialog.FormField(
-                    "url",
-                    mContext.getString(R.string.surface_feed_url_c2311),
-                    "https://example.com/feed.xml",
-                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
-                )
-            ),
-            mContext.getString(R.string.surface_add_f9460),
-            mContext.getString(R.string.surface_cancel_1507c),
-            { values ->
-                val url = values["url"].orEmpty()
-                if (!PodcastManager.isSecureFeedUrl(url)) {
-                    mContext.getString(R.string.surface_podcast_feed_url_must_be_a_valid_https_address_75717)
-                } else {
-                    null
-                }
-            }
-        ) { values ->
-            renderPodcastSurface(mContext.getString(R.string.surface_adding_podcast_98f33))
-            mainPack.podcastManager.subscribe(values["url"].orEmpty()) { message ->
-                podcastMode = PODCAST_MODE_SHOW_DETAIL
-                renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_added_49c22))
-            }
-        }
-    }
-
-    private fun renderPodcastSurface(status: String?) {
-        if (Looper.myLooper() != Looper.getMainLooper()) {
-            runOnMainThread { renderPodcastSurface(status) }
-            return
-        }
-
-        val generation = ++podcastRenderGeneration
-        val targetScrollY = when {
-            podcastLastRenderedMode == podcastMode -> podcastScroll?.scrollY ?: pendingPodcastScrollRestore
-            podcastLastRenderedMode < 0 -> pendingPodcastScrollRestore
-            else -> 0
-        }.coerceAtLeast(0)
-        podcastLastRenderedMode = podcastMode
-        podcastStatus = status
-        applyPodcastPaneGeometry()
-        updatePodcastTabStyle()
-        updatePodcastContentLabel()
-        updatePodcastNowPlaying()
-        val showNowPlaying = podcastMode != PODCAST_MODE_PLAYER
-            && (mainPack.podcastManager.isPlaying() || mainPack.podcastManager.isPreparing())
-        podcastNowPlaying?.visibility = if (showNowPlaying) View.VISIBLE else View.GONE
-        podcastPaneActions?.visibility = if (podcastMode == PODCAST_MODE_SHOWS) View.VISIBLE else View.GONE
-        podcastPlayerControls?.visibility = if (podcastMode == PODCAST_MODE_PLAYER) View.VISIBLE else View.GONE
-        podcastContentBack?.bringToFront()
-        podcastContentLabel?.bringToFront()
-        if (podcastMode == PODCAST_MODE_PLAYER) {
-            podcastPlayerControls?.bringToFront()
-        }
-        podcastScroll?.setPadding(
-            podcastScroll?.paddingLeft ?: 0,
-            podcastScroll?.paddingTop ?: 0,
-            podcastScroll?.paddingRight ?: 0,
-            Tuils.dpToPx(
-                mContext,
-                when {
-                    podcastMode == PODCAST_MODE_PLAYER -> 116
-                    showNowPlaying -> 52
-                    else -> 8
-                }
-            )
-        )
-        podcastPlayShow?.text = mContext.getString(R.string.surface_recents_1a978)
-
-        val content = podcastContent ?: return
-        content.removeAllViews()
-        podcastPlayerArt = null
-        podcastPlayerEpisodeTitle = null
-        podcastPlayerShowName = null
-
-        val detailStatus = if (podcastMode == PODCAST_MODE_SHOW_DETAIL) podcastStatus else null
-        if (!podcastStatus.isNullOrEmpty() && detailStatus == null) {
-            addPodcastRow(podcastStatus!!, false, null)
-        }
-
-        val manager = mainPack.podcastManager
-        if (podcastMode == PODCAST_MODE_PLAYER) {
-            renderPodcastPlayer()
-            restorePodcastScrollAfterRender(generation, targetScrollY)
-            return
-        }
-
-        val shows = manager.shows()
-        if (shows.isEmpty()) {
-            val feedCount = manager.feeds().size
-            addPodcastRow(
-                if (feedCount == 0) {
-                    mContext.getString(R.string.surface_no_subscriptions_yet_use_add_or_type_podcast_add_feed_url_d4398)
-                } else {
-                    mContext.getString(R.string.surface_subscriptions_are_saved_tap_a_show_to_refresh_it_539d1)
-                },
-                false,
-                null
-            )
-            restorePodcastScrollAfterRender(generation, targetScrollY)
-            return
-        }
-
-        when (podcastMode) {
-            PODCAST_MODE_RECENTS -> renderPodcastRecents()
-            PODCAST_MODE_SHOW_DETAIL -> renderPodcastEpisodes(manager.selectedShow(), detailStatus)
-            else -> renderPodcastShows(shows)
-        }
-
-        restorePodcastScrollAfterRender(generation, targetScrollY)
-    }
-
-    private fun updatePodcastNowPlaying() {
-        val manager = mainPack.podcastManager
-        val current = manager.currentSong()
-        val isPodcast = current != null
-        val active = manager.activeEpisode()
-        val selected = manager.selectedShow()
-        val displayShow = active?.let { episode ->
-            manager.shows().firstOrNull { it.id == episode.showId }
-        } ?: selected
-        val preparing = manager.isPreparing()
-        val playing = manager.isPlaying()
-
-        podcastNowTitle?.text = when {
-            active != null -> active.title
-            current != null -> current.getTitle()
-            selected != null -> selected.title
-            else -> mContext.getString(R.string.surface_no_podcast_playing_4555b)
-        }
-
-        val position = if (isPodcast) manager.currentPosition() else -1
-        val saved = active?.let { manager.progress(it) } ?: 0
-        val progress = if (position >= 0) position else saved
-        val duration = if (isPodcast) manager.duration() else -1
-        podcastNowMeta?.text = displayShow?.title ?: mContext.getString(R.string.surface_add_a_feed_then_play_a_show_8fab3)
-        podcastNowProgress?.text = when {
-            preparing -> mContext.getString(R.string.surface_buffering_6f50d, podcastPrepareGlyph())
-            duration > 0 -> PodcastManager.formatMillis(progress) + " / " + PodcastManager.formatMillis(duration)
-            else -> PodcastManager.formatMillis(progress)
-        }
-        podcastPlayerProgress?.text = podcastNowProgress?.text
-        val playText = podcastTransportLabel(
-            when {
-                preparing -> "···"
-                playing -> mContext.getString(R.string.surface_pause_9935d)
-                else -> mContext.getString(R.string.surface_play_42c5c)
-            }
-        )
-        podcastPlay?.text = playText
-        podcastPlayerPlay?.text = playText
-        podcastPlay?.isEnabled = !preparing
-        podcastPlayerPlay?.isEnabled = !preparing
-        if (!podcastSeekDragging) {
-            podcastSeek?.max = if (duration > 0) duration else 100
-            podcastSeek?.progress = if (duration > 0) min(progress, duration) else 0
-            podcastSeek?.isEnabled = duration > 0 && !preparing
-            podcastPlayerSeek?.max = if (duration > 0) duration else 100
-            podcastPlayerSeek?.progress = if (duration > 0) min(progress, duration) else 0
-            podcastPlayerSeek?.isEnabled = duration > 0 && !preparing
-        }
-        podcastPlayerEpisodeTitle?.text = active?.title ?: current?.getTitle() ?: mContext.getString(R.string.surface_no_podcast_loaded_84fab)
-        podcastPlayerShowName?.text = displayShow?.title ?: mContext.getString(R.string.surface_pick_a_show_to_start_listening_7b228)
-        updatePodcastArtwork(displayShow?.imageUrl)
-    }
-
-    private fun podcastPrepareGlyph(): String {
-        val frames = arrayOf("[·    ]", "[··   ]", "[···  ]", "[···· ]", "[·····]", "[ ····]", "[  ···]", "[   ··]", "[    ·]")
-        return frames[((SystemClock.uptimeMillis() / 120L) % frames.size).toInt()]
-    }
-
-    private fun renderPodcastRecents() {
-        val manager = mainPack.podcastManager
-        val recents = filterPodcastRecents(manager.recents())
-        addPodcastTagChips(manager.shows())
-        addPodcastSectionHeader(mContext.getString(R.string.surface_recent_shows_bf7cd), mContext.getString(R.string.surface_tap_a_row_to_resume_that_show_s_last_episode_abfac))
-        if (recents.isEmpty()) {
-            addPodcastRow(mContext.getString(R.string.surface_no_recent_podcast_episodes_yet_b17af), false, null)
-            return
-        }
-        addPodcastRecentGrid(recents)
-    }
-
-    private fun podcastTransportLabel(label: String): String = "[ " + label + " ]"
-
-    private fun updatePodcastArtwork(url: String?) {
-        val clean = url?.trim()?.takeIf { it.isNotEmpty() }
-        podcastArtwork?.let { loadPodcastImage(clean, it) }
-        podcastPlayerArt?.let { loadPodcastImage(clean, it) }
-        podcastArtworkUrl = clean
-    }
-
-    private fun loadPodcastImage(url: String?, target: ImageView) {
-        val clean = url?.trim()?.takeIf { it.isNotEmpty() }
-        if (clean == null) {
-            target.tag = Tuils.EMPTYSTRING
-            target.setImageResource(R.mipmap.ic_launcher)
-            return
-        }
-
-        val cached = synchronized(podcastImageCache) { podcastImageCache.get(clean) }
-        if (cached != null) {
-            target.tag = clean
-            target.setImageBitmap(cached)
-            return
-        }
-
-        // Same URL already loading/showing — don't flash launcher or spawn another fetch.
-        if (target.tag == clean) return
-
-        target.tag = clean
-        target.setImageResource(R.mipmap.ic_launcher)
-        Thread {
-            val bitmap = decodePodcastBitmap(clean)
-            runOnMainThread {
-                if (target.tag != clean) return@runOnMainThread
-                if (bitmap != null) {
-                    synchronized(podcastImageCache) { podcastImageCache.put(clean, bitmap) }
-                    target.setImageBitmap(bitmap)
-                } else {
-                    target.tag = Tuils.EMPTYSTRING
-                    target.setImageResource(R.mipmap.ic_launcher)
-                }
-            }
-        }.start()
-    }
-
-    private fun decodePodcastBitmap(url: String): Bitmap? {
-        return try {
-            val request = Request.Builder()
-                .url(url)
-                .header("User-Agent", "ReTUI/1.0 Android Podcast")
-                .get()
-                .build()
-            mainPack.client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) return null
-                val bytes = response.body?.bytes() ?: return null
-                val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
-                var sample = 1
-                val maxPx = 512
-                while (bounds.outWidth / sample > maxPx || bounds.outHeight / sample > maxPx) {
-                    sample *= 2
-                }
-                val opts = BitmapFactory.Options().apply { inSampleSize = sample }
-                BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
-            }
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    private fun renderPodcastShows(shows: List<PodcastShow>) {
-        val selected = mainPack.podcastManager.selectedShow()
-        val filteredShows = filterPodcastShows(shows)
-        addPodcastTagChips(shows)
-        addPodcastSectionHeader(mContext.getString(R.string.surface_subscriptions_5697f), tagFilterSummary(mContext.getString(R.string.surface_tap_a_show_to_refresh_open_it_6f531)))
-        if (filteredShows.isEmpty()) addPodcastRow(mContext.getString(R.string.surface_no_podcasts_match_this_tag_29076), false, null)
-        else addPodcastShowGrid(filteredShows, selected)
-
-        val recents = filterPodcastRecents(mainPack.podcastManager.recents())
-        if (recents.isNotEmpty()) {
-            addPodcastSectionLabel(mContext.getString(R.string.surface_recent_76eec))
-            addPodcastRecentGrid(recents)
-        }
-    }
-
-    private fun filterPodcastShows(shows: List<PodcastShow>): List<PodcastShow> {
-        val filter = podcastTagFilter ?: return shows
-        return shows.filter { show -> show.tags.any { it.equals(filter, ignoreCase = true) } }
-    }
-
-    private fun filterPodcastRecents(recents: List<PodcastRecent>): List<PodcastRecent> {
-        val filter = podcastTagFilter ?: return recents
-        return recents.filter { recent -> recent.show.tags.any { it.equals(filter, ignoreCase = true) } }
-    }
-
-    private fun tagFilterSummary(defaultText: String): String {
-        val filter = podcastTagFilter
-        return if (filter.isNullOrBlank()) defaultText else mContext.getString(R.string.surface_filtered_by_28f7e, filter)
-    }
-
-    private fun addPodcastTagChips(shows: List<PodcastShow>) {
-        val tags = mainPack.podcastManager.tags()
-        if (tags.isEmpty()) return
-
-        if (podcastTagFilter != null && tags.none { it.equals(podcastTagFilter, ignoreCase = true) }) {
-            podcastTagFilter = null
-        }
-
-        val scroll = HorizontalScrollView(mContext)
-        scroll.isHorizontalScrollBarEnabled = false
-        scroll.overScrollMode = View.OVER_SCROLL_NEVER
-        val row = LinearLayout(mContext)
-        row.orientation = LinearLayout.HORIZONTAL
-        scroll.addView(row, ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        ))
-        addPodcastTagChip(row, mContext.getString(R.string.surface_all_6b428), podcastTagFilter == null) {
-            podcastTagFilter = null
-            renderPodcastSurface(null)
-        }
-        for (tag in tags) {
-            addPodcastTagChip(row, tag.uppercase(Locale.getDefault()), tag.equals(podcastTagFilter, ignoreCase = true)) {
-                podcastTagFilter = tag
-                renderPodcastSurface(null)
-            }
-        }
-        addPodcastView(scroll)
-    }
-
-    private fun addPodcastTagChip(row: LinearLayout, label: String, selected: Boolean, action: Runnable) {
-        val chip = TextView(mContext)
-        chip.text = label
-        chip.gravity = Gravity.CENTER
-        chip.textSize = PODCAST_TEXT_SMALL
-        chip.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        chip.setTextColor(ThemeColorResolver.color(Theme.workspace_control_text_color))
-        chip.setPadding(
-            Tuils.dpToPx(mContext, 12),
-            Tuils.dpToPx(mContext, 6),
-            Tuils.dpToPx(mContext, 12),
-            Tuils.dpToPx(mContext, 6)
-        )
-        chip.setBackground(
-            if (selected) TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS)
-            else TerminalBorderRuntime.panelDrawable(
-                mContext,
-                Color.TRANSPARENT,
-                ThemeColorResolver.withMaxAlpha(terminalBorderColor(), 150),
-                1f,
-                moduleCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.OVERLAYS
-            )
-        )
-        chip.setOnClickListener { action.run() }
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.marginEnd = Tuils.dpToPx(mContext, 6)
-        row.addView(chip, params)
-    }
-
-    private fun addPodcastShowGrid(shows: List<PodcastShow>, selected: PodcastShow?) {
-        val manager = mainPack.podcastManager
-        addPodcastCardRows(shows) { parent, show ->
-            addPodcastCard(
-                parent,
-                show.imageUrl,
-                show.title,
-                mContext.getString(R.string.surface_episodes_223b9, show.episodes.size.toString()),
-                show.tags.joinToString("  ") { "#$it" },
-                Runnable {
-                    manager.selectShow(show.id)
-                    podcastEpisodeQuery = ""
-                    podcastMode = PODCAST_MODE_SHOW_DETAIL
-                    renderPodcastSurface(mContext.getString(R.string.surface_refreshing_09866, show.title))
-                    manager.refreshShow(show) { message -> renderPodcastSurface(message ?: mContext.getString(R.string.surface_podcast_refreshed_3f4e4)) }
-                },
-                Runnable { showPodcastShowMenu(show, parent) },
-                selected?.id == show.id
-            )
-        }
-    }
-
-    private fun addPodcastRecentGrid(recents: List<PodcastRecent>) {
-        val manager = mainPack.podcastManager
-        addPodcastCardRows(recents) { parent, recent ->
-            val resume = if (recent.progressMs > 0) PodcastManager.formatMillis(recent.progressMs) else mContext.getString(R.string.surface_not_started_db2c4)
-            addPodcastCard(
-                parent,
-                recent.show.imageUrl,
-                recent.show.title,
-                recent.episode.title,
-                resume,
-                Runnable {
-                    podcastMode = PODCAST_MODE_PLAYER
-                    renderPodcastSurface(manager.play(recent.show, recent.episode))
-                },
-                null,
-                false
-            )
-        }
-    }
-
-    private fun <T> addPodcastCardRows(items: List<T>, addCard: (LinearLayout, T) -> Unit) {
-        val columns = if (podcastLandscapePresentation()) 4 else 3
-        var index = 0
-        while (index < items.size) {
-            val row = LinearLayout(mContext)
-            row.orientation = LinearLayout.HORIZONTAL
-            row.gravity = Gravity.TOP
-            for (i in 0 until columns) {
-                if (index + i < items.size) {
-                    addCard(row, items[index + i])
-                } else {
-                    val spacer = View(mContext)
-                    row.addView(spacer, LinearLayout.LayoutParams(0, 1, 1f))
-                }
-            }
-            addPodcastView(row)
-            index += columns
-        }
-    }
-
-    private fun addPodcastCard(
-        parent: LinearLayout,
-        imageUrl: String?,
-        title: String,
-        meta: String,
-        subMeta: String,
-        action: Runnable,
-        menuAction: Runnable?,
-        selected: Boolean
-    ) {
-        val card = LinearLayout(mContext)
-        card.orientation = LinearLayout.VERTICAL
-        card.setPadding(Tuils.dpToPx(mContext, 5), Tuils.dpToPx(mContext, 5), Tuils.dpToPx(mContext, 5), Tuils.dpToPx(mContext, 8))
-        card.setOnClickListener { action.run() }
-        if (menuAction != null) {
-            card.setOnLongClickListener {
-                menuAction.run()
-                true
-            }
-        }
-
-        val image = ImageView(mContext)
-        image.scaleType = ImageView.ScaleType.CENTER_CROP
-        loadPodcastImage(imageUrl, image)
-        card.addView(image, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, Tuils.dpToPx(mContext, 112)))
-
-        val titleRow = LinearLayout(mContext)
-        titleRow.orientation = LinearLayout.HORIZONTAL
-        titleRow.gravity = Gravity.CENTER_VERTICAL
-        val titleView = TextView(mContext)
-        titleView.text = title
-        titleView.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        titleView.setTypeface(Tuils.getTypeface(mContext), if (selected) Typeface.BOLD else Typeface.NORMAL)
-        titleView.textSize = PODCAST_TEXT_LARGE
-        titleView.maxLines = 3
-        titleView.ellipsize = TextUtils.TruncateAt.END
-        titleRow.addView(titleView, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-        if (menuAction != null) {
-            val menu = TextView(mContext)
-            menu.text = "..."
-            menu.gravity = Gravity.CENTER
-            menu.textSize = PODCAST_TEXT_LARGE
-            menu.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-            menu.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
-            menu.setOnClickListener { menuAction.run() }
-            titleRow.addView(menu, LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 28), Tuils.dpToPx(mContext, 28)))
-        }
-        card.addView(titleRow)
-
-        val metaView = TextView(mContext)
-        metaView.text = meta
-        metaView.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        metaView.setTypeface(Tuils.getTypeface(mContext))
-        metaView.textSize = PODCAST_TEXT_MEDIUM
-        metaView.maxLines = 2
-        metaView.ellipsize = TextUtils.TruncateAt.END
-        card.addView(metaView)
-
-        if (subMeta.isNotBlank()) {
-            val sub = TextView(mContext)
-            sub.text = subMeta
-            sub.setTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_text_color), 190))
-            sub.setTypeface(Tuils.getTypeface(mContext))
-            sub.textSize = PODCAST_TEXT_SMALL
-            sub.maxLines = 1
-            sub.ellipsize = TextUtils.TruncateAt.END
-            card.addView(sub)
-        }
-
-        val params = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-        params.marginEnd = Tuils.dpToPx(mContext, 6)
-        parent.addView(card, params)
-    }
-
-    private fun addPodcastSectionLabel(title: String) {
-        val label = TextView(mContext)
-        label.text = title.uppercase(Locale.getDefault())
-        label.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        label.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        label.textSize = PODCAST_TEXT_MEDIUM
-        label.setPadding(
-            Tuils.dpToPx(mContext, 8),
-            Tuils.dpToPx(mContext, 12),
-            Tuils.dpToPx(mContext, 8),
-            Tuils.dpToPx(mContext, 4)
-        )
-        addPodcastView(label)
-    }
-
-    private fun confirmRemovePodcastShow(show: PodcastShow) {
-        TuixtDialog.showConfirm(
-            mContext,
-            mContext.getString(R.string.surface_remove_podcast_5cba3),
-            mContext.getString(R.string.surface_remove_from_podcasts_e8074, show.title),
-            mContext.getString(R.string.surface_remove_f9662),
-            mContext.getString(R.string.surface_cancel_1507c),
-            TuixtDialog.ConfirmAction {
-                podcastMode = PODCAST_MODE_SHOWS
-                renderPodcastSurface(mainPack.podcastManager.removeShow(show))
-            }
-        )
-    }
-
-    private fun showPodcastTagsDialog(show: PodcastShow) {
-        TuixtDialog.showValidatedForm(
-            mContext,
-            mContext.getString(R.string.surface_podcast_tags_cac94),
-            listOf(
-                TuixtDialog.FormField(
-                    "tags",
-                    mContext.getString(R.string.surface_tags_848ee),
-                    mContext.getString(R.string.surface_workout_travel_calming_5a511),
-                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_WORDS,
-                    show.tags.joinToString(", ")
-                )
-            ),
-            mContext.getString(R.string.surface_save_50815),
-            mContext.getString(R.string.surface_cancel_1507c),
-            { null }
-        ) { values ->
-            val message = mainPack.podcastManager.setTags(show, values["tags"].orEmpty())
-            val filter = podcastTagFilter
-            if (filter != null && mainPack.podcastManager.tags().none { it.equals(filter, ignoreCase = true) }) {
-                podcastTagFilter = null
-            }
-            podcastMode = PODCAST_MODE_SHOWS
-            renderPodcastSurface(message)
-        }
-    }
-
-    private fun renderPodcastEpisodes(show: PodcastShow?, status: String?) {
-        if (show == null) {
-            addPodcastRow(mContext.getString(R.string.surface_no_show_selected_7bad6), false, null)
-            return
-        }
-        addPodcastEpisodeHeader(show, status)
-        addPodcastEpisodeSearch(show)
-        val episodes = mainPack.podcastManager.episodesFor(show, podcastEpisodeQuery)
-        if (episodes.isEmpty()) {
-            addPodcastRow(
-                if (podcastEpisodeQuery.isBlank()) mContext.getString(R.string.surface_no_playable_episodes_found_in_this_feed_fc157)
-                else mContext.getString(R.string.surface_no_episodes_match_07d9b, podcastEpisodeQuery),
-                false,
-                null
-            )
-            return
-        }
-        for (i in episodes.indices) {
-            val episode = episodes[i]
-            addPodcastRow(
-                episodeRowText(i, episode),
-                false,
-                Runnable { renderPodcastSurface(mainPack.podcastManager.play(show, episode)) },
-                Runnable {
-                    val played = !mainPack.podcastManager.isPlayed(episode)
-                    mainPack.podcastManager.markPlayed(episode, played)
-                    renderPodcastSurface(if (played) mContext.getString(R.string.surface_marked_played_2ba05, episode.title) else mContext.getString(R.string.surface_marked_unplayed_2cd47, episode.title))
-                }
-            )
-        }
-    }
-
-    private fun addPodcastEpisodeSearch(show: PodcastShow) {
-        val row = LinearLayout(mContext)
-        row.orientation = LinearLayout.HORIZONTAL
-        row.gravity = Gravity.CENTER_VERTICAL
-
-        val search = TextView(mContext)
-        search.text = if (podcastEpisodeQuery.isBlank()) mContext.getString(R.string.surface_search_episodes_b4c19) else mContext.getString(R.string.surface_search_61550, podcastEpisodeQuery)
-        search.contentDescription = mContext.getString(R.string.surface_search_episodes_in_da3a8, show.title)
-        search.gravity = Gravity.CENTER
-        search.textSize = PODCAST_TEXT_SMALL
-        styleTermuxToolButton(search, ThemeColorResolver.color(Theme.workspace_control_text_color))
-        search.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
-        search.setOnClickListener { showPodcastEpisodeSearchDialog(show) }
-        row.addView(search, LinearLayout.LayoutParams(0, Tuils.dpToPx(mContext, 34), 1f))
-
-        if (podcastEpisodeQuery.isNotBlank()) {
-            val clear = TextView(mContext)
-            clear.text = mContext.getString(R.string.surface_clear_16ec7)
-            clear.contentDescription = mContext.getString(R.string.surface_clear_episode_search_d9091)
-            clear.gravity = Gravity.CENTER
-            clear.textSize = PODCAST_TEXT_SMALL
-            styleTermuxToolButton(clear, ThemeColorResolver.color(Theme.workspace_control_text_color))
-            clear.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
-            clear.setOnClickListener {
-                podcastEpisodeQuery = ""
-                renderPodcastSurface(null)
-            }
-            val clearParams = LinearLayout.LayoutParams(Tuils.dpToPx(mContext, 72), Tuils.dpToPx(mContext, 34))
-            clearParams.marginStart = Tuils.dpToPx(mContext, 6)
-            row.addView(clear, clearParams)
-        }
-        addPodcastView(row)
-    }
-
-    private fun showPodcastEpisodeSearchDialog(show: PodcastShow) {
-        TuixtDialog.showValidatedForm(
-            mContext,
-            mContext.getString(R.string.surface_search_episodes_b4c19),
-            listOf(
-                TuixtDialog.FormField(
-                    "query",
-                    mContext.getString(R.string.surface_title_or_description_a127c),
-                    mContext.getString(R.string.surface_search_2c5ea, show.title),
-                    InputType.TYPE_CLASS_TEXT,
-                    podcastEpisodeQuery
-                )
-            ),
-            mContext.getString(R.string.surface_search_a62a7),
-            mContext.getString(R.string.surface_cancel_1507c),
-            { null }
-        ) { values ->
-            podcastEpisodeQuery = values["query"].orEmpty().trim()
-            renderPodcastSurface(null)
-        }
-    }
-
-    private fun episodeRowText(index: Int, episode: PodcastEpisode): CharSequence {
-        val played = mainPack.podcastManager.isPlayed(episode)
-        val progress = mainPack.podcastManager.progress(episode)
-        val state = if (played) "[x]" else if (progress > 0) "[>]" else "[ ]"
-        val date = episode.publishedAt?.let {
-            android.text.format.DateFormat.format("yyyy-MM-dd", it).toString()
-        } ?: "undated"
-        val resume = if (progress > 0 && !played) " | " + PodcastManager.formatMillis(progress) else ""
-        val title = state + " " + (index + 1) + ". " + episode.title
-        return SpannableStringBuilder(title)
-            .append('\n')
-            .append(date)
-            .append(resume)
-            .also {
-                it.setSpan(
-                    RelativeSizeSpan(PODCAST_TEXT_LARGE / PODCAST_TEXT_MEDIUM),
-                    0,
-                    title.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-    }
-
-    private fun addPodcastSectionHeader(title: String, body: String) {
-        val text = SpannableStringBuilder(title).append('\n').append(body)
-        text.setSpan(StyleSpan(Typeface.BOLD), 0, title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        addPodcastRow(text, false, null)
-    }
-
-    private fun addPodcastEpisodeHeader(show: PodcastShow, status: String?) {
-        val manager = mainPack.podcastManager
-        val newestFirst = manager.isNewestFirst(show)
-        val detail = mContext.getString(R.string.surface_long_press_an_episode_to_mark_it_played_6543c, (status ?: if (newestFirst) mContext.getString(R.string.surface_newest_first_autoplay_42753) else mContext.getString(R.string.surface_oldest_first_autoplay_d3909)))
-        val row = LinearLayout(mContext)
-        row.orientation = LinearLayout.HORIZONTAL
-        row.gravity = Gravity.CENTER_VERTICAL
-        row.setPadding(
-            Tuils.dpToPx(mContext, 8),
-            Tuils.dpToPx(mContext, 7),
-            Tuils.dpToPx(mContext, 8),
-            Tuils.dpToPx(mContext, 7)
-        )
-
-        val title = TextView(mContext)
-        val text = SpannableStringBuilder(show.title).append('\n').append(detail)
-        text.setSpan(StyleSpan(Typeface.BOLD), 0, show.title.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        title.text = text
-        title.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        title.setTypeface(Tuils.getTypeface(mContext))
-        title.textSize = PODCAST_TEXT_SMALL
-        title.maxLines = 3
-        title.ellipsize = TextUtils.TruncateAt.END
-        row.addView(title, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f))
-
-        val sort = TextView(mContext)
-        sort.text = if (newestFirst) mContext.getString(R.string.surface_newest_first_bca94) else mContext.getString(R.string.surface_oldest_first_da9dd)
-        sort.contentDescription = if (newestFirst) {
-            mContext.getString(R.string.surface_sort_newest_first_tap_to_switch_to_oldest_first_6fbb3)
-        } else {
-            mContext.getString(R.string.surface_sort_oldest_first_tap_to_switch_to_newest_first_d5645)
-        }
-        sort.gravity = Gravity.CENTER
-        sort.textSize = PODCAST_TEXT_SMALL
-        sort.minWidth = Tuils.dpToPx(mContext, 104)
-        styleTermuxToolButton(sort, ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        sort.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
-        sort.setOnClickListener {
-            manager.toggleNewestFirst(show)
-            renderPodcastSurface(null)
-        }
-        row.addView(sort, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, Tuils.dpToPx(mContext, 30)))
-        addPodcastView(row)
-    }
-
-    private fun showPodcastShowMenu(show: PodcastShow, anchor: View) {
-        val menu = PopupMenu(anchor.context, anchor)
-        menu.menu.add(0, 1, 0, mContext.getString(R.string.surface_edit_tags_d8a5f))
-        menu.menu.add(0, 2, 1, mContext.getString(R.string.surface_remove_e9639))
-        menu.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                1 -> showPodcastTagsDialog(show)
-                2 -> confirmRemovePodcastShow(show)
-            }
-            true
-        }
-        menu.show()
-    }
-
-    private fun renderPodcastPlayer() {
-        val manager = mainPack.podcastManager
-        val current = manager.currentSong()
-        val active = manager.activeEpisode()
-        val selected = manager.selectedShow()
-        val displayShow = active?.let { episode ->
-            manager.shows().firstOrNull { it.id == episode.showId }
-        } ?: selected
-
-        val panel = LinearLayout(mContext)
-        panel.orientation = LinearLayout.VERTICAL
-        panel.gravity = Gravity.CENTER_HORIZONTAL
-        panel.setPadding(
-            Tuils.dpToPx(mContext, 12),
-            Tuils.dpToPx(mContext, 12),
-            Tuils.dpToPx(mContext, 12),
-            Tuils.dpToPx(mContext, 12)
-        )
-
-        val artFrame = FrameLayout(mContext)
-        val art = ImageView(mContext)
-        art.scaleType = ImageView.ScaleType.CENTER_CROP
-        podcastPlayerArt = art
-        loadPodcastImage(displayShow?.imageUrl, art)
-        val panelWidth = podcastContentPanel?.width ?: 0
-        val paneHeight = podcastWindowBorder?.height ?: (podcastScroll?.height ?: 0)
-        val controlsBudget = Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 120 else 130)
-        val metaBudget = Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 88 else 110)
-        val artCeiling = max(
-            Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 72 else 96),
-            paneHeight - controlsBudget - metaBudget
-        )
-        val artSize = if (panelWidth > 0 && paneHeight > 0) {
-            val widthFrac = if (podcastLandscapePresentation()) 0.42f else 0.72f
-            min((panelWidth * widthFrac).roundToInt(), artCeiling)
-        } else {
-            min(Tuils.dpToPx(mContext, 220), artCeiling)
-        }.coerceAtMost(Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 200 else 300))
-        artFrame.addView(art, FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        ))
-        val artParams = LinearLayout.LayoutParams(artSize, artSize)
-        artParams.gravity = Gravity.CENTER_HORIZONTAL
-        panel.addView(artFrame, artParams)
-
-        val details = LinearLayout(mContext)
-        details.orientation = LinearLayout.VERTICAL
-        details.gravity = Gravity.CENTER_HORIZONTAL
-
-        val title = TextView(mContext)
-        title.text = active?.title ?: current?.getTitle() ?: mContext.getString(R.string.surface_no_podcast_loaded_84fab)
-        title.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        title.textSize = PODCAST_TEXT_LARGE
-        title.maxLines = 3
-        title.ellipsize = TextUtils.TruncateAt.END
-        title.setPadding(0, Tuils.dpToPx(mContext, 16), 0, Tuils.dpToPx(mContext, 2))
-        podcastPlayerEpisodeTitle = title
-        details.addView(title)
-
-        val show = TextView(mContext)
-        show.text = displayShow?.title ?: mContext.getString(R.string.surface_pick_a_show_to_start_listening_7b228)
-        show.setTextColor(ThemeColorResolver.withMaxAlpha(ThemeColorResolver.color(Theme.workspace_panel_text_color), 210))
-        show.setTypeface(Tuils.getTypeface(mContext))
-        show.textSize = PODCAST_TEXT_MEDIUM
-        podcastPlayerShowName = show
-        details.addView(show)
-
-        val speed = TextView(mContext)
-        speed.text = mContext.getString(R.string.surface_speed_a23eb, PodcastManager.formatSpeed(manager.playbackSpeed()))
-        speed.contentDescription = mContext.getString(R.string.surface_podcast_playback_speed_7a955, PodcastManager.formatSpeed(manager.playbackSpeed()))
-        speed.gravity = Gravity.CENTER
-        speed.textSize = PODCAST_TEXT_SMALL
-        styleTermuxToolButton(speed, ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        speed.setBackground(TerminalBorderRuntime.tabDrawable(mContext, terminalHeaderTabBackground(), FrameTarget.OVERLAYS))
-        speed.setOnClickListener { showPodcastSpeedMenu(speed) }
-        val speedParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            Tuils.dpToPx(mContext, 34)
-        )
-        speedParams.gravity = Gravity.CENTER_HORIZONTAL
-        speedParams.topMargin = Tuils.dpToPx(mContext, 10)
-        details.addView(speed, speedParams)
-
-        panel.addView(details, LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ))
-
-        val content = podcastContent ?: return
-        content.addView(panel, LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        ))
-    }
-
-    private fun showPodcastSpeedMenu(anchor: View) {
-        val menu = PopupMenu(anchor.context, anchor)
-        PodcastManager.PLAYBACK_SPEEDS.forEachIndexed { index, speed ->
-            menu.menu.add(0, index + 1, index, PodcastManager.formatSpeed(speed))
-        }
-        menu.setOnMenuItemClickListener { item ->
-            val speed = PodcastManager.PLAYBACK_SPEEDS.getOrNull(item.itemId - 1)
-                ?: return@setOnMenuItemClickListener false
-            renderPodcastSurface(mainPack.podcastManager.setPlaybackSpeed(speed))
-            true
-        }
-        menu.show()
-    }
-
-    private fun addPodcastRow(
-        text: CharSequence,
-        bold: Boolean,
-        action: Runnable?,
-        longAction: Runnable? = null
-    ) {
-        val content = podcastContent ?: return
-        val row = TextView(mContext)
-        row.text = text
-        row.setTextColor(ThemeColorResolver.color(Theme.workspace_panel_text_color))
-        row.setTypeface(Tuils.getTypeface(mContext), if (bold) Typeface.BOLD else Typeface.NORMAL)
-        row.textSize = PODCAST_TEXT_MEDIUM
-        row.maxLines = 5
-        row.ellipsize = TextUtils.TruncateAt.END
-        row.setPadding(
-            Tuils.dpToPx(mContext, 8),
-            Tuils.dpToPx(mContext, 7),
-            Tuils.dpToPx(mContext, 8),
-            Tuils.dpToPx(mContext, 7)
-        )
-        if (action != null) {
-            row.setOnClickListener(View.OnClickListener { action.run() })
-        }
-        if (longAction != null) {
-            row.setOnLongClickListener {
-                longAction.run()
-                true
-            }
-        }
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.bottomMargin = Tuils.dpToPx(mContext, 4)
-        content.addView(row, params)
-    }
-
-    private fun addPodcastView(row: View) {
-        val content = podcastContent ?: return
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        params.bottomMargin = Tuils.dpToPx(mContext, 4)
-        content.addView(row, params)
-    }
-
-    private fun executeFileConsoleCommand(rawCommand: String?) {
-        val command = if (rawCommand == null) Tuils.EMPTYSTRING else rawCommand.trim { it <= ' ' }
-        if (command.length == 0) {
-            return
-        }
-        val lower = command.lowercase()
-
-        if ("exit" == lower || "close" == lower) {
-            closeFileConsole()
-            return
-        }
-        if ("help" == lower) {
-            renderFileConsole(mContext.getString(R.string.surface_commands_cd_folder_cd_ls_pwd_open_file_termux_open_file_sh_20502))
-            return
-        }
-        if ("refresh" == lower || "reload" == lower || "ls" == lower) {
-            refreshFileConsole(true)
-            return
-        }
-        if ("pwd" == lower) {
-            renderFileConsole(mainPack!!.currentDirectory.getAbsolutePath())
-            return
-        }
-
-        mExecuter.execute(command, null)
-
-        if (lower == "cd" || lower.startsWith("cd ")) {
-            refreshFileConsole(true)
-        } else if (lower.startsWith("open ") || lower.startsWith("termux-open ") || lower.startsWith(
-                "share "
-            )
-        ) {
-            renderFileConsole(mContext.getString(R.string.surface_dispatched_4daa9, command))
-        } else {
-            refreshFileConsole(true)
-        }
-    }
-
-    private fun refreshFileConsole(forceTermuxRequest: Boolean) {
-        if (fileOverlay == null || fileOverlay!!.getVisibility() != View.VISIBLE) {
-            return
-        }
-
-        val path = mainPack!!.currentDirectory.getAbsolutePath()
-        if (filePath != null) {
-            filePath!!.setText(path)
-        }
-
-        renderFileConsole(buildNativeFileListing(mainPack!!.currentDirectory))
-    }
-
-    private fun buildNativeFileListing(directory: File?): String {
-        if (directory == null || !directory.exists()) {
-            return mContext.getString(R.string.surface_path_not_found_7e7ec)
-        }
-        if (!directory.isDirectory()) {
-            return directory.getName()
-        }
-
-        val children = directory.listFiles()
-        if (children == null || children.size == 0) {
-            return "[]"
-        }
-        Arrays.sort<File?>(
-            children,
-            Comparator { a: File?, b: File? ->
-                a!!.getName().compareTo(b!!.getName(), ignoreCase = true)
-            })
-        val dirs: MutableList<String?> = ArrayList<String?>()
-        val files: MutableList<String?> = ArrayList<String?>()
-        for (child in children) {
-            if (child.isDirectory()) {
-                dirs.add(child.getName())
-            } else {
-                files.add(child.getName())
-            }
-        }
-        return buildFileListing(dirs, files, null)
-    }
-
-    private fun buildFileListing(
-        dirs: List<String?>,
-        files: List<String?>,
-        error: String?
-    ): String {
-        val out = StringBuilder()
-        out.append("[..]")
-        if (error != null && error.trim { it <= ' ' }.length > 0) {
-            out.append('\n').append(mContext.getString(R.string.surface_error_36baa)).append(error.trim { it <= ' ' })
-        }
-        for (dir in dirs) {
-            out.append('\n').append(mContext.getString(R.string.surface_d_a2c8d)).append(dir)
-        }
-        for (file in files) {
-            out.append('\n').append("    ").append(file)
-        }
-        return out.toString()
-    }
-
-    private fun renderFileConsole(text: String?) {
-        if (fileOutput != null) {
-            fileOutput!!.setText(if (text == null) Tuils.EMPTYSTRING else text)
-        }
-        if (fileScroll != null) {
-            fileScroll!!.post(Runnable { fileScroll!!.scrollTo(0, 0) })
-        }
-    }
-
     private fun closeTermuxConsole(restoreSuggestions: Boolean = true) {
         termuxFocusCapturePending = false
         captureTermuxSurfaceSession(
@@ -8926,9 +4827,6 @@ class UIManager(
 
     private val isTermuxConsoleVisible: Boolean
         get() = termuxOverlay != null && termuxOverlay!!.getVisibility() == View.VISIBLE
-
-    private val isPodcastSurfaceVisible: Boolean
-        get() = podcastOverlay != null && podcastOverlay!!.getVisibility() == View.VISIBLE
 
 
     private fun takeTermuxConsoleFocus(showKeyboard: Boolean) {
@@ -9001,20 +4899,8 @@ class UIManager(
         return true
     }
 
-    private fun handlePodcastBackPressed(): Boolean {
-        if (!isPodcastSurfaceVisible || podcastMode == PODCAST_MODE_SHOWS) return false
-        navigatePodcastToShows()
-        return true
-    }
-
-    private fun navigatePodcastToShows() {
-        podcastMode = PODCAST_MODE_SHOWS
-        podcastEpisodeQuery = ""
-        renderPodcastSurface(null)
-    }
-
     fun consumeBackPressed(): Boolean {
-        return handleTermuxBackPressed() || handlePodcastBackPressed()
+        return handleTermuxBackPressed()
     }
 
     private fun focusTermuxInput(showKeyboard: Boolean) {
@@ -9131,7 +5017,7 @@ class UIManager(
             val app = termuxAppSession!!
             termuxAppLastStatus = mContext.getString(R.string.surface_sent_interrupt_e9bc2)
             renderTermuxAppFrame(null, termuxAppLastStatus)
-            dispatchTermuxAppScript("interrupt", buildTermuxAppControlScript(app, "C-c"), true)
+            dispatchTermuxAppScript("interrupt", TermuxAppScripts.buildTermuxAppControlScript(app, "C-c", ::calculateTermuxAppGeometry), true)
             scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
             return
         }
@@ -9394,20 +5280,20 @@ class UIManager(
             termuxOutput!!.text = Tuils.EMPTYSTRING
         }
 
-        addLuaText(container, mContext.getString(R.string.surface_re_t_ui_lua_app_dfb07, luaAppTitle()), id, MODULE_TEXT_FONT_MONO)
-        addLuaText(container, mContext.getString(R.string.surface_script_4bf42, id), id, MODULE_TEXT_FONT_MONO)
-        addLuaText(
+        luaModules.layout.addLuaText(container, mContext.getString(R.string.surface_re_t_ui_lua_app_dfb07, luaAppTitle()), id, MODULE_TEXT_FONT_MONO)
+        luaModules.layout.addLuaText(container, mContext.getString(R.string.surface_script_4bf42, id), id, MODULE_TEXT_FONT_MONO)
+        luaModules.layout.addLuaText(
             container,
             mContext.getString(R.string.surface_local_commands_help_refresh_restart_config_edit_clear_clos_0f9a2),
             id,
             MODULE_TEXT_FONT_MONO
         )
         if (!TextUtils.isEmpty(status)) {
-            addLuaText(container, mContext.getString(R.string.surface_status_573dd, status), id, MODULE_TEXT_FONT_MONO)
+            luaModules.layout.addLuaText(container, mContext.getString(R.string.surface_status_573dd, status), id, MODULE_TEXT_FONT_MONO)
         }
-        addLuaText(container, "----------------", id, MODULE_TEXT_FONT_MONO)
+        luaModules.layout.addLuaText(container, "----------------", id, MODULE_TEXT_FONT_MONO)
 
-        renderLuaLayout(container, id, result.layoutJson, true)
+        luaModules.layout.renderLuaLayout(container, id, result.layoutJson, true)
         if (!TextUtils.isEmpty(result.body)) {
             val spacer = View(mContext)
             spacer.setLayoutParams(
@@ -9417,7 +5303,7 @@ class UIManager(
                 )
             )
             container.addView(spacer)
-            addLuaBodyText(container, result.body, id)
+            luaModules.layout.addLuaBodyText(container, result.body, id)
         }
         scrollTermuxOutputToTop(this.isTermuxConsoleVisible && termuxInput != null && termuxInput!!.hasFocus())
         return true
@@ -9807,7 +5693,7 @@ class UIManager(
         }
         termuxAppLastStatus = if (command.length == 0) mContext.getString(R.string.surface_sent_enter_df691) else mContext.getString(R.string.surface_sent_faa06, command)
         renderTermuxAppFrame(null, termuxAppLastStatus)
-        dispatchTermuxAppScript("send", buildTermuxAppSendScript(app, command), true)
+        dispatchTermuxAppScript("send", TermuxAppScripts.buildTermuxAppSendScript(app, command, ::calculateTermuxAppGeometry), true)
         scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
     }
 
@@ -9815,7 +5701,7 @@ class UIManager(
         val app = termuxAppSession ?: return
         termuxAppLastStatus = mContext.getString(R.string.surface_action_a7fac, action.label)
         renderTermuxAppFrame(null, termuxAppLastStatus)
-        dispatchTermuxAppScript("action", buildTermuxAppSendScript(app, action.send), true)
+        dispatchTermuxAppScript("action", TermuxAppScripts.buildTermuxAppSendScript(app, action.send, ::calculateTermuxAppGeometry), true)
         scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_INPUT_WATCH_MS)
         scheduleTermuxConsoleFocusCapture(true)
     }
@@ -9832,13 +5718,13 @@ class UIManager(
         } else if ("restart" == command) {
             termuxAppLastStatus = "restarting"
             renderTermuxAppFrame(null, termuxAppLastStatus)
-            dispatchTermuxAppScript("restart", buildTermuxAppKillScript(app) + "\n" + buildTermuxAppStartScript(app), true)
+            dispatchTermuxAppScript("restart", TermuxAppScripts.buildTermuxAppKillScript(app) + "\n" + TermuxAppScripts.buildTermuxAppStartScript(app, ::calculateTermuxAppGeometry), true)
             scheduleTermuxAppRefreshBurst(app.id, TERMUX_APP_START_WATCH_MS)
         } else if ("stop" == command || "kill" == command) {
             termuxAppRefreshGeneration++
             termuxAppLastStatus = "stopping"
             renderTermuxAppFrame(null, termuxAppLastStatus)
-            dispatchTermuxAppScript("stop", buildTermuxAppKillScript(app), true)
+            dispatchTermuxAppScript("stop", TermuxAppScripts.buildTermuxAppKillScript(app), true)
         } else if ("detach" == command || "exit" == command || "close" == command) {
             closeTermuxConsole()
         } else if ("open" == command) {
@@ -9857,7 +5743,7 @@ class UIManager(
             termuxAppLastStatus = "refreshing"
             renderTermuxAppFrame(null, termuxAppLastStatus)
         }
-        dispatchTermuxAppScript("capture", buildTermuxAppCaptureScript(app), false)
+        dispatchTermuxAppScript("capture", TermuxAppScripts.buildTermuxAppCaptureScript(app, ::calculateTermuxAppGeometry), false)
     }
 
     private fun scheduleTermuxAppRefreshBurst(appId: String?, watchMs: Long) {
@@ -9933,27 +5819,13 @@ class UIManager(
     private fun syncTermuxAppManifest(app: TermuxAppManager.TermuxApp, echoToConsole: Boolean): Boolean {
         val dispatched = dispatchTermuxAppSideEffectScript(
             app,
-            buildTermuxAppPrepareScript(app, echoToConsole),
+            TermuxAppScripts.buildTermuxAppPrepareScript(app, echoToConsole),
             if (echoToConsole) TERMUX_APP_SYNC_RESULT_PREFIX + app.id else null
         )
         if (!dispatched && echoToConsole) {
             appendTermuxLine(mContext.getString(R.string.surface_manifest_sync_pending_termux_bridge_is_not_ready_1d5d0))
         }
         return dispatched
-    }
-
-    private fun removeTermuxAppManifest(id: String?): Boolean {
-        val normalized = TermuxAppManager.normalizeId(id)
-        if (normalized.length == 0) {
-            return false
-        }
-        val appHome = shellQuote(TermuxAppManager.appHomeDir(normalized))
-        return dispatchTermuxAppSideEffectScript(
-            null,
-            "rm -f " + appHome + "/app.json\n"
-                    + "printf '%s\\n' 'Re:T-UI app manifest removed; state directory kept.'",
-            null
-        )
     }
 
     private fun dispatchTermuxAppSideEffectScript(
@@ -10104,116 +5976,6 @@ class UIManager(
         output.minimumWidth = 0
         output.minimumHeight = 0
         output.requestLayout()
-    }
-
-    private fun buildTermuxAppResizeScript(session: String): String {
-        val geometry = calculateTermuxAppGeometry()
-        return ("tmux resize-window -t " + session + " -x " + geometry.cols + " -y " + geometry.rows + " 2>/dev/null || true\n"
-                + "tmux resize-pane -t " + session + " -x " + geometry.cols + " -y " + geometry.rows + " 2>/dev/null || true")
-    }
-
-    private fun buildTermuxAppStartScript(app: TermuxAppManager.TermuxApp): String {
-        val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        val workDir = shellQuote(app.workDir)
-        val command = shellQuote(app.command)
-        val sh = shellQuote(TermuxBridgeManager.TERMUX_SH)
-        val appId = shellQuote(app.id)
-        val appHome = shellQuote(app.homeDir)
-        val state = shellQuote(app.statePath)
-        val manifest = shellQuote(app.manifestPath)
-        return (buildTermuxAppPrepareScript(app, false) + "\n"
-                + "if ! command -v tmux >/dev/null 2>&1; then\n"
-                + "  printf '%s\\n' 'tmux missing: pkg install tmux'\n"
-                + "  exit 127\n"
-                + "fi\n"
-                + "if ! tmux has-session -t " + session + " 2>/dev/null; then\n"
-                + "  mkdir -p " + workDir + " 2>/dev/null || true\n"
-                + "  tmux new-session -d -s " + session + " -c " + workDir
-                + " env RETUI_APP_ID=" + appId
-                + " RETUI_APP_HOME=" + appHome
-                + " RETUI_APP_STATE=" + state
-                + " RETUI_APP_MANIFEST=" + manifest
-                + " " + sh + " -lc " + command + "\n"
-                + "  sleep 0.35\n"
-                + "fi\n"
-                + buildTermuxAppResizeScript(session) + "\n"
-                + "tmux capture-pane -t " + session + " -p -e -N")
-    }
-
-    private fun buildTermuxAppPrepareScript(app: TermuxAppManager.TermuxApp, echo: Boolean): String {
-        val appHome = shellQuote(app.homeDir)
-        val memoryDir = shellQuote(app.memoryDir)
-        val logsDir = shellQuote(app.logsDir)
-        val manifest = shellQuote(app.manifestPath)
-        val state = shellQuote(app.statePath)
-        val json = shellQuote(TermuxAppManager.manifestJson(app))
-        val script = ("mkdir -p " + appHome + " " + memoryDir + " " + logsDir + "\n"
-                + "if [ ! -f " + state + " ]; then printf '%s\\n' '{}' > " + state + "; fi\n"
-                + "printf '%s\\n' " + json + " > " + manifest)
-        if (!echo) {
-            return script
-        }
-        return script + "\nprintf '%s\\n' 'manifest: " + app.manifestPath.replace("'", "'\"'\"'") + "'"
-    }
-
-    private fun buildTermuxAppSendScript(app: TermuxAppManager.TermuxApp, input: String): String {
-        val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        val send = if (input.length == 0) {
-            "tmux send-keys -t " + session + " C-m"
-        } else {
-            "tmux send-keys -t " + session + " -- " + shellQuote(input) + "\n" +
-                    "tmux send-keys -t " + session + " C-m"
-        }
-        return buildTermuxAppEnsureScript(app) + "\n" +
-                buildTermuxAppResizeScript(session) + "\n" +
-                send + "\nsleep 0.25\n" +
-                buildTermuxAppPostInputCaptureScript(session)
-    }
-
-    private fun buildTermuxAppControlScript(app: TermuxAppManager.TermuxApp, key: String): String {
-        val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        return buildTermuxAppEnsureScript(app) + "\n" +
-                buildTermuxAppResizeScript(session) + "\n" +
-                "tmux send-keys -t " + session + " -- " + shellQuote(key) + "\n" +
-                "sleep 0.25\n" +
-                buildTermuxAppPostInputCaptureScript(session)
-    }
-
-    private fun buildTermuxAppCaptureScript(app: TermuxAppManager.TermuxApp): String {
-        val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        return buildTermuxAppEnsureScript(app) + "\n" +
-                buildTermuxAppResizeScript(session) + "\n" +
-                "tmux capture-pane -t " + session + " -p -e -N"
-    }
-
-    private fun buildTermuxAppPostInputCaptureScript(session: String): String {
-        return ("if ! tmux has-session -t " + session + " 2>/dev/null; then\n"
-                + "  printf '%s\\n' 'session ended. Type :restart to start it.'\n"
-                + "  exit 0\n"
-                + "fi\n"
-                + "tmux capture-pane -t " + session + " -p -e -N")
-    }
-
-    private fun buildTermuxAppKillScript(app: TermuxAppManager.TermuxApp): String {
-        val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        return ("if command -v tmux >/dev/null 2>&1; then\n"
-                + "  tmux kill-session -t " + session + " 2>/dev/null || true\n"
-                + "  printf '%s\\n' 'session stopped.'\n"
-                + "else\n"
-                + "  printf '%s\\n' 'tmux missing: pkg install tmux'\n"
-                + "fi")
-    }
-
-    private fun buildTermuxAppEnsureScript(app: TermuxAppManager.TermuxApp): String {
-        val session = shellQuote(TermuxAppManager.tmuxSessionName(app.id))
-        return ("if ! command -v tmux >/dev/null 2>&1; then\n"
-                + "  printf '%s\\n' 'tmux missing: pkg install tmux'\n"
-                + "  exit 127\n"
-                + "fi\n"
-                + "if ! tmux has-session -t " + session + " 2>/dev/null; then\n"
-                + "  printf '%s\\n' 'session not running. Type :restart to start it.'\n"
-                + "  exit 1\n"
-                + "fi")
     }
 
     private fun appendTermuxAppSyncResult(
@@ -10412,7 +6174,7 @@ class UIManager(
             val geometry = calculateTermuxAppGeometry()
             termuxGrid?.setFrame(raw, geometry.cols, geometry.rows, null, null)
         } else {
-            val rendered = if (hasFrame) renderTermuxWorkspaceAnsi(raw) else SpannableStringBuilder(raw)
+            val rendered = if (hasFrame) TermuxAnsiRenderer.renderTermuxWorkspaceAnsi(raw) else SpannableStringBuilder(raw)
             termuxOutput?.setText(rendered)
         }
         updateTermuxAppMeasuredLineHeight()
@@ -10795,13 +6557,6 @@ class UIManager(
         return command.toString()
     }
 
-    private fun shellQuote(value: String?): String {
-        if (value == null) {
-            return "''"
-        }
-        return "'" + value.replace("'", "'\"'\"'") + "'"
-    }
-
     private fun reportTermuxDispatch(message: String?, echoToConsole: Boolean) {
         if (echoToConsole) {
             appendTermuxLine(message)
@@ -11060,30 +6815,30 @@ class UIManager(
                     ACTION_UPDATE_HINT
                 )
             )
-            refreshFileConsole(true)
+            fileConsoleController?.refreshFileConsole(true)
         }
         if (label.startsWith("fm-dirs ")) {
             val target = label.substring(8)
             if (exitCode == 0) {
                 putDirs(target, stdout)
-                updateFileConsoleFromTermux(target, null)
+                fileConsoleController?.updateFileConsoleFromTermux(target, null)
             } else {
-                updateFileConsoleFromTermux(target, stderr)
+                fileConsoleController?.updateFileConsoleFromTermux(target, stderr)
             }
             return
         } else if (label.startsWith("fm-files ")) {
             val target = label.substring(9)
             if (exitCode == 0) {
                 putFiles(target, stdout)
-                updateFileConsoleFromTermux(target, null)
+                fileConsoleController?.updateFileConsoleFromTermux(target, null)
             } else {
-                updateFileConsoleFromTermux(target, stderr)
+                fileConsoleController?.updateFileConsoleFromTermux(target, stderr)
             }
             return
         } else if (label.startsWith("dirs ") && exitCode == 0) {
             val target = label.substring(5)
             putDirs(target, stdout)
-            updateFileConsoleFromTermux(target, null)
+            fileConsoleController?.updateFileConsoleFromTermux(target, null)
             LocalBroadcastManager.getInstance(mContext!!.getApplicationContext()).sendBroadcast(
                 Intent(
                     ACTION_UPDATE_SUGGESTIONS
@@ -11093,7 +6848,7 @@ class UIManager(
         } else if (label.startsWith("files ") && exitCode == 0) {
             val target = label.substring(6)
             putFiles(target, stdout)
-            updateFileConsoleFromTermux(target, null)
+            fileConsoleController?.updateFileConsoleFromTermux(target, null)
             LocalBroadcastManager.getInstance(mContext!!.getApplicationContext()).sendBroadcast(
                 Intent(
                     ACTION_UPDATE_SUGGESTIONS
@@ -11120,20 +6875,6 @@ class UIManager(
             builder.append(mContext.getString(R.string.surface_debug_7052a)).append(debug.trim { it <= ' ' })
         }
         Tuils.sendOutput(mContext, builder.toString(), TerminalManager.CATEGORY_OUTPUT)
-    }
-
-    private fun updateFileConsoleFromTermux(path: String?, error: String?) {
-        if (fileOverlay == null || fileOverlay!!.getVisibility() != View.VISIBLE) {
-            return
-        }
-        val current = mainPack!!.currentDirectory.getAbsolutePath()
-        if (current != path) {
-            return
-        }
-        if (filePath != null) {
-            filePath!!.setText(current)
-        }
-        renderFileConsole(buildFileListing(dirs(path), files(path), error))
     }
 
     private fun updateModuleFromTermuxResult(
@@ -11299,11 +7040,11 @@ class UIManager(
         val stopwatchTab = rootView.findViewById<TextView?>(R.id.stopwatch_tab)
         podcastTab = rootView.findViewById(R.id.podcast_tab)
 
-        styleClockTab(timerTab, View.OnClickListener { v: View? ->
+        clockTabDock?.styleClockTab(timerTab, View.OnClickListener { v: View? ->
             val message = ClockManager.getInstance(mContext).stopTimer()
             Tuils.sendOutput(mContext, message, TerminalManager.CATEGORY_OUTPUT)
         })
-        styleClockTab(stopwatchTab, View.OnClickListener { v: View? ->
+        clockTabDock?.styleClockTab(stopwatchTab, View.OnClickListener { v: View? ->
             val message = ClockManager.getInstance(mContext).stopStopwatch()
             Tuils.sendOutput(mContext, message, TerminalManager.CATEGORY_OUTPUT)
         })
@@ -11315,23 +7056,46 @@ class UIManager(
             return
         }
         LauncherPillStyle.apply(mContext!!, tab)
-        tab.setOnClickListener { openPodcastSurface(null) }
+        tab.setOnClickListener { launchPodcastPlayer() }
     }
 
-    private fun showPodcastPill() {
+    private fun launchPodcastPlayer() {
+        mContext.startActivity(Intent(mContext, MediaPlayerActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(MediaPlayerActivity.EXTRA_NOW_PLAYING, true))
+    }
+
+    /**
+     * The pill stands in for the player while a podcast is loaded and the player is off screen. It appears only
+     * once an episode has played in this run, so a queue restored at start does not bring it back on its own.
+     */
+    fun syncPodcastPill() {
+        val manager = mainPack.podcastManager
+        if (manager.isPlaying() || manager.isPreparing()) podcastPillArmed = true
+        else if (manager.currentSong() == null) podcastPillArmed = false
         val tab = podcastTab ?: mRootView?.findViewById(R.id.podcast_tab)
         podcastTab = tab
         if (tab == null) {
             return
         }
-        if (!podcastSessionActive || isPodcastSurfaceVisible) {
+        val wanted = podcastPillArmed && !MediaPlayerActivity.visible
+        val state = wanted to manager.isPlaying()
+        if (state == podcastPillState) return
+        podcastPillState = state
+        if (!wanted) {
+            hidePodcastPill()
+            return
+        }
+        publishEdgePodcast()
+        if (ohi.andre.consolelauncher.sidebar.EdgePills.onEdge(mContext)) {
             tab.visibility = View.GONE
             return
         }
+        if (tab.visibility == View.VISIBLE) return
         stylePodcastPill(tab)
         tab.visibility = View.VISIBLE
         if (!podcastTabDockReady) {
-            makeClockTabDockable(
+            clockTabDock?.makeClockTabDockable(
                 tab,
                 PREF_PODCAST_BADGE_EDGE,
                 PREF_PODCAST_BADGE_FRACTION,
@@ -11354,9 +7118,9 @@ class UIManager(
         ).coerceIn(0f, 1f)
         if (land) {
             // Portrait right-edge dock lands on the terminal pane / bezel — park left instead.
-            forceClockTabEdge(tab, CLOCK_EDGE_LEFT, frac)
+            clockTabDock?.forceClockTabEdge(tab, CLOCK_EDGE_LEFT, frac)
         } else {
-            applyClockTabDock(
+            clockTabDock?.applyClockTabDock(
                 tab,
                 PREF_PODCAST_BADGE_EDGE,
                 PREF_PODCAST_BADGE_FRACTION,
@@ -11368,1370 +7132,47 @@ class UIManager(
         tab.bringToFront()
     }
 
-    private fun forceClockTabEdge(view: View, edge: String, fraction: Float) {
-        val parent = view.parent as? View ?: return
-        if (parent.width <= 0 || parent.height <= 0 || view.width <= 0 || view.height <= 0) {
-            view.post { forceClockTabEdge(view, edge, fraction) }
-            return
-        }
-        val margin = Tuils.dpToPx(mContext, if (podcastLandscapePresentation()) 14 else 6)
-        // Prefer system insets — parent padding can lag one frame after rotate.
-        val padL = max(parent.paddingLeft, systemInsetLeft)
-        val padR = max(parent.paddingRight, systemInsetRight)
-        val padT = max(parent.paddingTop, systemInsetTop)
-        val padB = max(parent.paddingBottom, systemInsetBottom)
-        val minX = (padL + margin).toFloat()
-        val minY = (padT + margin).toFloat()
-        val maxX = max(minX, (parent.width - padR - view.width - margin).toFloat())
-        val maxY = max(minY, (parent.height - padB - view.height - margin).toFloat())
-        val frac = fraction.coerceIn(0f, 1f)
-        val x: Float
-        val y: Float
-        when (edge) {
-            CLOCK_EDGE_LEFT -> {
-                x = minX
-                y = minY + frac * max(0f, maxY - minY)
-            }
-            CLOCK_EDGE_TOP -> {
-                x = minX + frac * max(0f, maxX - minX)
-                y = minY
-            }
-            CLOCK_EDGE_BOTTOM -> {
-                x = minX + frac * max(0f, maxX - minX)
-                y = maxY
-            }
-            else -> {
-                x = maxX
-                y = minY + frac * max(0f, maxY - minY)
-            }
-        }
-        setClockTabPosition(view, x, y, parent)
+    /** The podcast as a screen-edge pill: its button plays/pauses, tapping it opens the player. */
+    private fun publishEdgePodcast() {
+        val manager = mainPack.podcastManager
+        ohi.andre.consolelauncher.sidebar.EdgePills.setPodcast(mContext, ohi.andre.consolelauncher.sidebar.EdgePills.Podcast(
+            playing = { manager.isPlaying() },
+            toggle = { manager.toggle() },
+            open = { launchPodcastPlayer() }
+        ))
     }
 
     private fun hidePodcastPill() {
         podcastTab?.visibility = View.GONE
-    }
-
-    private fun setPodcastFocusChrome(expanded: Boolean) {
-        if (podcastLandscapePresentation()) {
-            // Portrait-only: landscape uses fade pane and keeps the split chrome put.
-            resetPodcastFocusChromeImmediate()
-            return
-        }
-        val top = mainContainer
-        val tray = terminalTrayContainer
-        if (top == null && tray == null) {
-            podcastFocusChromeActive = expanded
-            return
-        }
-
-        val headerH = headerContainer?.height ?: 0
-        val dockH = moduleDockScroll?.height ?: 0
-        val topH = top?.height ?: 0
-        val trayH = tray?.height ?: 0
-        // Heights can be 0 on first expand before layout — retry once.
-        if (expanded && ((top != null && topH <= 0) || (tray != null && trayH <= 0))) {
-            (top ?: tray)?.post { setPodcastFocusChrome(true) }
-            return
-        }
-
-        podcastChromeAnim?.cancel()
-        val peek = Tuils.dpToPx(mContext, PODCAST_CHROME_PEEK_DP).toFloat()
-        val anims = ArrayList<Animator>()
-        val duration = 260L
-        val module = homeModulesContainer
-
-        if (!expanded) {
-            module?.visibility = View.VISIBLE
-        }
-
-        if (top != null) {
-            // Move header + module dock with the home column; leave a peek in the top gap.
-            val chromeBand = max(headerH + dockH, Tuils.dpToPx(mContext, 96)).toFloat()
-            val target = if (expanded) {
-                -max(0f, chromeBand - peek)
-            } else {
-                0f
-            }
-            anims.add(ObjectAnimator.ofFloat(top, View.TRANSLATION_Y, top.translationY, target))
-            anims.add(
-                ObjectAnimator.ofFloat(
-                    top,
-                    View.ALPHA,
-                    top.alpha,
-                    if (expanded) PODCAST_CHROME_PEEK_ALPHA else 1f
-                )
-            )
-        }
-        if (tray != null) {
-            // Slide input tray down; leave a peek strip in the bottom gap.
-            val target = if (expanded) {
-                max(0f, trayH - peek)
-            } else {
-                0f
-            }
-            anims.add(ObjectAnimator.ofFloat(tray, View.TRANSLATION_Y, tray.translationY, target))
-            anims.add(
-                ObjectAnimator.ofFloat(
-                    tray,
-                    View.ALPHA,
-                    tray.alpha,
-                    if (expanded) PODCAST_CHROME_PEEK_ALPHA else 1f
-                )
-            )
-        }
-        if (module != null) {
-            anims.add(
-                ObjectAnimator.ofFloat(
-                    module,
-                    View.ALPHA,
-                    module.alpha,
-                    if (expanded) 0f else 1f
-                )
-            )
-        }
-
-        if (anims.isEmpty()) {
-            podcastFocusChromeActive = expanded
-            return
-        }
-
-        val set = AnimatorSet()
-        set.playTogether(anims)
-        set.duration = duration
-        set.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator) {
-                podcastFocusChromeActive = expanded
-                if (expanded) {
-                    module?.visibility = View.INVISIBLE
-                } else {
-                    module?.alpha = 1f
-                    module?.visibility = View.VISIBLE
-                    top?.translationY = 0f
-                    top?.alpha = 1f
-                    tray?.translationY = 0f
-                    tray?.alpha = 1f
-                }
-            }
-        })
-        podcastChromeAnim = set
-        set.start()
-    }
-
-    private fun resetPodcastFocusChromeImmediate() {
-        podcastChromeAnim?.cancel()
-        podcastChromeAnim = null
-        podcastFocusChromeActive = false
-        mainContainer?.translationY = 0f
-        mainContainer?.alpha = 1f
-        terminalTrayContainer?.translationY = 0f
-        terminalTrayContainer?.alpha = 1f
-        homeModulesContainer?.alpha = 1f
-        homeModulesContainer?.visibility = View.VISIBLE
-    }
-
-    private fun styleClockTab(tab: TextView?, listener: View.OnClickListener?) {
-        if (tab == null) {
-            return
-        }
-        LauncherPillStyle.apply(mContext!!, tab)
-        tab.setOnClickListener(listener)
-    }
-
-    private fun makeClockTabDockable(
-        tab: View?,
-        edgeKey: String?,
-        fractionKey: String?,
-        defaultEdge: String?,
-        defaultFraction: Float
-    ) {
-        if (tab == null) {
-            return
-        }
-
-        val touchSlop = ViewConfiguration.get(mContext!!).getScaledTouchSlop()
-        val downRawX = FloatArray(1)
-        val downRawY = FloatArray(1)
-        val startX = FloatArray(1)
-        val startY = FloatArray(1)
-        val dragging = BooleanArray(1)
-
-        tab.setOnTouchListener(OnTouchListener { view: View?, event: MotionEvent? ->
-            val parent = view!!.getParent() as View?
-            if (parent == null || parent.getWidth() <= 0 || parent.getHeight() <= 0) {
-                false
-            } else when (event!!.getActionMasked()) {
-                MotionEvent.ACTION_DOWN -> {
-                    downRawX[0] = event.getRawX()
-                    downRawY[0] = event.getRawY()
-                    startX[0] = view.getX()
-                    startY[0] = view.getY()
-                    dragging[0] = false
-                    view.getParent().requestDisallowInterceptTouchEvent(true)
-                    true
-                }
-
-                MotionEvent.ACTION_MOVE -> {
-                    val dx = event.getRawX() - downRawX[0]
-                    val dy = event.getRawY() - downRawY[0]
-                    if (!dragging[0] && hypot(dx.toDouble(), dy.toDouble()) > touchSlop) {
-                        dragging[0] = true
-                    }
-                    if (dragging[0]) {
-                        setClockTabPosition(view, startX[0] + dx, startY[0] + dy, parent)
-                    }
-                    true
-                }
-
-                MotionEvent.ACTION_CANCEL -> {
-                    view.getParent().requestDisallowInterceptTouchEvent(false)
-                    true
-                }
-
-                MotionEvent.ACTION_UP -> {
-                    view.getParent().requestDisallowInterceptTouchEvent(false)
-                    if (dragging[0]) {
-                        snapClockTabToNearestEdge(view, parent, edgeKey, fractionKey)
-                    } else {
-                        view.performClick()
-                    }
-                    true
-                }
-
-                else -> true
-            }
-        })
-
-        tab.post(Runnable {
-            applyClockTabDock(
-                tab,
-                edgeKey,
-                fractionKey,
-                defaultEdge,
-                defaultFraction
-            )
-        })
-    }
-
-    private fun applyClockTabDock(
-        view: View,
-        edgeKey: String?,
-        fractionKey: String?,
-        defaultEdge: String?,
-        defaultFraction: Float
-    ) {
-        val parent = view.getParent() as View?
-        if (parent == null || parent.getWidth() <= 0 || parent.getHeight() <= 0 || view.getWidth() <= 0 || view.getHeight() <= 0) {
-            view.post(Runnable {
-                applyClockTabDock(
-                    view,
-                    edgeKey,
-                    fractionKey,
-                    defaultEdge,
-                    defaultFraction
-                )
-            })
-            return
-        }
-
-        val edge = preferences.getString(edgeKey, defaultEdge)
-        var fraction = preferences.getFloat(
-            fractionKey,
-            defaultFraction
-        )
-        fraction = max(0f, min(1f, fraction))
-
-        val margin = Tuils.dpToPx(mContext, 6)
-        val minX = (parent.paddingLeft + margin).toFloat()
-        val minY = (parent.paddingTop + margin).toFloat()
-        val maxX = max(minX, (parent.width - parent.paddingRight - view.width - margin).toFloat())
-        val maxY = max(minY, (parent.height - parent.paddingBottom - view.height - margin).toFloat())
-        val x: Float
-        val y: Float
-
-        if (CLOCK_EDGE_LEFT == edge) {
-            x = minX
-            y = minY + fraction * max(0f, maxY - minY)
-        } else if (CLOCK_EDGE_TOP == edge) {
-            x = minX + fraction * max(0f, maxX - minX)
-            y = minY
-        } else if (CLOCK_EDGE_BOTTOM == edge) {
-            x = minX + fraction * max(0f, maxX - minX)
-            y = maxY
-        } else {
-            x = maxX
-            y = minY + fraction * max(0f, maxY - minY)
-        }
-
-        setClockTabPosition(view, x, y, parent)
-    }
-
-    private fun setClockTabPosition(view: View, x: Float, y: Float, parent: View) {
-        val margin = Tuils.dpToPx(mContext, 6)
-        val padL = max(parent.paddingLeft, systemInsetLeft)
-        val padR = max(parent.paddingRight, systemInsetRight)
-        val padT = max(parent.paddingTop, systemInsetTop)
-        val padB = max(parent.paddingBottom, systemInsetBottom)
-        val minX = (padL + margin).toFloat()
-        val minY = (padT + margin).toFloat()
-        val maxX = max(minX, (parent.width - padR - view.width - margin).toFloat())
-        val maxY = max(minY, (parent.height - padB - view.height - margin).toFloat())
-        view.setX(max(minX, min(x, maxX)))
-        view.setY(max(minY, min(y, maxY)))
-    }
-
-    private fun snapClockTabToNearestEdge(
-        view: View,
-        parent: View,
-        edgeKey: String?,
-        fractionKey: String?
-    ) {
-        val margin = Tuils.dpToPx(mContext, 6)
-        val minX = (parent.paddingLeft + margin).toFloat()
-        val minY = (parent.paddingTop + margin).toFloat()
-        val maxX = max(minX, (parent.width - parent.paddingRight - view.width - margin).toFloat())
-        val maxY = max(minY, (parent.height - parent.paddingBottom - view.height - margin).toFloat())
-        val leftDistance = view.getX() - minX
-        val topDistance = view.getY() - minY
-        val rightDistance = maxX - view.getX()
-        val bottomDistance = maxY - view.getY()
-
-        var edge: String = CLOCK_EDGE_LEFT
-        var nearest = leftDistance
-        if (rightDistance < nearest) {
-            nearest = rightDistance
-            edge = CLOCK_EDGE_RIGHT
-        }
-        if (topDistance < nearest) {
-            nearest = topDistance
-            edge = CLOCK_EDGE_TOP
-        }
-        if (bottomDistance < nearest) {
-            edge = CLOCK_EDGE_BOTTOM
-        }
-
-        var fraction: Float
-        if (CLOCK_EDGE_TOP == edge || CLOCK_EDGE_BOTTOM == edge) {
-            fraction = (view.getX() - minX) / max(1f, maxX - minX)
-        } else {
-            fraction = (view.getY() - minY) / max(1f, maxY - minY)
-        }
-        fraction = max(0f, min(1f, fraction))
-
-        preferences.edit()
-            .putString(edgeKey, edge)
-            .putFloat(fractionKey, fraction)
-            .apply()
-        applyClockTabDock(view, edgeKey, fractionKey, edge, fraction)
-    }
-
-    private fun updateClockOverlay(intent: Intent) {
-        val timerTab = mRootView!!.findViewById<TextView?>(R.id.timer_tab)
-        val stopwatchTab = mRootView.findViewById<TextView?>(R.id.stopwatch_tab)
-        if (timerTab == null || stopwatchTab == null) {
-            return
-        }
-
-        styleClockOverlay(mRootView)
-
-        val timerRunning = intent.getBooleanExtra(ClockManager.EXTRA_TIMER_RUNNING, false)
-        val timerRemaining = intent.getLongExtra(ClockManager.EXTRA_TIMER_REMAINING, 0L)
-        val stopwatchRunning = intent.getBooleanExtra(ClockManager.EXTRA_STOPWATCH_RUNNING, false)
-        val stopwatchElapsed = intent.getLongExtra(ClockManager.EXTRA_STOPWATCH_ELAPSED, 0L)
-
-        timerTabVisible = timerRunning
-        stopwatchTabVisible = stopwatchRunning
-
-        if (timerRunning) {
-            timerTab.setVisibility(View.VISIBLE)
-            timerTab.setText(ClockManager.formatDuration(timerRemaining))
-            if (!timerTabDockReady) {
-                makeClockTabDockable(
-                    timerTab,
-                    PREF_TIMER_BADGE_EDGE,
-                    PREF_TIMER_BADGE_FRACTION,
-                    CLOCK_EDGE_RIGHT,
-                    0.45f
-                )
-                timerTabDockReady = true
-            }
-        } else {
-            timerTab.setVisibility(View.GONE)
-        }
-
-        if (stopwatchRunning) {
-            stopwatchTab.setVisibility(View.VISIBLE)
-            stopwatchTab.setText(ClockManager.formatDuration(stopwatchElapsed))
-            if (!stopwatchTabDockReady) {
-                makeClockTabDockable(
-                    stopwatchTab,
-                    PREF_STOPWATCH_BADGE_EDGE,
-                    PREF_STOPWATCH_BADGE_FRACTION,
-                    CLOCK_EDGE_RIGHT,
-                    0.55f
-                )
-                stopwatchTabDockReady = true
-            }
-        } else {
-            stopwatchTab.setVisibility(View.GONE)
-        }
-    }
-
-    private fun updatePomodoroOverlay(intent: Intent) {
-        val running = intent.getBooleanExtra(PomodoroManager.EXTRA_POMODORO_RUNNING, false)
-        val remaining = intent.getLongExtra(PomodoroManager.EXTRA_POMODORO_REMAINING, 0L)
-        val total = intent.getLongExtra(PomodoroManager.EXTRA_POMODORO_TOTAL, 0L)
-        val task = intent.getStringExtra(PomodoroManager.EXTRA_POMODORO_TASK)
-        val typeStr = intent.getStringExtra(PomodoroManager.EXTRA_POMODORO_TYPE)
-        val message = intent.getStringExtra(PomodoroManager.EXTRA_MESSAGE)
-
-        var overlay = mRootView!!.findViewById<View?>(R.id.pomodoro_root)
-        if (overlay == null) {
-            if (!running) return
-            overlay = View.inflate(mContext, R.layout.pomodoro_overlay, mRootView as ViewGroup)
-            setupPomodoroOverlay(overlay)
-        }
-
-        if (!running) {
-            (mRootView as ViewGroup).removeView(overlay)
-            this.isPomodoroOverlayVisible = false
-            if (!isLockdownOverlayVisible) {
-                mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.VISIBLE)
-                val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
-                if (terminalTray != null) {
-                    terminalTray.setVisibility(View.VISIBLE)
-                }
-            }
-            if (message != null) {
-                Tuils.sendOutput(mContext, message)
-            }
-            return
-        }
-
-        this.isPomodoroOverlayVisible = true
-        closeKeyboard()
-        mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.GONE)
-        val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
-        if (terminalTray != null) {
-            terminalTray.setVisibility(View.GONE)
-        }
-        overlay.bringToFront()
-        overlay.setElevation(Tuils.dpToPx(mContext, 128).toFloat())
-
-        val title = overlay.findViewById<TextView>(R.id.pomodoro_title)
-        val countdown = overlay.findViewById<TextView>(R.id.pomodoro_countdown)
-        val taskDisplay = overlay.findViewById<TextView>(R.id.pomodoro_task_display)
-        val terminateBtn = overlay.findViewById<Button>(R.id.pomodoro_terminate)
-
-        val type = SessionType.valueOf(typeStr!!)
-
-        overlay.setKeepScreenOn(running && type == SessionType.FOCUS)
-
-        if (type == SessionType.FINISHED) {
-            title.setText(mContext.getString(R.string.surface_mission_accomplished_5f337))
-            title.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
-            taskDisplay.setText(mContext.getString(R.string.surface_good_job_you_did_great_c4fb2))
-            countdown.setVisibility(View.GONE)
-            terminateBtn.setText(mContext.getString(R.string.surface_exit_session_52cc0))
-        } else {
-            countdown.setVisibility(View.VISIBLE)
-            if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
-                terminateBtn.setText(mContext.getString(R.string.surface_terminate_session_cd886))
-            } else if (RetuiCreditManager.wallet(mContext).credits >= RetuiCreditManager.ESCAPE_COST) {
-                terminateBtn.setText(mContext.getString(R.string.surface_skip_pomodoro_credits_b7376, RetuiCreditManager.ESCAPE_COST))
-            } else {
-                terminateBtn.setText(mContext.getString(R.string.surface_emergency_breach_ce727))
-            }
-            if (type == SessionType.BREAK) {
-                title.setText(mContext.getString(R.string.surface_take_a_break_849f9))
-                title.setTextColor(XMLPrefsManager.getColor(Theme.input_text_color))
-            } else {
-                title.setText(mContext.getString(R.string.surface_focus_mode_active_f4757))
-                title.setTextColor(ThemeColorResolver.color(Theme.error_text_color))
-            }
-            taskDisplay.setText(mContext.getString(R.string.surface_task_c6f9a, task))
-            countdown.setText(ClockManager.formatDuration(remaining))
-        }
-    }
-
-    private fun setupPomodoroOverlay(overlay: View) {
-        val title = overlay.findViewById<TextView>(R.id.pomodoro_title)
-        val countdown = overlay.findViewById<TextView>(R.id.pomodoro_countdown)
-        val taskDisplay = overlay.findViewById<TextView>(R.id.pomodoro_task_display)
-        val terminateBtn = overlay.findViewById<Button>(R.id.pomodoro_terminate)
-
-        val color = ThemeColorResolver.color(Theme.overlay_panel_text_color)
-        val bgColor = if (XMLPrefsManager.getBoolean(Ui.system_wallpaper)) {
-            XMLPrefsManager.getColor(Theme.wallpaper_overlay_color)
-        } else {
-            XMLPrefsManager.getColor(Theme.background_color)
-        }
-        val textBgColor = ThemeColorResolver.color(Theme.overlay_panel_background_color)
-        overlay.setBackgroundColor(bgColor)
-
-        title.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        countdown.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        taskDisplay.setTypeface(Tuils.getTypeface(mContext))
-        terminateBtn.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-
-        countdown.setTextColor(color)
-        taskDisplay.setTextColor(color)
-        terminateBtn.setTextColor(color)
-
-        title.setBackgroundColor(textBgColor)
-        countdown.setBackgroundColor(textBgColor)
-        taskDisplay.setBackgroundColor(textBgColor)
-
-        terminateBtn.setBackground(
-            TerminalBorderRuntime.panelDrawable(
-                mContext!!,
-                textBgColor,
-                color,
-                1.4f,
-                moduleCornerRadius(),
-                dashedBorders(),
-                target = FrameTarget.MODULES
-            )
-        )
-
-        terminateBtn.setOnClickListener(View.OnClickListener { v: View? ->
-            val manager = PomodoroManager.getInstance(mContext)
-            if (manager.currentType == SessionType.FINISHED) {
-                manager.stopSession()
-            } else {
-                TuixtDialog.showConfirm(
-                    mContext,
-                    mContext.getString(R.string.surface_terminate_7acd3),
-                    pomodoroStopConfirmText(),
-                    mContext.getString(R.string.surface_yes_8fff0),
-                    mContext.getString(R.string.surface_no_a0509),
-                    ConfirmAction {
-                        terminatePomodoroEarly(manager)
-                    })
-            }
-        })
-    }
-
-    private fun pomodoroStopConfirmText(): String {
-        if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
-            return mContext.getString(R.string.surface_do_you_really_want_to_stop_the_focus_session_8ed84)
-        }
-        return if (RetuiCreditManager.wallet(mContext).credits >= RetuiCreditManager.ESCAPE_COST) {
-            mContext.getString(R.string.surface_stop_this_pomodoro_for_credits_ad296, RetuiCreditManager.ESCAPE_COST)
-        } else {
-            mContext.getString(R.string.surface_not_enough_credits_try_an_emergency_breach_75d79)
-        }
-    }
-
-    private fun terminatePomodoroEarly(manager: PomodoroManager) {
-        if (!RetuiCreditManager.isDystopiaEnabled(mContext)) {
-            manager.stopSession()
-            return
-        }
-
-        if (RetuiCreditManager.spendCredits(mContext)) {
-            manager.stopSession()
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_pomodoro_terminated_credits_d6ff8, RetuiCreditManager.ESCAPE_COST))
-            return
-        }
-
-        BreachDialog.show(mContext, BreachManager.Mode.EMERGENCY) { won ->
-            if (won) {
-                PomodoroManager.getInstance(mContext).stopSession()
-            }
-        }
-    }
-
-    private fun updateLockdownOverlay(intent: Intent) {
-        val running = intent.getBooleanExtra(LockdownManager.EXTRA_LOCKDOWN_RUNNING, false)
-        val remaining = intent.getLongExtra(LockdownManager.EXTRA_LOCKDOWN_REMAINING, 0L)
-        val reason = intent.getStringExtra(LockdownManager.EXTRA_LOCKDOWN_REASON)
-        val message = intent.getStringExtra(LockdownManager.EXTRA_MESSAGE)
-
-        var overlay = mRootView!!.findViewById<View?>(R.id.lockdown_root)
-        if (overlay == null) {
-            if (!running) return
-            overlay = View.inflate(mContext, R.layout.lockdown_overlay, mRootView as ViewGroup)
-            setupLockdownOverlay(overlay)
-        }
-
-        if (!running) {
-            (mRootView as ViewGroup).removeView(overlay)
-            isLockdownOverlayVisible = false
-            if (!isPomodoroOverlayVisible) {
-                mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.VISIBLE)
-                val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
-                if (terminalTray != null) {
-                    terminalTray.setVisibility(View.VISIBLE)
-                }
-            }
-            if (message != null) {
-                Tuils.sendOutput(mContext, message)
-            }
-            if (launcherWindowFocused) {
-                resumeAsciiAnimation()
-            }
-            return
-        }
-
-        isLockdownOverlayVisible = true
-        pauseAsciiAnimation()
-        closeKeyboard()
-        mRootView.findViewById<View?>(R.id.main_container)?.setVisibility(View.GONE)
-        val terminalTray = mRootView.findViewById<View?>(R.id.terminal_tray_container)
-        if (terminalTray != null) {
-            terminalTray.setVisibility(View.GONE)
-        }
-        overlay.bringToFront()
-        overlay.setElevation(Tuils.dpToPx(mContext, 160).toFloat())
-        overlay.setKeepScreenOn(true)
-
-        val countdown = overlay.findViewById<TextView>(R.id.lockdown_countdown)
-        val reasonView = overlay.findViewById<TextView>(R.id.lockdown_reason)
-        countdown.setText(ClockManager.formatDuration(remaining))
-        reasonView.setText(if (reason.isNullOrBlank()) mContext.getString(R.string.surface_focus_mode_9a2af) else reason)
-        refreshLockdownActions(overlay)
-    }
-
-    private fun setupLockdownOverlay(overlay: View) {
-        overlay.setBackgroundColor(FocusFrictionStyle.overlayBackground())
-
-        val title = overlay.findViewById<ImageView>(R.id.lockdown_title)
-        val countdown = overlay.findViewById<TextView>(R.id.lockdown_countdown)
-        val reason = overlay.findViewById<TextView>(R.id.lockdown_reason)
-        val wallet = overlay.findViewById<TextView>(R.id.lockdown_wallet)
-        val skip = overlay.findViewById<TextView>(R.id.lockdown_skip)
-        val key = overlay.findViewById<TextView>(R.id.lockdown_key)
-        val breach = overlay.findViewById<TextView>(R.id.lockdown_breach)
-
-        title.setColorFilter(FocusFrictionStyle.buttonFill(), PorterDuff.Mode.SRC_IN)
-        countdown.setTextColor(FocusFrictionStyle.bodyText())
-        reason.setTextColor(FocusFrictionStyle.bodyText())
-        wallet.setTextColor(FocusFrictionStyle.bodyText())
-
-        countdown.setTypeface(Tuils.getTypeface(mContext), Typeface.BOLD)
-        reason.setTypeface(Tuils.getTypeface(mContext))
-        wallet.setTypeface(Tuils.getTypeface(mContext))
-
-        FocusFrictionStyle.styleSticker(mContext, skip)
-        FocusFrictionStyle.styleSticker(mContext, key)
-        FocusFrictionStyle.styleSticker(mContext, breach)
-
-        skip.setOnClickListener {
-            if (RetuiCreditManager.spendCredits(mContext)) {
-                LockdownManager.getInstance(mContext).stop(mContext.getString(R.string.surface_lockdown_skipped_credits_29c2d, RetuiCreditManager.ESCAPE_COST))
-            } else {
-                refreshLockdownActions(overlay)
-            }
-        }
-        key.setOnClickListener {
-            if (RetuiCreditManager.spendKey(mContext)) {
-                LockdownManager.getInstance(mContext).stop(mContext.getString(R.string.surface_lockdown_skipped_with_breach_key_19c9d))
-            } else {
-                refreshLockdownActions(overlay)
-            }
-        }
-        breach.setOnClickListener {
-            BreachDialog.show(mContext, BreachManager.Mode.EMERGENCY) { won ->
-                if (won) {
-                    LockdownManager.getInstance(mContext).stop(mContext.getString(R.string.surface_emergency_breach_accepted_fed42))
-                } else {
-                    refreshLockdownActions(overlay)
-                }
-            }
-        }
-
-        refreshLockdownActions(overlay)
-    }
-
-    private fun refreshLockdownActions(overlay: View) {
-        val current = RetuiCreditManager.wallet(mContext)
-        val wallet = overlay.findViewById<TextView>(R.id.lockdown_wallet)
-        val skip = overlay.findViewById<TextView>(R.id.lockdown_skip)
-        val key = overlay.findViewById<TextView>(R.id.lockdown_key)
-        val breach = overlay.findViewById<TextView>(R.id.lockdown_breach)
-
-        wallet.setText(mContext.getString(R.string.surface_credits_keys_bb9c3, current.credits, current.keys))
-        skip.setVisibility(if (current.credits >= RetuiCreditManager.ESCAPE_COST) View.VISIBLE else View.GONE)
-        key.setText(mContext.getString(R.string.surface_use_breach_key_8d028, current.keys))
-        key.setVisibility(if (current.keys > 0) View.VISIBLE else View.GONE)
-        breach.setVisibility(
-            if (current.credits < RetuiCreditManager.ESCAPE_COST && current.keys <= 0) View.VISIBLE else View.GONE
-        )
-    }
-
-    private fun playHackOverlay() {
-        val overlay = mRootView!!.findViewById<View?>(R.id.hack_overlay)
-        val hackText = mRootView.findViewById<TextView?>(R.id.hack_text)
-        val hackScroll = overlay as? ScrollView
-        if (overlay == null || hackText == null || hackScroll == null || handler == null) {
-            return
-        }
-
-        closeKeyboard()
-        styleHackOverlay(mRootView)
-        clearHackCallbacks()
-
-        hackText.setText(mContext.getString(R.string.surface_breach_protocol_engaged_8f35d))
-        overlay.setAlpha(0f)
-        overlay.setVisibility(View.VISIBLE)
-        overlay.animate().alpha(1f).setDuration(120).start()
-
-        for (i in hackLines.indices) {
-            val line = hackLines[i]
-            val delay = 120 + (i * 55)
-            val lineRunnable = Runnable {
-                hackText.append(line)
-                hackText.append(Tuils.NEWLINE)
-                hackScroll.post(Runnable { hackScroll.fullScroll(View.FOCUS_DOWN) })
-            }
-            hackSequenceRunnables.add(lineRunnable)
-            handler!!.postDelayed(lineRunnable, delay.toLong())
-        }
-
-        val exitRunnable = Runnable {
-            hackText.append(mContext.getString(R.string.surface_exit_connection_severed_db482, Tuils.NEWLINE))
-            hackScroll.post(Runnable { hackScroll.fullScroll(View.FOCUS_DOWN) })
-        }
-        hackSequenceRunnables.add(exitRunnable)
-        handler!!.postDelayed(exitRunnable, (120 + (hackLines.size * 55)).toLong())
-
-        val fadeRunnable = Runnable {
-            overlay.animate().alpha(0f).setDuration(180).withEndAction(
-                Runnable {
-                    overlay.setVisibility(View.GONE)
-                    overlay.setAlpha(1f)
-                }).start()
-        }
-        hackSequenceRunnables.add(fadeRunnable)
-        handler!!.postDelayed(fadeRunnable, 5200)
-    }
-
-    private fun clearHackCallbacks() {
-        if (handler == null) {
-            return
-        }
-
-        for (runnable in hackSequenceRunnables) {
-            handler!!.removeCallbacks(runnable)
-        }
-        hackSequenceRunnables.clear()
-        handler!!.removeCallbacks(hackHideRunnable)
-    }
-
-    private fun dismissHackOverlay() {
-        clearHackCallbacks()
-        hackHideRunnable.run()
-    }
-
-    private fun styleNotificationWidget(notificationWidget: View) {
-        decorateWidget(
-            notificationWidget,
-            R.id.notification_module_border,
-            R.id.notification_module_label,
-            R.id.notification_module_close,
-            notificationWidgetBorderColor(),
-            notificationWidgetTextColor(),
-            FrameTarget.NOTIFICATIONS
-        )
-        styleModuleClose(notificationWidget.findViewById<TextView?>(R.id.notification_module_close), FrameTarget.NOTIFICATIONS)
-        styleNotificationSettingsButton(notificationWidget.findViewById<ImageButton?>(R.id.notification_module_settings))
-        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_prev))
-        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_next))
-        styleNotificationPagerButton(notificationWidget.findViewById<View?>(R.id.notification_module_clear))
-        applyNotificationWidgetSize(notificationWidget)
-        renderNotificationRows(notificationWidget)
-    }
-
-    private fun updateNotificationWidget(
-        rootView: View,
-        notifications: MutableList<NotificationService.Notification?>?
-    ) {
-        var previousFocusKey = notificationReplyFocusKey
-        if (ModulePromptManager.isNotificationReplyActive(mContext) && TextUtils.isEmpty(
-                previousFocusKey
-            )
-        ) {
-            val selected = currentNotification()
-            previousFocusKey = notificationKey(selected)
-        }
-
-        // New notifications must not swap the one being read for another.
-        val expandedKey = if (ModuleManager.notificationExpanded) notificationKey(currentNotification()) else null
-        currentOverlayNotifications.clear()
-        if (notifications != null) {
-            currentOverlayNotifications.addAll(notifications.filterNotNull())
-        }
-        suggestionsManager?.setSearchNotifications(currentOverlayNotifications)
-        findNotificationIndexByKey(expandedKey).takeIf { it >= 0 }?.let { currentNotificationIndex = it }
-        preserveNotificationReplyFocus(previousFocusKey)
-        clampNotificationIndex()
-
-        val notificationWidget = rootView.findViewById<View?>(R.id.notification_module)
-        if (notificationWidget != null) {
-            val visible = ModuleManager.NOTIFICATIONS == activeModule
-            notificationWidget.setVisibility(if (visible) View.VISIBLE else View.GONE)
-            if (visible) {
-                styleNotificationWidget(notificationWidget)
-            }
-        }
-        updateContextContainerVisibility(rootView)
-    }
-
-    private fun renderNotificationRows(notificationWidget: View) {
-        val rows = notificationWidget.findViewById<LinearLayout?>(R.id.notification_rows)
-        val scrollView = notificationWidget.findViewById<ScrollView?>(R.id.notification_scroll)
-        if (rows == null) {
-            return
-        }
-
-        rows.removeAllViews()
-        val widgetTextColor = notificationWidgetTextColor()
-        val widgetBorderColor = notificationWidgetBorderColor()
-
-        val maxRows = if (notificationCompactForKeyboard) min(
-            1,
-            currentOverlayNotifications.size
-        ) else currentOverlayNotifications.size
-        if (maxRows == 0) {
-            val row = buildNotificationRow(mContext.getString(R.string.surface_no_notifications_273d1), widgetTextColor, widgetBorderColor)
-            rows.addView(row)
-            updateNotificationPagerButtons(notificationWidget)
-            constrainNotificationContentScroll(scrollView)
-            if (scrollView != null) {
-                scrollView.post(Runnable { scrollView.scrollTo(0, 0) })
-            }
-            return
-        }
-        val listing = ModuleManager.NOTIFICATIONS == activeModule && !ModuleManager.notificationExpanded
-        if (ModuleManager.NOTIFICATIONS == activeModule && ModuleManager.notificationExpanded) {
-            clampNotificationIndex()
-            val notification = currentOverlayNotifications.get(currentNotificationIndex)
-            val row = buildNotificationDetailRow(notification, widgetTextColor, widgetBorderColor)
-            wireNotificationOpen(row, notification)
-            rows.addView(row)
-        } else {
-            val group = if (listing) openNotificationGroup else null
-            val entries = listedNotificationEntries()
-            if (group != null && !notificationCompactForKeyboard) {
-                // A row back to the full list, alongside the Back key.
-                val back = buildNotificationRow(
-                    mContext.getString(R.string.surface_notification_group_back, entries.first().head.appName ?: entries.first().head.pkg),
-                    widgetTextColor,
-                    widgetBorderColor
-                )
-                back.isClickable = true
-                back.setOnClickListener { collapseNotification() }
-                rows.addView(back)
-            }
-            for (entry in entries.take(if (notificationCompactForKeyboard) 1 else entries.size)) {
-                val notification = entry.head
-                val row = buildNotificationRow(
-                    when {
-                        entry.isGroup -> buildNotificationGroupLine(entry)
-                        // The back row already names the app.
-                        group != null -> notification.preview.takeUnless { it.isNullOrEmpty() } ?: buildNotificationLine(notification)
-                        else -> buildNotificationLine(notification)
-                    },
-                    widgetTextColor,
-                    widgetBorderColor
-                )
-                if (listing) {
-                    // Tapping a group lists its notifications; tapping one expands it, where reply and actions live.
-                    row.isClickable = true
-                    row.isFocusable = true
-                    row.setOnClickListener {
-                        if (entry.isGroup) listNotificationGroup(notification.group)
-                        else expandNotification(currentOverlayNotifications.indexOf(notification))
-                    }
-                } else {
-                    wireNotificationOpen(row, notification)
-                }
-                rows.addView(row)
-            }
-        }
-        updateNotificationPagerButtons(notificationWidget)
-        constrainNotificationContentScroll(scrollView)
-
-        if (scrollView != null) {
-            scrollView.post(Runnable { scrollView.scrollTo(0, 0) }) // fullScroll would take focus from the input
-        }
-    }
-
-    private fun wireNotificationOpen(
-        row: TextView?,
-        notification: NotificationService.Notification?
-    ) {
-        if (row == null || notification == null || notification.pendingIntent == null) {
-            return
-        }
-        row.setClickable(true)
-        row.setFocusable(true)
-        row.setOnClickListener(View.OnClickListener { v: View? ->
-            try {
-                Tuils.sendPendingIntent(mContext, notification.pendingIntent)
-            } catch (e: CanceledException) {
-                Tuils.sendOutput(ThemeColorResolver.color(Theme.error_text_color), mContext, e.toString())
-            }
-        })
-    }
-
-    private fun buildNotificationRow(
-        text: CharSequence?,
-        widgetTextColor: Int,
-        widgetBorderColor: Int
-    ): TextView {
-        val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.notificationText(mContext,false,notificationCompactForKeyboard)
-        TextShadows.apply(row, Theme.module_text_shadow_color)
-        val lp = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        lp.bottomMargin = if (notificationCompactForKeyboard) 0 else Tuils.dpToPx(mContext, 6)
-        row.setLayoutParams(lp)
-        row.setTypeface(Tuils.getTypeface(mContext))
-        row.setTextSize(moduleBodyTextSize().toFloat())
-        row.setSingleLine(true)
-        row.setEllipsize(TextUtils.TruncateAt.END)
-        row.setGravity(Gravity.CENTER_VERTICAL)
-        val verticalPadding = Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 5 else 8)
-        row.setPadding(
-            Tuils.dpToPx(mContext, 10),
-            verticalPadding,
-            Tuils.dpToPx(mContext, 10),
-            verticalPadding
-        )
-        row.setTextColor(widgetTextColor)
-        row.setText(text)
-        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.notificationRow(row,
-            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),widgetTextColor,widgetBorderColor,true)
-        return row
-    }
-
-    private fun buildNotificationDetailRow(
-        notification: NotificationService.Notification,
-        widgetTextColor: Int,
-        widgetBorderColor: Int
-    ): TextView {
-        val row = ohi.andre.consolelauncher.presentation.ModuleBodyPresentation.notificationText(mContext,true,notificationCompactForKeyboard)
-        TextShadows.apply(row, Theme.module_text_shadow_color)
-        val lp = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        row.setLayoutParams(lp)
-        row.setTypeface(Tuils.getTypeface(mContext))
-        row.setTextSize(moduleBodyTextSize().toFloat())
-        row.setTextColor(widgetTextColor)
-        row.setText(buildNotificationDetail(notification))
-        row.setSingleLine(false)
-        row.setEllipsize(null)
-        row.setGravity(Gravity.TOP)
-        row.setMinLines(if (notificationCompactForKeyboard) 1 else 3)
-        row.setPadding(
-            Tuils.dpToPx(mContext, 6),
-            Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 5 else 10),
-            Tuils.dpToPx(mContext, 6),
-            Tuils.dpToPx(mContext, if (notificationCompactForKeyboard) 5 else 10)
-        )
-        ohi.andre.consolelauncher.presentation.ModuleContentPresentation.notificationRow(row,
-            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved(),widgetTextColor,widgetBorderColor,false)
-        return row
-    }
-
-    private fun buildNotificationDetail(notification: NotificationService.Notification): CharSequence {
-        var appName = notification.appName
-        if (TextUtils.isEmpty(appName)) {
-            appName = notification.pkg
-        }
-        val title = cleanNotificationValue(notification.title)
-        val body = cleanNotificationValue(notification.body)
-        var fallback = cleanNotificationValue(notification.preview)
-        if (TextUtils.isEmpty(fallback)) {
-            fallback = cleanNotificationValue(notification.text)
-        }
-
-        val pages = pageableNotifications()
-        val out = StringBuilder()
-        out.append(pages.indexOf(notification) + 1)
-            .append(" / ")
-            .append(pages.size)
-            .append("    ")
-            .append(if (appName != null) appName else mContext.getString(R.string.surface_notification_c18f8))
-        if (!TextUtils.isEmpty(title)) {
-            out.append(Tuils.NEWLINE).append(Tuils.NEWLINE).append(title)
-        }
-        if (!TextUtils.isEmpty(body)) {
-            out.append(Tuils.NEWLINE).append(body)
-        } else if (!TextUtils.isEmpty(fallback)) {
-            out.append(Tuils.NEWLINE).append(fallback)
-        } else {
-            out.append(Tuils.NEWLINE).append(Tuils.NEWLINE).append(mContext.getString(R.string.surface_no_readable_content_5d972))
-        }
-        if (this.isCurrentNotificationReplyable) {
-            out.append(Tuils.NEWLINE).append(mContext.getString(R.string.surface_reply_available_0b0fd))
-        }
-        return out.toString()
-    }
-
-    private fun cleanNotificationValue(value: String?): String {
-        if (value == null) {
-            return Tuils.EMPTYSTRING
-        }
-        var clean = value.trim { it <= ' ' }
-        if (clean.length == 0 || "null".equals(clean, ignoreCase = true)) {
-            return Tuils.EMPTYSTRING
-        }
-        if (clean.contains("%pkg") || clean.contains("%t") || clean.contains("--- null")) {
-            return Tuils.EMPTYSTRING
-        }
-        clean = clean.replace("(?i)\\bnull\\b".toRegex(), "").replace("\\s+---\\s*$".toRegex(), "")
-            .trim { it <= ' ' }
-        return clean
-    }
-
-    private fun buildNotificationLine(notification: NotificationService.Notification): CharSequence {
-        var appName = notification.appName
-        if (TextUtils.isEmpty(appName)) {
-            appName = notification.pkg
-        }
-        var preview = notification.preview
-        if (TextUtils.isEmpty(preview)) {
-            preview = notification.text
-        }
-        return (if (appName != null) appName else mContext.getString(R.string.surface_notification_c18f8)) + "  " + (if (preview != null) preview else Tuils.EMPTYSTRING)
-    }
-
-    private fun buildNotificationGroupLine(entry: NotificationGroups.Entry<NotificationService.Notification>): CharSequence {
-        val head = entry.head
-        val appName = head.appName.takeUnless { it.isNullOrEmpty() } ?: head.pkg
-        // A summary's title is usually the app name again, so its text alone reads better.
-        val preview = (if (head.groupSummary) head.body else head.preview).takeUnless { it.isNullOrEmpty() }
-            ?: head.preview.takeUnless { it.isNullOrEmpty() } ?: head.text.orEmpty()
-        return mContext.getString(R.string.surface_notification_group_row, appName, entry.children.size, preview)
-    }
-
-    private fun notificationEntries() =
-        NotificationGroups.entries(currentOverlayNotifications, { it.group }, { it.groupSummary })
-
-    /** The rows the list shows: the open group's notifications, or the top level. */
-    private fun listedNotificationEntries(): List<NotificationGroups.Entry<NotificationService.Notification>> {
-        val group = openNotificationGroup ?: return notificationEntries()
-        val children = NotificationGroups.children(currentOverlayNotifications, group, { it.group }, { it.groupSummary })
-        if (children.isEmpty()) {
-            // The group dropped below two notifications, so the top level shows what is left.
-            openNotificationGroup = null
-            return notificationEntries()
-        }
-        return children.map { NotificationGroups.Entry(it, emptyList()) }
-    }
-
-    /** What Prev and Next step through from an expanded notification. */
-    private fun pageableNotifications() = NotificationGroups.pageable(listedNotificationEntries())
-
-    private fun setNotificationWidgetCompact(rootView: View, compact: Boolean) {
-        if (notificationCompactForKeyboard == compact) {
-            return
-        }
-
-        notificationCompactForKeyboard = compact
-        val notificationWidget = rootView.findViewById<View?>(R.id.notification_module)
-        if (notificationWidget != null && notificationWidget.getVisibility() == View.VISIBLE) {
-            applyNotificationWidgetSize(notificationWidget)
-            renderNotificationRows(notificationWidget)
-        }
-    }
-
-    private fun applyNotificationWidgetSize(notificationWidget: View) {
-        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationSize(notificationWidget,notificationCompactForKeyboard)
-    }
-
-    private fun calculateNotificationContentMaxHeight(): Int {
-        return ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationMaxHeight(mContext,
-            mRootView?.height?:0,notificationCompactForKeyboard)
-    }
-
-    private fun constrainNotificationContentScroll(scrollView: ScrollView?) {
-        if(scrollView==null) return
-        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.limitNotifications(scrollView,calculateNotificationContentMaxHeight())
-    }
-
-    private fun styleNotificationPagerButton(button: View?) {
-        if (button !is TextView) return
-        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationPager(button,
-            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
-    }
-
-    private fun styleNotificationSettingsButton(button: ImageButton?) {
-        if (button == null) return
-        ohi.andre.consolelauncher.presentation.ModulePanelPresentation.notificationSettings(button,
-            statusAppearance ?: ohi.andre.consolelauncher.presentation.HomeAppearance.saved())
-    }
-
-    private fun clampNotificationIndex() {
-        if (currentOverlayNotifications.isEmpty()) {
-            currentNotificationIndex = 0
-            return
-        }
-        if (currentNotificationIndex < 0) {
-            currentNotificationIndex = 0
-        } else if (currentNotificationIndex >= currentOverlayNotifications.size) {
-            currentNotificationIndex = currentOverlayNotifications.size - 1
-        }
-    }
-
-    private fun preserveNotificationReplyFocus(focusKey: String?) {
-        if (!ModulePromptManager.isNotificationReplyActive(mContext)) {
-            notificationReplyFocusKey = null
-            return
-        }
-
-        if (!TextUtils.isEmpty(focusKey)) {
-            val index = findNotificationIndexByKey(focusKey)
-            if (index >= 0) {
-                currentNotificationIndex = index
-                notificationReplyFocusKey = focusKey
-                return
-            }
-        }
-
-        val pkg = ModulePromptManager.getNotificationReplyPackage(mContext)
-        val packageIndex = findNotificationIndexByPackage(pkg)
-        if (packageIndex >= 0) {
-            currentNotificationIndex = packageIndex
-            notificationReplyFocusKey =
-                notificationKey(currentOverlayNotifications.get(packageIndex))
-        }
-    }
-
-    private fun findNotificationIndexByKey(key: String?): Int {
-        if (TextUtils.isEmpty(key)) return -1
-        for (i in currentOverlayNotifications.indices) {
-            if (TextUtils.equals(key, notificationKey(currentOverlayNotifications.get(i)))) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    private fun findNotificationIndexByPackage(pkg: String?): Int {
-        if (TextUtils.isEmpty(pkg)) return -1
-        for (i in currentOverlayNotifications.indices) {
-            if (TextUtils.equals(pkg, currentOverlayNotifications.get(i).pkg)) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    private fun notificationKey(notification: NotificationService.Notification?): String? {
-        if (notification == null) return null
-        if (!TextUtils.isEmpty(notification.key)) return notification.key
-        return (safeNotificationPart(notification.pkg)
-                + "|"
-                + safeNotificationPart(notification.title)
-                + "|"
-                + safeNotificationPart(notification.body)
-                + "|"
-                + safeNotificationPart(notification.preview))
-    }
-
-    private fun safeNotificationPart(value: String?): String {
-        return if (value == null) "" else value.trim { it <= ' ' }
-    }
-
-    private fun updateNotificationPagerButtons(notificationWidget: View?) {
-        if (notificationWidget == null) return
-        val replyActive = ModulePromptManager.isNotificationReplyActive(mContext)
-        val expanded = ModuleManager.NOTIFICATIONS == activeModule && ModuleManager.notificationExpanded
-        val enabled = expanded && pageableNotifications().size > 1 && !replyActive
-        val clearEnabled = expanded && !replyActive && !TextUtils.isEmpty(currentNotification()?.key)
-        val prev = notificationWidget.findViewById<TextView?>(R.id.notification_module_prev)
-        val next = notificationWidget.findViewById<TextView?>(R.id.notification_module_next)
-        val clear = notificationWidget.findViewById<TextView?>(R.id.notification_module_clear)
-        if (prev != null) {
-            prev.setVisibility(if (expanded) View.VISIBLE else View.GONE)
-            prev.setEnabled(enabled)
-            prev.setAlpha(if (enabled) 1f else 0.35f)
-        }
-        if (next != null) {
-            next.setVisibility(if (expanded) View.VISIBLE else View.GONE)
-            next.setEnabled(enabled)
-            next.setAlpha(if (enabled) 1f else 0.35f)
-        }
-        if (clear != null) {
-            clear.setVisibility(if (expanded) View.VISIBLE else View.GONE)
-            clear.setEnabled(clearEnabled)
-            clear.setAlpha(if (clearEnabled) 1f else 0.35f)
-        }
+        ohi.andre.consolelauncher.sidebar.EdgePills.setPodcast(mContext, null)
     }
 
     fun expandNotification(index: Int) {
-        if (index !in currentOverlayNotifications.indices) return
-        currentNotificationIndex = index
-        ModuleManager.notificationExpanded = true
-        refreshNotificationModuleView()
+        notificationsModule.expandNotification(index)
     }
 
-    private fun listNotificationGroup(group: String?) {
-        if (group == null) return
-        openNotificationGroup = group
-        refreshNotificationModuleView()
+    fun collapseNotification(): Boolean = notificationsModule.collapseNotification()
+
+    fun nextNotificationPage() {
+        notificationsModule.nextNotificationPage()
     }
 
-    /**
-     * Back from an expanded notification returns to the list it came from, and back from a group's
-     * list returns to the top level; false when there is nothing to collapse.
-     */
-    fun collapseNotification(): Boolean {
-        if (ModuleManager.NOTIFICATIONS != activeModule) return false
-        if (ModuleManager.notificationExpanded) {
-            if (ModulePromptManager.isNotificationReplyActive(mContext)) return false
-            ModuleManager.notificationExpanded = false
-        } else if (openNotificationGroup != null) {
-            openNotificationGroup = null
-        } else {
-            return false
-        }
-        refreshNotificationModuleView()
-        return true
-    }
-
-    private fun requireExpandedNotification(): Boolean {
-        if (ModuleManager.notificationExpanded) return true
-        Tuils.sendOutput(mContext, mContext.getString(R.string.surface_open_a_notification_first))
-        return false
-    }
-
-    fun nextNotificationPage() = stepNotificationPage(1)
-
-    fun previousNotificationPage() = stepNotificationPage(-1)
-
-    private fun stepNotificationPage(delta: Int) {
-        if (!requireExpandedNotification()) return
-        if (ModulePromptManager.isNotificationReplyActive(mContext)) return
-        val pages = pageableNotifications()
-        if (pages.isEmpty()) return
-        val at = pages.indexOf(currentNotification()).coerceAtLeast(0)
-        currentNotificationIndex = currentOverlayNotifications.indexOf(pages[(at + delta + pages.size) % pages.size])
-        refreshNotificationModuleView()
+    fun previousNotificationPage() {
+        notificationsModule.previousNotificationPage()
     }
 
     fun startCurrentNotificationReply() {
-        if (!requireExpandedNotification()) return
-        val notification = currentNotification()
-        if (notification == null) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
-            return
-        }
-        if (!this.isCurrentNotificationReplyable) {
-            Tuils.sendOutput(
-                mContext,
-                mContext.getString(R.string.surface_selected_notification_is_not_replyable_bind_the_app_with_r_0cf3e)
-            )
-            return
-        }
-        notificationReplyFocusKey = notificationKey(notification)
-        ModulePromptManager.startNotificationReply(
-            mContext,
-            notification.pkg ?: return,
-            notification.appName,
-            notification.key
-        )
-        refreshSuggestionsForActiveModule()
+        notificationsModule.startCurrentNotificationReply()
     }
 
     fun dismissCurrentNotification() {
-        if (ModulePromptManager.isNotificationReplyActive(mContext)) return
-        if (!requireExpandedNotification()) return
-        val notification = currentNotification()
-        if (notification == null) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
-            return
-        }
-        val key = notification.key
-        if (TextUtils.isEmpty(key)) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_selected_notification_cannot_be_cleared_20da0))
-            return
-        }
-
-        NotificationService.requestDismiss(mContext, key)
-        // Move on to the next notification in the same list, or back to the list after its last one.
-        val pages = pageableNotifications()
-        val at = pages.indexOf(notification)
-        val following = pages.getOrNull(at + 1) ?: pages.getOrNull(at - 1)
-        currentOverlayNotifications.remove(notification)
-        if (following != null) currentNotificationIndex = currentOverlayNotifications.indexOf(following)
-        clampNotificationIndex()
-        if (following == null) ModuleManager.notificationExpanded = false
-        refreshNotificationModuleView()
+        notificationsModule.dismissCurrentNotification()
     }
 
-    private fun showNotificationSettingsPopup(anchor: View) {
-        val notification = currentNotification()
-        if (notification == null) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_no_notification_selected_1f0ee))
-            return
-        }
-
-        val menu = PopupMenu(anchor.context, anchor)
-        menu.menu.add(R.string.exclude_notification)
-        menu.setOnMenuItemClickListener {
-                excludeNotificationFromPanel(notification)
-            true
-        }
-        menu.show()
-    }
-
-    private fun excludeNotificationFromPanel(notification: NotificationService.Notification) {
-        if (TextUtils.isEmpty(notification.text)) {
-            Tuils.sendOutput(mContext, mContext.getString(R.string.surface_selected_notification_cannot_be_excluded_5df6b))
-            return
-        }
-
-        NotificationManager.addLiteralFilter(notification.text)
-        NotificationService.requestReload(mContext)
-        currentOverlayNotifications.remove(notification)
-        clampNotificationIndex()
-        refreshNotificationModuleView()
-        Tuils.sendOutput(mContext, mContext.getString(R.string.surface_notification_excluded_from_launcher_panel_18a97))
-    }
-
-    private val isCurrentNotificationReplyable: Boolean
-        get() {
-            val notification = currentNotification()
-            val replyManager = ReplyManager.getInstance()
-            return notification != null && replyManager != null &&
-                (replyManager.canReplyToNotification(notification.key) || replyManager.canReplyTo(notification.pkg))
-        }
-
-    private fun currentNotification(): NotificationService.Notification? {
-        if (currentOverlayNotifications.isEmpty()) return null
-        clampNotificationIndex()
-        return currentOverlayNotifications.get(currentNotificationIndex)
-    }
-
-    private fun refreshNotificationModuleView() {
-        if (ModuleManager.NOTIFICATIONS == activeModule) {
-            showHomeModule(ModuleManager.NOTIFICATIONS)
-        }
-    }
+    fun openNotificationShade(): Boolean = notificationsModule.openNotificationShade()
 
     private fun updateContextContainerVisibility(rootView: View?) {
         // Widgets are now inside terminalContainer in terminalPage
-    }
-
-    fun openNotificationShade(): Boolean {
-        try {
-            @SuppressLint("WrongConstant") val sbservice = mContext!!.getSystemService("statusbar")
-            val statusbarManager = Class.forName("android.app.StatusBarManager")
-            val expand = statusbarManager.getMethod("expandNotificationsPanel")
-            expand.invoke(sbservice)
-            return true
-        } catch (e: Exception) {
-            Tuils.sendOutput(ThemeColorResolver.color(Theme.error_text_color), mContext, e.toString())
-            return false
-        }
     }
 
     val isAppsDrawerOpen: Boolean
@@ -12749,7 +7190,7 @@ class UIManager(
     }
 
     @JvmOverloads
-    fun showAppsDrawer(filter: String? = null, ranking: ohi.andre.consolelauncher.managers.AppsManager.Ranking? = null, limit: Int = 500) {
+    fun showAppsDrawer(filter: String? = null, ranking: ohi.andre.consolelauncher.managers.apps.AppsManager.Ranking? = null, limit: Int = 500) {
         androidWidgetDrawerManager?.hide()
         appDrawerPaneManager?.show(filter, ranking, limit)
         scheduleTypefaceRefreshes()
@@ -12765,6 +7206,7 @@ class UIManager(
         if (isAndroidWidgetDrawerOpen) hideAndroidWidgetDrawer()
         if (isAppsDrawerOpen) hideAppsDrawer()
         if (isTermuxConsoleVisible) closeTermuxConsole()
+        homeModes.active.onHome()
     }
 
     private fun setWallpaperTouchEnabled(enabled: Boolean) {
@@ -12792,8 +7234,6 @@ class UIManager(
     ): Boolean {
         return androidWidgetDrawerManager?.handleActivityResult(requestCode, resultCode, data) == true
     }
-
-    private class LuaSurfaceAction(val label: String, val run: Runnable)
 
     fun applyAppearance(previous: LauncherSettings.Snapshot, current: LauncherSettings.Snapshot) {
         val root = mRootView as? ViewGroup ?: return
@@ -12849,7 +7289,7 @@ class UIManager(
         listOfNotNull(ramManager,storageManager,networkManager,tuiTimeManager,unlockManager,tuiNotesManager,weatherManager)
             .forEach { it.refreshAppearance() }
         batteryManager?.refreshAppearance()
-        terminalHome?.refreshAppearance()
+        homeModes.active.onAppearanceChanged()
         val input = mTerminalAdapter?.inputView as? EditText
         applyRetuiKeyboardTheme(input, "launcher")
         if (keyboardVisible && input?.hasFocus() == true) sendRetuiKeyboardTheme(input, "launcher")
@@ -12867,8 +7307,7 @@ class UIManager(
     }
 
     fun dispose() {
-        terminalHome?.pause()
-        terminalHome = null
+        homeModes.active.dispose()
         launcherWindowFocused = false
         ramManager?.stop()
         batteryManager?.stop()
@@ -12882,10 +7321,8 @@ class UIManager(
         cancelTerminalOutputAutoHide()
 
         profilePaneController?.hide()
-        clearPodcastImages()
         closeLuaAppSession(false)
-        luaWidgetEngines.values.filterNotNull().forEach(LuaWidgetEngine::dispose)
-        luaWidgetEngines.clear()
+        luaModules.disposeEngines()
         if (handler != null) {
             handler!!.removeCallbacksAndMessages(null)
             handler = null
@@ -12935,8 +7372,8 @@ class UIManager(
     }
 
     fun onStart(openKeyboardOnStart: Boolean) {
-        if (LauncherMode.isTerminal()) { showTerminalSearch(false); return }
-        activateTerminalInput(openKeyboardOnStart)
+        if (!homeModes.active.managesOwnKeyboard) { activateTerminalInput(openKeyboardOnStart); return }
+        homeModes.active.onStart()
     }
 
     fun setInput(s: String?) {
@@ -12964,6 +7401,7 @@ class UIManager(
     }
 
     fun setOutput(s: CharSequence?, category: Int) {
+        homeModes.active.onOutput(s)
         if (mTerminalAdapter != null) {
             mTerminalAdapter!!.setOutput(s, category)
         } else {
@@ -12972,6 +7410,7 @@ class UIManager(
     }
 
     fun setOutput(color: Int, output: CharSequence?) {
+        homeModes.active.onOutput(output)
         if (mTerminalAdapter != null) {
             mTerminalAdapter!!.setOutput(color, output)
         } else {
@@ -13038,10 +7477,6 @@ class UIManager(
         if (handleTermuxBackPressed()) {
             return
         }
-        if (this.isPodcastSurfaceVisible) {
-            minimizePodcastSurface()
-            return
-        }
         if (profilePaneController?.visible == true) {
             closeProfileSurface()
             return
@@ -13058,14 +7493,11 @@ class UIManager(
             return
         }
         if (isSearchModulesOpen) {
-            searchModules?.close()
+            searchSurface.closeModules()
             return
         }
         // Surfaces opened by commands (podcast, profile, drawers) close first in every mode.
-        if (LauncherMode.isTerminal()) {
-            if (terminalSearchOpen) showTerminalSearch(false) else terminalHome?.releaseInput()
-            return
-        }
+        if (homeModes.active.handleBack()) return
         if (this.isOutputTrayToggleEnabled && terminalTrayExpanded) {
             setTerminalTrayExpanded(false)
             return
@@ -13076,10 +7508,6 @@ class UIManager(
         if (mTerminalAdapter != null) {
             mTerminalAdapter!!.onBackPressed()
         }
-    }
-
-    fun focusTerminal() {
-        activateTerminalInput(false)
     }
 
     fun activateTerminalInput(showSoftKeyboard: Boolean, preserveSelection: Boolean = false) {
@@ -13115,21 +7543,19 @@ class UIManager(
     }
 
     fun pause() {
-        terminalHome?.pause()
+        homeModes.active.onPause()
         launcherWindowFocused = false
 
         if (mTerminalAdapter != null) {
             closeKeyboard()
         }
         if (handler != null) {
-            handler!!.removeCallbacks(musicTimeRunnable)
-            musicTickerScheduled = false
+            homeModules.onLauncherPaused()
             handler!!.removeCallbacks(eventsRefreshRunnable)
-            handler!!.removeCallbacks(luaWidgetTickRunnable)
+            luaModules.cancelTick()
             handler!!.removeCallbacks(fontRefreshRunnable)
             mRootView?.removeCallbacks(fontRefreshRunnable)
         }
-        setMusicVisualizerPlaying(false)
         val pomodoroOverlay =
             if (mRootView != null) mRootView.findViewById<View?>(R.id.pomodoro_root) else null
         if (pomodoroOverlay != null) {
@@ -13147,44 +7573,8 @@ class UIManager(
         androidWidgetDrawerManager?.stopListening()
     }
 
-    private fun setMusicVisualizerPlaying(playing: Boolean) {
-        val visualizer =
-            if (mRootView != null) mRootView.findViewById<MusicVisualizerView?>(R.id.music_visualizer) else null
-        if (visualizer != null) {
-            visualizer.setPlaying(playing)
-        }
-    }
-
-    private fun scheduleInternalMusicTickerIfNeeded() {
-        if (handler == null) {
-            return
-        }
-        if (!launcherWindowFocused) {
-            handler!!.removeCallbacks(musicTimeRunnable)
-            musicTickerScheduled = false
-            return
-        }
-        val musicWidget =
-            if (mRootView != null) mRootView.findViewById<View?>(R.id.music_module) else null
-        val internalPlaying = MusicService.SOURCE_INTERNAL == activeMusicSource
-            && mainPack.player != null
-            && mainPack.player!!.isPlaying()
-            && musicWidget != null
-            && musicWidget.getVisibility() == View.VISIBLE
-        val podcastPlaying = MusicService.SOURCE_PODCAST == activeMusicSource
-            && (mainPack.podcastManager.isPlaying() || mainPack.podcastManager.isPreparing())
-        if (!internalPlaying && !podcastPlaying) {
-            handler!!.removeCallbacks(musicTimeRunnable)
-            musicTickerScheduled = false
-            return
-        }
-        if (musicTickerScheduled) return
-        musicTickerScheduled = true
-        handler!!.post(musicTimeRunnable)
-    }
-
     fun resume() {
-        terminalHome?.resume()
+        homeModes.active.onResume()
         if (handler == null) {
             return
         }
@@ -13194,8 +7584,7 @@ class UIManager(
             restoreLauncherChromeOnResume = false
             restoreLauncherChromeAfterSurface()
         }
-        setMusicVisualizerPlaying(lastMusicPlaying)
-        scheduleInternalMusicTickerIfNeeded()
+        homeModules.onLauncherResumed()
         scheduleEventsRefreshIfNeeded()
 
         if (ramManager != null) ramManager!!.start()
@@ -13223,7 +7612,7 @@ class UIManager(
             intent.putExtra(PomodoroManager.EXTRA_POMODORO_TASK, pomodoro.taskName)
             intent.putExtra(PomodoroManager.EXTRA_POMODORO_TYPE, pomodoro.currentType.name)
             intent.putExtra(PomodoroManager.EXTRA_POMODORO_CYCLE, pomodoro.completedFocuses)
-            updatePomodoroOverlay(intent)
+            focusOverlayController?.updatePomodoroOverlay(intent)
         }
 
         val lockdown = LockdownManager.getInstance(mContext)
@@ -13233,7 +7622,7 @@ class UIManager(
             intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_REMAINING, lockdown.remainingMillis)
             intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_TOTAL, lockdown.totalDuration)
             intent.putExtra(LockdownManager.EXTRA_LOCKDOWN_REASON, lockdown.reason)
-            updateLockdownOverlay(intent)
+            focusOverlayController?.updateLockdownOverlay(intent)
         }
     }
 
@@ -13258,12 +7647,6 @@ class UIManager(
         }
         if (mRootView != null) {
             mRootView.post {
-                if (isPodcastSurfaceVisible) {
-                    closeKeyboard()
-                    snapPodcastPresentationForCurrentOrientation()
-                    applyPodcastPaneGeometry()
-                    renderPodcastSurface(null)
-                }
                 // Docked pills keep portrait translation across layout — clamp after rotate.
                 reapplyVisibleClockTabDocks()
             }
@@ -13275,31 +7658,10 @@ class UIManager(
         val root = mRootView ?: return
         val podcast = podcastTab ?: root.findViewById(R.id.podcast_tab)
         if (podcast.visibility == View.VISIBLE
-            && podcastSessionActive
-            && !isPodcastSurfaceVisible
         ) {
             applyPodcastPillDock(podcast)
         }
-        val timer = root.findViewById<TextView?>(R.id.timer_tab)
-        if (timer != null && timer.visibility == View.VISIBLE) {
-            applyClockTabDock(
-                timer,
-                PREF_TIMER_BADGE_EDGE,
-                PREF_TIMER_BADGE_FRACTION,
-                CLOCK_EDGE_RIGHT,
-                0.45f
-            )
-        }
-        val stopwatch = root.findViewById<TextView?>(R.id.stopwatch_tab)
-        if (stopwatch != null && stopwatch.visibility == View.VISIBLE) {
-            applyClockTabDock(
-                stopwatch,
-                PREF_STOPWATCH_BADGE_EDGE,
-                PREF_STOPWATCH_BADGE_FRACTION,
-                CLOCK_EDGE_RIGHT,
-                0.55f
-            )
-        }
+        clockTabDock?.reapplyVisibleTimerAndStopwatchDocks()
     }
 
     fun scheduleTypefaceRefreshes() {
@@ -13441,7 +7803,7 @@ class UIManager(
                 if (name == ACTION_CLEAR) {
                     mTerminalAdapter!!.clear()
                 } else if (name == ACTION_HACK) {
-                    playHackOverlay()
+                    hackOverlayController?.playHackOverlay()
                 } else if (name == ACTION_WEATHER) {
                     if (weatherManager != null) weatherManager!!.updateWeather()
                 } else if (name == ACTION_WEATHER_GOT_LOCATION) {
@@ -13459,37 +7821,24 @@ class UIManager(
         }
     }
 
-    private fun onLock() {
-        if (clearOnLock) {
-            mTerminalAdapter!!.clear()
-        }
-    }
-
     companion object {
         const val NEXT_UNLOCK_CYCLE_RESTART: String = "nextUnlockRestart"
         const val UNLOCK_KEY: String = "unlockTimes"
         const val PREFS_NAME: String = "ui"
         private const val PREF_OUTPUT_TRAY_EXPANDED = "output_tray_expanded"
-        private const val TERMINAL_OUTPUT_HORIZONTAL_PADDING_DP = 8
-        private const val TERMINAL_OUTPUT_TOP_PADDING_DP = 12
-        private const val TERMINAL_OUTPUT_BOTTOM_PADDING_DP = 6
-        private const val TERMINAL_OUTPUT_HEADER_GAP_DP = 6
-        private const val TERMINAL_OUTPUT_HEIGHT_ALLOWANCE_DP = 38
-        private const val SEARCH_MODE_EDGE_INSET_DP = 6
-        private const val CLOCK_EDGE_LEFT = "left"
-        private const val CLOCK_EDGE_RIGHT = "right"
-        private const val CLOCK_EDGE_TOP = "top"
-        private const val CLOCK_EDGE_BOTTOM = "bottom"
-        private const val PREF_TIMER_BADGE_EDGE = "timer_badge_edge"
-        private const val PREF_TIMER_BADGE_FRACTION = "timer_badge_fraction"
-        private const val PREF_STOPWATCH_BADGE_EDGE = "stopwatch_badge_edge"
-        private const val PREF_STOPWATCH_BADGE_FRACTION = "stopwatch_badge_fraction"
+        internal const val CLOCK_EDGE_LEFT = "left"
+        internal const val CLOCK_EDGE_RIGHT = "right"
+        internal const val CLOCK_EDGE_TOP = "top"
+        internal const val CLOCK_EDGE_BOTTOM = "bottom"
+        internal const val PREF_TIMER_BADGE_EDGE = "timer_badge_edge"
+        internal const val PREF_TIMER_BADGE_FRACTION = "timer_badge_fraction"
+        internal const val PREF_STOPWATCH_BADGE_EDGE = "stopwatch_badge_edge"
+        internal const val PREF_STOPWATCH_BADGE_FRACTION = "stopwatch_badge_fraction"
         private const val PREF_PODCAST_BADGE_EDGE = "podcast_badge_edge"
         private const val PREF_PODCAST_BADGE_FRACTION = "podcast_badge_fraction"
         private const val ASCII_IDLE_PAUSE_MS = 120_000L
         private const val UNIFIED_MODULE_AUTO_HIDE_MS = 10_000L
         internal fun shouldAutoHideUnifiedModules(activeModule: String?): Boolean = activeModule.isNullOrEmpty()
-        private const val RSS_MODULE_VISIBLE_LINES = 14
         val ACTION_UPDATE_SUGGESTIONS: String =
             BuildConfig.APPLICATION_ID + ".ui_update_suggestions"
         val ACTION_UPDATE_APPS: String =
@@ -13509,14 +7858,6 @@ class UIManager(
         const val WEATHER_CONDITION: String = "weatherCondition"
         const val WEATHER_DETAILS: String = "weatherDetails"
 
-        val ACTION_MUSIC_CHANGED: String = MusicService.ACTION_MUSIC_CHANGED
-        val SONG_TITLE: String = MusicService.SONG_TITLE
-        val SONG_SINGER: String = MusicService.SONG_SINGER
-        val SONG_DURATION: String = MusicService.SONG_DURATION
-        val SONG_POSITION: String = MusicService.SONG_POSITION
-        val MUSIC_PLAYING: String = MusicService.MUSIC_PLAYING
-        val ACTION_NOTIFICATION_FEED: String = NotificationService.ACTION_NOTIFICATION_FEED
-        val EXTRA_NOTIFICATION_LIST: String = NotificationService.EXTRA_NOTIFICATION_LIST
         val ACTION_REQUEST_NOTIFICATION_FEED: String =
             NotificationService.ACTION_REQUEST_NOTIFICATION_FEED
         val ACTION_CLOCK_STATE: String = ClockManager.ACTION_CLOCK_STATE
@@ -13530,8 +7871,6 @@ class UIManager(
         const val EXTRA_LUA_APP_ID: String = "lua_app_id"
         val ACTION_FILE_CONSOLE: String = BuildConfig.APPLICATION_ID + ".ui_file_console"
         const val EXTRA_FILE_COMMAND: String = "file_command"
-        val ACTION_PODCAST_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_podcast_surface"
-        const val EXTRA_PODCAST_COMMAND: String = "podcast_command"
         val ACTION_PROFILE_SURFACE: String = BuildConfig.APPLICATION_ID + ".ui_profile_surface"
         val ACTION_MODULE_COMMAND: String = BuildConfig.APPLICATION_ID + ".ui_module_command"
         const val EXTRA_MODULE_COMMAND: String = "module_command"
@@ -13547,20 +7886,6 @@ class UIManager(
         private const val TERMUX_CONSOLE_RESULT_PREFIX = "retui-console:"
         private const val TERMUX_APP_RESULT_PREFIX = "retui-app:"
         private const val TERMUX_APP_SYNC_RESULT_PREFIX = "retui-app-sync:"
-        private const val PODCAST_MODE_SHOWS = 0
-        private const val PODCAST_MODE_RECENTS = 1
-        private const val PODCAST_MODE_SHOW_DETAIL = 2
-        private const val PODCAST_MODE_PLAYER = 3
-        private const val PODCAST_TEXT_SMALL = 11f
-        private const val PODCAST_TEXT_MEDIUM = 12f
-        private const val PODCAST_TEXT_LARGE = 15f
-        private const val PODCAST_PANE_HEIGHT_FRACTION = 0.64f
-        private const val PODCAST_PANE_MIN_HEIGHT_DP = 620
-        private const val PODCAST_PANE_LAND_HEIGHT_FRACTION = 0.92f
-        private const val PODCAST_PANE_LAND_MIN_HEIGHT_DP = 260
-        private const val PODCAST_PANE_LAND_SIDE_INSET_DP = 16
-        private const val PODCAST_CHROME_PEEK_DP = 36
-        private const val PODCAST_CHROME_PEEK_ALPHA = 0.92f
         private const val TERMUX_WORKSPACE_KEY_MODE_SWIPE_THRESHOLD_PX = 70f
         private const val TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_OUT_MS = 92L
         private const val TERMUX_WORKSPACE_KEY_MODE_CAROUSEL_IN_MS = 124L
@@ -13597,8 +7922,8 @@ class UIManager(
         private const val OUTPUT_HEADER_MODE_NONE = "none"
         private const val OUTPUT_AUTO_HIDE_MIN_SECONDS = 1
         private const val OUTPUT_AUTO_HIDE_MAX_SECONDS = 3600
-        private const val MODULE_TEXT_FONT_THEME = "theme"
-        private const val MODULE_TEXT_FONT_MONO = "mono"
+        internal const val MODULE_TEXT_FONT_THEME = "theme"
+        internal const val MODULE_TEXT_FONT_MONO = "mono"
         private const val EVENTS_REFRESH_GRACE_MS: Long = 1000
         private val EVENTS_REFRESH_FALLBACK_MS = (60 * 1000).toLong()
         private val LABEL_INDEX_UNMAPPED = -1f
@@ -13731,59 +8056,6 @@ class UIManager(
             val side: String =
                 normalizeDuoLayoutMode(preferences.getString(DUO_LAST_SIDE_PREF, DUO_LAYOUT_RIGHT))
             return if (DUO_LAYOUT_OFF == side) DUO_LAYOUT_RIGHT else side
-        }
-
-        private fun applyBgRect(
-            context: Context,
-            v: View,
-            bgColor: String?,
-            spaces: IntArray,
-            cornerRadius: Int,
-            dashed: Boolean,
-            borderColor: Int,
-            cyberdeckNotch: Boolean,
-            surface: SurfaceBorder,
-            allowBorder: Boolean = true,
-            allowFrame: Boolean = true
-        ) {
-            try {
-                applyMargins(v, spaces)
-
-                val color = try {
-                    Color.parseColor(bgColor)
-                } catch (e: Exception) {
-                    terminalWindowBackground()
-                }
-                ohi.andre.consolelauncher.presentation.HomeAppearance.surface(context, v, color, borderColor,
-                    cornerRadius.toFloat(), dashed, cyberdeckNotch, surface, allowBorder, allowFrame)
-
-            } catch (e: Exception) {
-                Tuils.toFile(e)
-                Tuils.log(e)
-            }
-        }
-
-        private fun applyMargins(v: View, margins: IntArray) {
-            v.setPadding(margins[2], margins[3], margins[2], margins[3])
-
-            val params = v.getLayoutParams()
-            if (params is RelativeLayout.LayoutParams) {
-                params.setMargins(margins[0], margins[1], margins[0], margins[1])
-            } else if (params is LinearLayout.LayoutParams) {
-                params.setMargins(margins[0], margins[1], margins[0], margins[1])
-            }
-        }
-
-        private fun applyShadow(v: TextView, color: String, x: Int, y: Int, radius: Float) {
-            if (!(color.startsWith("#00") && color.length == 9)) {
-                try {
-                    v.setShadowLayer(radius, x.toFloat(), y.toFloat(), Color.parseColor(color))
-                    v.setTag(OutlineTextView.SHADOW_TAG)
-                } catch (e: Exception) {
-                    // Fallback to transparent if color is invalid
-                    v.setShadowLayer(0f, 0f, 0f, Color.TRANSPARENT)
-                }
-            }
         }
     }
 }

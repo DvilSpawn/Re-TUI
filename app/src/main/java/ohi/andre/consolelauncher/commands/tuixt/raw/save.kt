@@ -4,7 +4,7 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.TuixtPack
-import ohi.andre.consolelauncher.managers.FileManager
+import ohi.andre.consolelauncher.managers.file.FileManager
 
 class save : CommandAbstraction {
     override fun exec(pack: ExecutePack): String? {

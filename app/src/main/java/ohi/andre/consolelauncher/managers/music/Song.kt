@@ -13,6 +13,8 @@ class Song : StringableObject {
     private var podcastShowId: String? = null
     private var podcastEpisodeKey: String? = null
     private var startPositionMs: Int = 0
+    var album: String = ""
+    var folder: String = ""
 
     constructor(songID: Long, songTitle: String, singer: String) {
         id = songID
@@ -32,6 +34,7 @@ class Song : StringableObject {
         path = file.absolutePath
         id = -1
         singer = "Unknown"
+        folder = file.parentFile?.name.orEmpty()
         lowercaseTitle = title.lowercase()
     }
 

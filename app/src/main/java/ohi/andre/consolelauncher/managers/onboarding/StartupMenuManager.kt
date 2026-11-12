@@ -53,8 +53,8 @@ import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.requestNoTitleIfFullscreen
 import ohi.andre.consolelauncher.tuils.Tuils
-import ohi.andre.consolelauncher.tuils.TerminalBorderDrawable
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderDrawable
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 
 object StartupMenuManager {
     const val PREFS = "retui_startup"
@@ -320,6 +320,7 @@ object StartupMenuManager {
         fun selected(id: String): Boolean = selectedFeature(level(context), id, enabled(context, id))
 
         LauncherSettings.set(context, Behavior.swipe_up_apps_drawer, selected(APP_DRAWER).toString())
+        LauncherSettings.set(context, ohi.andre.consolelauncher.managers.xml.options.Toolbar.show_apps_drawer_button, selected(APP_DRAWER).toString())
         LauncherSettings.set(context, Behavior.show_module_dock, selected(MODULE_DOCK).toString())
         LauncherSettings.set(context, Behavior.show_android_widget_drawer_button, selected(WIDGETS).toString())
         // Startup can be restored without a live LauncherActivity owning notification settings.

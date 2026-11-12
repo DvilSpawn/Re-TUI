@@ -20,6 +20,7 @@ object RetuiWallpaperSettings {
     private const val ASTRO_SEED = "astro_seed"
     private const val ASTRO_MONO = "astro_mono"
     private const val PIXEL_LOOK = "pixel_look_"
+    private const val DOOM_FIRE_COLORS = "doom_fire_colors"
     private const val PHOTO_RIPPLES = "photo_ripples"
     private const val PHOTO_OFFSET = "photo_offset"
     private const val SHORE_OFFSET_X = "shore_offset_x"
@@ -99,6 +100,14 @@ object RetuiWallpaperSettings {
             if (ripples != null) putBoolean(PHOTO_RIPPLES, ripples)
             if (photoOffset != null) putFloat(PHOTO_OFFSET, photoOffset)
         }.apply()
+    }
+
+    /** Doom fire's own colours (background, embers, flame, tips), or null before any were picked. */
+    fun doomFireColors(context: Context): IntArray? = prefs(context).getString(DOOM_FIRE_COLORS, null)
+        ?.split(',')?.mapNotNull { it.trim().toLongOrNull(16)?.toInt() }?.takeIf { it.size == 4 }?.toIntArray()
+
+    fun saveDoomFireColors(context: Context, colors: IntArray) {
+        prefs(context).edit().putString(DOOM_FIRE_COLORS, colors.joinToString(",") { "%08X".format(it) }).apply()
     }
 
     fun matrixStyle(context: Context): String = prefs(context).getString(MATRIX_STYLE, "classic") ?: "classic"
@@ -231,6 +240,38 @@ object RetuiWallpaperSettings {
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
+    /** The applied live wallpaper settings, for a preset to keep. Values carry their type so [restore] is exact. */
+    fun snapshot(context: Context): org.json.JSONObject {
+        val out = org.json.JSONObject()
+        for ((key, value) in prefs(context).all) {
+            val typed = when (value) {
+                is Boolean -> "b"; is Int -> "i"; is Long -> "l"; is Float -> "f"; is String -> "s"
+                is Set<*> -> "S"; else -> continue
+            }
+            out.put(key, org.json.JSONObject().put("t", typed).put("v",
+                if (value is Set<*>) org.json.JSONArray(value.filterIsInstance<String>()) else value))
+        }
+        return out
+    }
+
+    /** Replaces the applied settings with a [snapshot] and drops any choice staged in the picker. */
+    fun restore(context: Context, saved: org.json.JSONObject) {
+        val values = linkedMapOf<String, Any>()
+        for (key in saved.keys()) {
+            val entry = saved.optJSONObject(key) ?: continue
+            values[key] = when (entry.optString("t")) {
+                "b" -> entry.optBoolean("v"); "i" -> entry.optInt("v"); "l" -> entry.optLong("v")
+                "f" -> entry.optDouble("v").toFloat(); "s" -> entry.optString("v")
+                "S" -> entry.optJSONArray("v")?.let { a -> (0 until a.length()).map(a::optString).toSet() } ?: continue
+                else -> continue
+            }
+        }
+        val editor = prefs(context).edit().clear()
+        copy(values, editor)
+        editor.commit()
+        discardPending(context)
+    }
 
     // Use on phone stages the picker's choices here. Android's apply page previews them (its engine reads through
     // previewContext); the running wallpaper keeps the committed settings until the user really applies.

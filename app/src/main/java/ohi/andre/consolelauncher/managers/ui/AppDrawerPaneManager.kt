@@ -23,9 +23,9 @@ import android.widget.TextView
 import android.widget.Toast
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.managers.AppFinder
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
+import ohi.andre.consolelauncher.managers.apps.AppFinder
+import ohi.andre.consolelauncher.managers.apps.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.dashedBorders
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.moduleCornerRadius
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalBorderColor
@@ -34,8 +34,8 @@ import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.terminalWi
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.util.Collections
 import java.util.Locale
@@ -220,6 +220,8 @@ class AppDrawerPaneManager(
 
         buildGroupTabs(appsManager, drawerColor, borderColor, backgroundColor)
         rebuildContents(appsManager, drawerColor, borderColor, backgroundColor)
+        // Mono's home is opaque and raised over everything, so the drawer has to come up over it.
+        if (ohi.andre.consolelauncher.managers.settings.LauncherMode.isMono()) drawerRoot.bringToFront()
         drawerRoot.visibility = View.VISIBLE
     }
 

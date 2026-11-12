@@ -2,8 +2,8 @@ package ohi.andre.consolelauncher.navigation
 
 import android.graphics.Bitmap
 import androidx.test.platform.app.InstrumentationRegistry
-import ohi.andre.consolelauncher.tuils.FrameManager
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.LocalizedStateException
 import org.junit.Assert.*
 import org.junit.Test

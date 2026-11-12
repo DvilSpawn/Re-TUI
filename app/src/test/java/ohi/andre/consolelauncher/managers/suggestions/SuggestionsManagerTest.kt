@@ -8,6 +8,16 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.main.raw.preset
 
 class SuggestionsManagerTest {
+    @Test fun mediaOffersItsOptionsAndRemovesFoldersByName() {
+        val options = SuggestionsManager.mediaSuggestions("media", "media", "", emptyList())
+        assertEquals(listOf("-v", "-ls", "-add", "-scan", "-rm"), options.map { it.text })
+        assertFalse(options.last().exec)
+        assertEquals(listOf("-scan"), SuggestionsManager.mediaSuggestions("media", "media", "-s", emptyList()).map { it.text })
+        val folders = SuggestionsManager.mediaSuggestions("media -rm", "media -rm", "", listOf("Music", "Movies"))
+        assertEquals(listOf("Music", "Movies"), folders.map { it.text })
+        assertEquals(listOf("media -rm 1", "media -rm 2"), folders.map { it.getText() })
+    }
+
     @Test fun termuxLaunchersKeepFriendlyLabelsAndDispatchExplicitlyDespiteCommandCollisions() {
         val launchers = listOf(
             ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager.Launcher("shell", "Shell", "", true),
@@ -43,6 +53,11 @@ class SuggestionsManagerTest {
         assertTrue(SuggestionsManager.helpTopics("help ${article.id}").contains(article))
         assertTrue(SuggestionsManager.helpTopics("help unknown").isEmpty())
         assertFalse(SuggestionsManager.commandSuggestionExecutes("help", intArrayOf(CommandAbstraction.PLAIN_TEXT)))
+    }
+
+    @Test fun settingsSuggestionOpensSettingsOnTap() {
+        // settings takes an optional search since 5.1; tapping its chip should still open Settings (issue #33).
+        assertTrue(SuggestionsManager.commandSuggestionExecutes("settings", intArrayOf(CommandAbstraction.PLAIN_TEXT)))
     }
 
     @Test fun offlineHelpNormalizesCaseWhitespaceAndTopicPrefix() {

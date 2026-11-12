@@ -4,7 +4,7 @@ import java.util.Locale
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
-import ohi.andre.consolelauncher.managers.ClockManager
+import ohi.andre.consolelauncher.managers.time.ClockManager
 
 class stopwatch : CommandAbstraction {
     override fun argType(): IntArray = intArrayOf(CommandAbstraction.PLAIN_TEXT)

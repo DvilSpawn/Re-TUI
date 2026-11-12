@@ -10,6 +10,8 @@ import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 import ohi.andre.consolelauncher.managers.xml.options.*
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 
 /** Immutable values: rendering a draft never writes the settings singleton or its caches. */
 internal class HomeAppearance(private val values: Map<XMLPrefsSave, String?>) {
@@ -24,8 +26,14 @@ internal class HomeAppearance(private val values: Map<XMLPrefsSave, String?>) {
     fun differs(saved: HomeAppearance) = values.any { (key,_) -> changed(key,saved) }
     fun changed(key: XMLPrefsSave, saved: HomeAppearance) = raw(key) != saved.raw(key)
     fun radius(key: Ui): Int = (if (raw(key) != key.defaultValue()) number(key) else number(Ui.dashed_border_corner_radius)).toInt().coerceIn(0,48)
-    fun font(context: Context): Typeface = typeface ?: LauncherTypeface.load(context,Tuils.getFolder(),
-        bool(Ui.system_font),raw(Ui.font_file)).typeface.also { typeface=it }
+    fun font(context: Context): Typeface {
+        typeface?.let { return it }
+        // Mono draws in its own pixel font, whatever font the user set for the other modes.
+        val mono = if (ohi.andre.consolelauncher.managers.settings.MonoMode.active())
+            runCatching { Typeface.createFromAsset(context.assets, ohi.andre.consolelauncher.managers.settings.MonoMode.FONT_ASSET) }.getOrNull()
+        else null
+        return (mono ?: LauncherTypeface.load(context,Tuils.getFolder(),bool(Ui.system_font),raw(Ui.font_file)).typeface).also { typeface=it }
+    }
     fun textSize(key: Ui) = LauncherFontScale.scaledSp(number(key, 12f), number(Ui.font_size_offset).toInt())
     fun overlay(draft: (XMLPrefsSave) -> String?, hasDraft: (XMLPrefsSave) -> Boolean): HomeAppearance =
         HomeAppearance(values.mapValues { (k,v) -> if (hasDraft(k)) draft(k) ?: v else v })
@@ -37,7 +45,12 @@ internal class HomeAppearance(private val values: Map<XMLPrefsSave, String?>) {
         fun saved(): HomeAppearance {
             val revision = LauncherSettings.currentRevision()
             cached?.takeIf { it.first == revision }?.let { return it.second }
-            return HomeAppearance(LauncherSettings.currentSnapshot().values).also { cached = revision to it }
+            val values = LauncherSettings.currentSnapshot().values
+            // Mono mode takes its settings over here too, so Home is drawn from the same values everyone reads.
+            val effective = if (ohi.andre.consolelauncher.managers.settings.MonoMode.active())
+                values.mapValues { (key, value) -> ohi.andre.consolelauncher.managers.settings.MonoMode.override(key) ?: value }
+            else values
+            return HomeAppearance(effective).also { cached = revision to it }
         }
 
         /** Shared by Home's existing surface construction and the detached draft scene. */

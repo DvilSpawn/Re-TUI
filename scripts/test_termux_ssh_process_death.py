@@ -6,7 +6,7 @@ parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--serial', required=True, help='Exact adb device serial')
 parser.add_argument('--adb', default=shutil.which('adb') or 'adb')
 parser.add_argument('--package', default='com.dvil.tui_renewed.termuxsshdebug')
-parser.add_argument('--output', default=str(Path(__file__).resolve().parents[1] / 'docs/analysis/termux-ssh/evidence/production'))
+parser.add_argument('--output', default=str(Path(__file__).resolve().parents[1] / 'build/termux-ssh/evidence/production'))
 options=parser.parse_args()
 pkg=options.package
 if not pkg.endswith('.termuxsshdebug'):

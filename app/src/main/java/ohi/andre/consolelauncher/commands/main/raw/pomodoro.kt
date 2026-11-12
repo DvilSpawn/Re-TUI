@@ -6,9 +6,9 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.BreachDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormField
-import ohi.andre.consolelauncher.managers.BreachManager
-import ohi.andre.consolelauncher.managers.PomodoroManager
-import ohi.andre.consolelauncher.managers.PomodoroManager.SessionType
+import ohi.andre.consolelauncher.managers.net.BreachManager
+import ohi.andre.consolelauncher.managers.time.PomodoroManager
+import ohi.andre.consolelauncher.managers.time.PomodoroManager.SessionType
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
 
 class pomodoro : CommandAbstraction {
@@ -70,7 +70,7 @@ class pomodoro : CommandAbstraction {
         return pack.context.getString(R.string.command_pomodoro_opening_pomodoro_setup_32cb0)
     }
 
-    override fun helpRes(): Int = 0
+    override fun helpRes(): Int = R.string.help_pomodoro
 
     override fun priority(): Int = 2
 

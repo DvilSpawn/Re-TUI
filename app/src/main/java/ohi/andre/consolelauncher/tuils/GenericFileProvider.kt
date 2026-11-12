@@ -8,7 +8,7 @@ class GenericFileProvider : FileProvider() {
         // Resolve through FileProvider first so invalid or escaping URIs are rejected.
         val original = super.getType(uri)
         return if (uri.lastPathSegment?.endsWith(".retui", ignoreCase = true) == true)
-            ohi.andre.consolelauncher.managers.BackupManager.PRESET_MIME else original
+            ohi.andre.consolelauncher.managers.backup.BackupManager.PRESET_MIME else original
     }
 
     companion object {

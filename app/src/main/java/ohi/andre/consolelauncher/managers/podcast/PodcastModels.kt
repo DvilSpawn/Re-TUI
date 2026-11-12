@@ -26,5 +26,6 @@ data class PodcastEpisode(
     val description: String,
     val duration: String?,
     val publishedAt: Long?,
-    val feedOrder: Int
+    val feedOrder: Int,
+    val chaptersUrl: String? = null
 )

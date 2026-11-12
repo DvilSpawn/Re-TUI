@@ -16,9 +16,9 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.managers.xml.options.SurfaceBorder
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.ThemeColorSpan
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -88,7 +88,9 @@ internal object SearchResultPresentation {
             Role.HEADER -> if(view is TextView) {
                 view.setTypeface(appearance.font(view.context),Typeface.BOLD)
                 LauncherFontScale.setBaseSize(view,(appearance.number(Suggestions.suggestions_size)*.72f).coerceAtLeast(9f),appearance.number(Ui.font_size_offset).toInt())
-                view.setTextColor(SuggestionChipStyler.textColor(binding.suggestionType,appearance))
+                // Mono inverts the chips, so a header coloured like a chip label would vanish on the paper.
+                view.setTextColor(if(ohi.andre.consolelauncher.managers.settings.MonoMode.active()) ohi.andre.consolelauncher.managers.settings.MonoMode.ink()
+                    else SuggestionChipStyler.textColor(binding.suggestionType,appearance))
                 view.setPadding(dp(3),dp(4),dp(3),dp(2))
                 val color=appearance.color(Theme.suggestions_text_shadow_color)
                 if(Color.alpha(color)==0) view.setShadowLayer(0f,0f,0f,Color.TRANSPARENT)

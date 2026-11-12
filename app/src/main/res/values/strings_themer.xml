@@ -512,6 +512,7 @@
     <string name="hub_appearance">Appearance</string>
     <string name="hub_behavior">Behavior</string>
     <string name="hub_sounds">Sounds</string>
+    <string name="hub_edge_sidebar">Edge Sidebar</string>
     <string name="hub_personalization">Personalization</string>
     <string name="hub_ascii_settings">ASCII Settings</string>
     <string name="hub_integrations">Integrations</string>

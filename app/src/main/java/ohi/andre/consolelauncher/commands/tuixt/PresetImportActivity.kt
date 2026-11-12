@@ -12,8 +12,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.localization.LocalizedComponentActivity
-import ohi.andre.consolelauncher.managers.BackupManager
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.backup.BackupManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager.XMLPrefsRoot
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
@@ -55,7 +55,7 @@ class PresetImportActivity : LocalizedComponentActivity() {
             setText(R.string.portable_preset_inspecting)
             setTextIsSelectable(true)
             typeface = Tuils.getTypeface(this@PresetImportActivity)
-            textSize = 14f
+            textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(14f)
             setLineSpacing(dp(4).toFloat(), 1f)
             setPadding(dp(14), dp(14), dp(14), dp(14))
             accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE

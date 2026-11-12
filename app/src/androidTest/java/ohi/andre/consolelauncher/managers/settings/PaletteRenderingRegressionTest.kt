@@ -49,13 +49,13 @@ class PaletteRenderingRegressionTest {
         val originals = folder.listFiles().orEmpty().filter { it.isFile && it.extension == "xml" }.associateWith { it.readBytes() }
         val names = mutableListOf<String>()
         fun apply(name: String) {
-            ohi.andre.consolelauncher.managers.PresetManager.apply(name)
+            ohi.andre.consolelauncher.managers.preset.PresetManager.apply(name)
             XMLPrefsManager.dispose(); XMLPrefsManager.loadCommons(context); LauncherSettings.refreshFromLoadedPrefs()
         }
         try {
             for (slug in listOf("catppuccin-latte", "catppuccin-mocha")) {
                 instrumentation.context.assets.open("terminal-colors/downloads/$slug.retui").use { bytes ->
-                    ohi.andre.consolelauncher.managers.BackupManager.inspectPreset(bytes, java.io.File(context.cacheDir, "switch-inspect")).use { names.add(it.save()) }
+                    ohi.andre.consolelauncher.managers.backup.BackupManager.inspectPreset(bytes, java.io.File(context.cacheDir, "switch-inspect")).use { names.add(it.save()) }
                 }
             }
             for ((type, inputId) in listOf(CalculatorActivity::class.java to R.id.calculator_expression,
@@ -88,7 +88,7 @@ class PaletteRenderingRegressionTest {
             }
         } finally {
             originals.forEach { (file, bytes) -> file.writeBytes(bytes) }
-            names.forEach { java.io.File(ohi.andre.consolelauncher.managers.PresetManager.presetsDir, it).deleteRecursively() }
+            names.forEach { java.io.File(ohi.andre.consolelauncher.managers.preset.PresetManager.presetsDir, it).deleteRecursively() }
             XMLPrefsManager.dispose(); XMLPrefsManager.loadCommons(context); LauncherSettings.refreshFromLoadedPrefs()
         }
     }

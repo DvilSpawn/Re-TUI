@@ -8,7 +8,9 @@ import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
+import ohi.andre.consolelauncher.managers.preset.PresetWallpaper
+import ohi.andre.consolelauncher.managers.preset.PresetWallpaperPickerActivity
 import ohi.andre.consolelauncher.tuils.Tuils
 import ohi.andre.consolelauncher.tuils.interfaces.Reloadable
 
@@ -18,7 +20,8 @@ class preset : ParamCommand() {
             override fun exec(pack: ExecutePack): String {
                 val name = pack.getString()!!
                 try {
-                    PresetManager.save(pack.context, name)
+                    if (PresetManager.save(pack.context, name) == PresetWallpaper.Saved.UNKNOWN)
+                        PresetWallpaperPickerActivity.ask(pack.context, name.trim())
                     if (pack.context is Reloadable) {
                         (pack.context as Reloadable).addMessage("preset", pack.context.getString(R.string.command_preset_saved_preset_4a339, name.trim()))
                     }
@@ -37,6 +40,7 @@ class preset : ParamCommand() {
                 val name = pack.getString()!!
                 try {
                     PresetManager.apply(name)
+                    runCatching { PresetManager.applyWallpaper(pack.context, name) }
 
                     if (pack.context is Reloadable) {
                         (pack.context as Reloadable).addMessage("preset", pack.context.getString(R.string.command_preset_applied_preset_c132b, name.trim()))

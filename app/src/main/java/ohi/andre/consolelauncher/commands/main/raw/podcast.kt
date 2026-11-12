@@ -1,13 +1,10 @@
 package ohi.andre.consolelauncher.commands.main.raw
 
 import android.content.Intent
-import android.os.Handler
-import android.os.Looper
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.UIManager
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
+import ohi.andre.consolelauncher.managers.mediaplayer.MediaPlayerActivity
 
 class podcast : CommandAbstraction {
     override fun exec(pack: ExecutePack): String? {
@@ -33,12 +30,12 @@ class podcast : CommandAbstraction {
     }
 
     private fun openPodcast(pack: ExecutePack, command: String?) {
-        val intent = Intent(UIManager.ACTION_PODCAST_SURFACE)
-        intent.putExtra(UIManager.EXTRA_PODCAST_COMMAND, command)
-        Handler(Looper.getMainLooper()).post {
-            LocalBroadcastManager
-                .getInstance(pack.context.applicationContext)
-                .sendBroadcast(intent)
-        }
+        // The player is its own screen now, so there is no surface left to close or shrink from the terminal.
+        if (command?.lowercase() in setOf("exit", "close", "minimize", "min")) return
+        val context = pack.context
+        context.startActivity(Intent(context, MediaPlayerActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(MediaPlayerActivity.EXTRA_TAB, MediaPlayerActivity.Tab.PODCASTS.name)
+            .putExtra(MediaPlayerActivity.EXTRA_PODCAST_COMMAND, command))
     }
 }

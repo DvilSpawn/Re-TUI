@@ -39,7 +39,7 @@ class TerminalHomeIntegrationTest {
                 ohi.andre.consolelauncher.presentation.HomeLayoutPresentation.configureSearch(root,appearance)
                 val bar = root.findViewById<View>(ohi.andre.consolelauncher.R.id.input_group)
                 assertNotNull("$mode bar needs a foreground frame",bar.foreground)
-                val border = bar.foreground as? ohi.andre.consolelauncher.tuils.TerminalBorderDrawable
+                val border = bar.foreground as? ohi.andre.consolelauncher.tuils.frame.TerminalBorderDrawable
                 if (border != null) assertTrue("$mode Cyberdeck border was gated off",border.strokeWidthPx > 0)
             }
         }

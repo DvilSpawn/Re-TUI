@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.tuixt.ThemerActivity
-import ohi.andre.consolelauncher.tuils.FrameManager
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.FrameManager
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.junit.Assert.*
 import org.junit.Test

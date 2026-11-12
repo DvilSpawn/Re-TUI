@@ -8,7 +8,7 @@ import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.tuixt.WidgetEditorActivity
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.IOException
-import ohi.andre.consolelauncher.managers.FileManager
+import ohi.andre.consolelauncher.managers.file.FileManager
 
 class tuixt : CommandAbstraction {
     override fun exec(pack: ExecutePack): String {

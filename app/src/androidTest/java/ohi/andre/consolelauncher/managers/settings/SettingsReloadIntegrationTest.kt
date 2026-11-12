@@ -77,14 +77,14 @@ class SettingsReloadIntegrationTest {
     }
     @Test fun invalidPresetFramesCannotPartiallyApplyItsPalette() = fixture {
         val name="reload-transaction-test"
-        ohi.andre.consolelauncher.managers.PresetManager.save(c,name)
+        ohi.andre.consolelauncher.managers.preset.PresetManager.save(c,name)
         LauncherSettings.set(c,Theme.input_text_color,"#FF345678")
         val before=LauncherSettings.currentSnapshot()
         val theme=File(Tuils.getFolder(),"theme.xml").readBytes()
-        val preset=ohi.andre.consolelauncher.managers.PresetManager.getSavedPresetFolder(name)
+        val preset=ohi.andre.consolelauncher.managers.preset.PresetManager.getSavedPresetFolder(name)
         val frames=File(preset,"frames").apply {mkdirs()}
         File(frames,"unexpected-file.txt").writeText("invalid frame")
-        assertThrows(Exception::class.java) {ohi.andre.consolelauncher.managers.PresetManager.apply(name)}
+        assertThrows(Exception::class.java) {ohi.andre.consolelauncher.managers.preset.PresetManager.apply(name)}
         assertEquals(before,LauncherSettings.currentSnapshot())
         assertArrayEquals(theme,File(Tuils.getFolder(),"theme.xml").readBytes())
     }

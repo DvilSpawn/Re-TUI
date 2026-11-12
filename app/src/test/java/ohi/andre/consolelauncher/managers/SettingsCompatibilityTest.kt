@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.managers
 
 import java.nio.file.Files
 import javax.xml.parsers.DocumentBuilderFactory
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.*
 import org.junit.Assert.*

@@ -17,6 +17,18 @@
     {
       "path": "app/src/main/res/drawable/ic_toolbar_gesture_24.xml",
       "sha256": "a788d09e3355e302b50cf57a7fb9a4e571fc997c6235a50c6f62980838c49c40"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_edge_home.xml",
+      "sha256": "d69dec3aab5d9c1a0b923ab048b1fea67967c125c4435a3684e9cfe39a170a6d"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_edge_timer.xml",
+      "sha256": "252c6ac83af9ac659b81fc45945f3b9403b29027a968b1f146e5424ce6f51264"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_edge_stopwatch.xml",
+      "sha256": "67a35f2d35afc901715595485c11da75d2a0ffec58728c6b4fd70d93239fbecc"
     }
   ]
 }

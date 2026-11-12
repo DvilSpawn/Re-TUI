@@ -8,7 +8,7 @@ import android.location.Geocoder
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import java.util.Locale
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.HTMLExtractManager
+import ohi.andre.consolelauncher.managers.net.HTMLExtractManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.UIManager

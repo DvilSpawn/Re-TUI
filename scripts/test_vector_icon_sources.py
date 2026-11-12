@@ -26,16 +26,17 @@ class VectorSourcesTest(unittest.TestCase):
                     b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M0 0" transform="translate(1)"/></svg>'):
             with self.assertRaises(AssertionError):
                 icons.convert(svg, "24dp", "24dp")
-        self.assertEqual("code", icons.OUTLINED["ic_tuixt_github_24"])
-        self.assertEqual("chat", icons.OUTLINED["ic_tuixt_discord_24"])
-        self.assertEqual("forum", icons.OUTLINED["ic_tuixt_reddit_24"])
+        self.assertNotIn("ic_tuixt_github_24", icons.OUTLINED)
+        self.assertNotIn("ic_tuixt_discord_24", icons.OUTLINED)
+        self.assertNotIn("ic_tuixt_reddit_24", icons.OUTLINED)
 
     def test_current_vectors_all_have_source_and_unchanged_reviewed_hashes(self):
         material = json.loads((icons.ROOT / "third_party/material-icons.json").read_text())
         own = json.loads((icons.ROOT / "third_party/project-vector-icons.json").read_text())
-        self.assertEqual(66, len(material["files"]))
+        self.assertEqual(63, len(material["files"]))
+        brand = json.loads((icons.ROOT / "third_party/brand-icons.json").read_text())
         known = set()
-        for entry in material["files"] + own["files"]:
+        for entry in material["files"] + own["files"] + brand["files"]:
             path = icons.ROOT / entry["path"]
             known.add(path)
             self.assertEqual(entry.get("vector_sha256", entry.get("sha256")), hashlib.sha256(path.read_bytes()).hexdigest())
@@ -44,7 +45,7 @@ class VectorSourcesTest(unittest.TestCase):
                 known.add(path)
         vectors = {p for p in (icons.ROOT / "app/src/main/res/drawable").glob("*.xml")
                    if any(item.tag == "vector" for item in ET.parse(p).getroot().iter())}
-        self.assertEqual(known, vectors)
+        self.assertEqual({p for p in known if p.suffix == ".xml"}, vectors)
         self.assertFalse(list((icons.ROOT / "app/src/main/res/drawable").glob("remember_ic_format_*.png")))
 
 

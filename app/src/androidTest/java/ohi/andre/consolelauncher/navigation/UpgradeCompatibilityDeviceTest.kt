@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.test.platform.app.InstrumentationRegistry
 import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.BackupManager
+import ohi.andre.consolelauncher.managers.backup.BackupManager
 import ohi.andre.consolelauncher.managers.ChangelogManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager

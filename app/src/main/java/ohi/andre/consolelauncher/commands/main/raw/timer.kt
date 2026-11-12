@@ -6,7 +6,7 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand
-import ohi.andre.consolelauncher.managers.ClockManager
+import ohi.andre.consolelauncher.managers.time.ClockManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
 class timer : CommandAbstraction {

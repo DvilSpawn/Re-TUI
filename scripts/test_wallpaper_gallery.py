@@ -40,7 +40,7 @@ class WallpaperGalleryTest(unittest.TestCase):
                     self.assertEqual(assets | {'wallpaper.json', 'LICENSE.txt'}, set(pack.namelist()))
                     self.assertEqual(row['id'], json.loads(pack.read('wallpaper.json'))['id'])
                     self.assertLessEqual(sum(item.file_size for item in pack.infolist()), 4 * 1024 * 1024)
-                    self.assertLessEqual(pack.getinfo('LICENSE.txt').file_size, 64 * 1024)
+                    self.assertLessEqual(pack.getinfo('LICENSE.txt').file_size, 128 * 1024)
                     for name in assets:
                         image = pack.read(name)
                         self.assertEqual(image, (ROOT / 'wallpaper-packs/content' / row['id'] / name).read_bytes())

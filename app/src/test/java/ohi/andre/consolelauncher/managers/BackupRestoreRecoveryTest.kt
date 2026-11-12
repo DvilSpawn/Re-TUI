@@ -4,6 +4,8 @@ import java.io.File
 import java.nio.file.Files
 import org.junit.Assert.*
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.backup.BackupRestoreTransaction
+import ohi.andre.consolelauncher.managers.file.FileOperationCancellation
 
 class BackupRestoreRecoveryTest {
     private class ProcessKilled : Error()

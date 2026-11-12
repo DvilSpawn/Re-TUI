@@ -40,16 +40,6 @@ object RetuiCreditManager {
         )
     }
 
-    fun addCredits(context: Context, amount: Int): Wallet {
-        if (!isDystopiaEnabled(context)) return Wallet(0, 0)
-        if (amount <= 0) return wallet(context)
-        ensureGrant(context)
-        val prefs = prefs(context)
-        val next = max(0, prefs.getInt(KEY_CREDITS, 0) + amount)
-        prefs.edit().putInt(KEY_CREDITS, next).apply()
-        return wallet(context)
-    }
-
     fun spendCredits(context: Context, amount: Int = ESCAPE_COST): Boolean {
         if (!isDystopiaEnabled(context)) return false
         ensureGrant(context)

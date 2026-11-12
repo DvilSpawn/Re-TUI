@@ -35,9 +35,11 @@ internal object SettingsRefreshCoordinator {
         Behavior.swipe_up_apps_drawer, Ui.show_ascii_landscape)
     private val widgetGrid = setOf(Ui.android_widget_grid_columns, Ui.android_widget_min_columns, Ui.android_widget_min_rows, Ui.android_widget_spacing)
     private val geometry = margins + landscape + widgetGrid + setOf(
-        Behavior.show_tmux_workspace_button, Behavior.show_android_widget_drawer_button)
+        Behavior.show_tmux_workspace_button, Behavior.show_android_widget_drawer_button,
+        ohi.andre.consolelauncher.managers.xml.options.Toolbar.show_apps_drawer_button)
     internal fun effect(setting: XMLPrefsSave): Effect = when {
         setting is Notifications || setting == Behavior.preferred_music_app -> Effect.SERVICES
+        setting is Behavior && ohi.andre.consolelauncher.sidebar.EdgeSidebar.isSetting(setting) -> Effect.SERVICES
         setting == Behavior.orientation -> Effect.ORIENTATION
         setting == Behavior.breath_out || setting == Behavior.breath_out_seconds -> Effect.IDLE
         setting in geometry -> Effect.GEOMETRY
@@ -66,6 +68,8 @@ internal object SettingsRefreshCoordinator {
         }
         if (owner != null && keys.any { it is Notifications || it == Behavior.preferred_music_app })
             NotificationService.requestReload(owner)
+        if (keys.any { it is Behavior && ohi.andre.consolelauncher.sidebar.EdgeSidebar.isSetting(it) })
+            (owner ?: LauncherActivity.instance)?.let { ohi.andre.consolelauncher.sidebar.EdgeSidebar.sync(it, askPermission = Behavior.edge_sidebar in keys) }
         val effects = keys.map(::effect).toSet()
         val launcher = LauncherActivity.instance
         if (launcher != null && !launcher.isFinishing && !launcher.isDestroyed) {
@@ -81,6 +85,7 @@ internal object SettingsRefreshCoordinator {
                     if (keys.any { it in widgetGrid }) ui.refreshAndroidWidgetDrawerGrid()
                     if (Behavior.show_tmux_workspace_button in keys) ui.refreshTermuxWorkspaceToolbarButton()
                     if (Behavior.show_android_widget_drawer_button in keys) ui.refreshAndroidWidgetDrawerToolbarButton()
+                    if (ohi.andre.consolelauncher.managers.xml.options.Toolbar.show_apps_drawer_button in keys) ui.refreshAppsDrawerToolbarButton()
                 }
             }
         }

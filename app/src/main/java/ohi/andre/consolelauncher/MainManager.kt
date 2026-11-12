@@ -16,17 +16,17 @@ import ohi.andre.consolelauncher.commands.CommandTuils.parse
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.raw.location
 import ohi.andre.consolelauncher.commands.main.specific.RedirectCommand
-import ohi.andre.consolelauncher.managers.AliasManager
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
+import ohi.andre.consolelauncher.managers.terminal.AliasManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.ContactManager
-import ohi.andre.consolelauncher.managers.HTMLExtractManager
-import ohi.andre.consolelauncher.managers.HistoryManager
+import ohi.andre.consolelauncher.managers.net.HTMLExtractManager
+import ohi.andre.consolelauncher.managers.terminal.HistoryManager
 import ohi.andre.consolelauncher.managers.LauncherSoundManager
-import ohi.andre.consolelauncher.managers.RssManager
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.net.RssManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.TuiLocationManager
-import ohi.andre.consolelauncher.managers.WebhookManager
+import ohi.andre.consolelauncher.managers.net.WebhookManager
 import ohi.andre.consolelauncher.managers.modules.ModulePromptManager
 import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.managers.music.MusicService
@@ -38,8 +38,8 @@ import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Cmd
-import ohi.andre.consolelauncher.managers.SearchProviderManager
-import ohi.andre.consolelauncher.managers.WebSearchFallback
+import ohi.andre.consolelauncher.managers.net.SearchProviderManager
+import ohi.andre.consolelauncher.managers.net.WebSearchFallback
 import ohi.andre.consolelauncher.commands.main.raw.search
 import ohi.andre.consolelauncher.managers.suggestions.SuggestionsManager
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -62,7 +62,7 @@ import java.util.regex.Pattern
 import ohi.andre.consolelauncher.commands.Command
 import ohi.andre.consolelauncher.commands.CommandTuils
 import ohi.andre.consolelauncher.managers.ChangelogManager
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.settings.MusicSettings
 
 /*Copyright Francesco Andreuzzi
@@ -249,14 +249,6 @@ class MainManager(private val mContext: LauncherActivity) {
             mContext.uiManager?.refreshSuggestionsSoon()
             mContext.uiManager?.scrollTerminalToEndSoon()
         }
-    }
-
-    fun onLongBack() {
-        Tuils.sendInput(mContext, Tuils.EMPTYSTRING)
-    }
-
-    fun sendPermissionNotGrantedWarning() {
-        redirectator.cleanup()
     }
 
     fun dispose() {

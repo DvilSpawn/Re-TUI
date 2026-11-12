@@ -1,18 +1,15 @@
 package ohi.andre.consolelauncher.help
 
-import java.io.File
 import javax.xml.parsers.DocumentBuilderFactory
+import ohi.andre.consolelauncher.SourceFiles
 import org.junit.Assert.*
 import org.junit.Test
 import org.w3c.dom.Element
 
 class TerminalPaneLayoutTest {
-    private val root = generateSequence(File(checkNotNull(System.getProperty("user.dir")))) { it.parentFile }
-        .first { File(it, "app/src/main").isDirectory }
-    private fun source(path: String) = File(root, "app/src/main/$path").readText()
     private fun element(layout: String, id: String): Element {
         val nodes = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-            .parse(File(root, "app/src/main/res/layout/$layout.xml")).getElementsByTagName("*")
+            .parse(SourceFiles.repo("app/src/main/res/layout/$layout.xml")).getElementsByTagName("*")
         return (0 until nodes.length).map { nodes.item(it) as Element }
             .first { it.getAttribute("android:id").substringAfter('/') == id }
     }
@@ -24,9 +21,9 @@ class TerminalPaneLayoutTest {
         assertEquals("@+id/calculator_transcript_scroll", (input.parentNode.parentNode.parentNode as Element).getAttribute("android:id"))
         assertEquals("2", preview.getAttribute("android:lines"))
         assertEquals("polite", preview.getAttribute("android:accessibilityLiveRegion"))
-        val dock = source("java/ohi/andre/consolelauncher/calculator/CalculatorKeypadScrollView.kt")
+        val dock = SourceFiles.kotlin("CalculatorKeypadScrollView.kt").readText()
         assertTrue(dock.contains("prompt.measuredHeight + preview.measuredHeight"))
-        val activity = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
+        val activity = SourceFiles.kotlin("CalculatorActivity.kt").readText()
         assertTrue(activity.contains("main.postDelayed(it, 300)"))
         assertTrue(activity.contains("generation != previewGeneration"))
         assertFalse("Discarding a preview must not kill the variable-owning native process", activity.contains("previewRequest?.cancel()"))
@@ -42,7 +39,7 @@ class TerminalPaneLayoutTest {
         val prompt = element("offline_help_surface", "offline_help_prompt")
         assertEquals(helpPane.getAttribute("android:id"), (prompt.parentNode.parentNode as Element).getAttribute("android:id"))
         assertEquals("0dp", element("offline_help_surface", "offline_help_scroll").getAttribute("android:paddingStart"))
-        val calculator = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
+        val calculator = SourceFiles.kotlin("CalculatorActivity.kt").readText()
         assertFalse("A trailing transcript newline adds an empty line before the live prompt", calculator.contains("transcript.text = history\n"))
     }
 
@@ -55,36 +52,36 @@ class TerminalPaneLayoutTest {
         val helpTitle = element("offline_help_surface", "offline_help_header")
         assertEquals("wrap_content", helpTitle.getAttribute("android:layout_width"))
         assertEquals("180dp", helpTitle.getAttribute("android:maxWidth"))
-        val panel = source("java/ohi/andre/consolelauncher/help/HelpWindowPanel.kt")
+        val panel = SourceFiles.kotlin("HelpWindowPanel.kt").readText()
         assertTrue("Window actions reuse raised tabs within accessible targets", panel.contains("InsetDrawable"))
-        val activity = source("java/ohi/andre/consolelauncher/help/OfflineHelpActivity.kt")
+        val activity = SourceFiles.kotlin("OfflineHelpActivity.kt").readText()
         assertTrue("Root manual title is already in the chrome", activity.contains("if (category != null) HelpText.title"))
-        assertTrue(source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt").contains("InsetDrawable"))
+        assertTrue(SourceFiles.kotlin("CalculatorActivity.kt").readText().contains("InsetDrawable"))
     }
 
     @Test fun windowActionsAndCalculatorHelpUseExistingTintedIcons() {
-        val panel = source("java/ohi/andre/consolelauncher/help/HelpWindowPanel.kt")
+        val panel = SourceFiles.kotlin("HelpWindowPanel.kt").readText()
         assertFalse(panel.contains("control(\"max\""))
         assertFalse(panel.contains("control(\"reset\""))
         assertFalse(panel.contains("\"float\" else \"max\""))
         assertTrue(panel.contains("R.drawable.ic_toolbar_refresh_24"))
         assertTrue(panel.contains("R.drawable.open_in_full_24"))
         assertTrue(panel.contains("R.drawable.pip_24"))
-        val calculator = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
+        val calculator = SourceFiles.kotlin("CalculatorActivity.kt").readText()
         assertTrue(calculator.contains("R.drawable.ic_material_help_24"))
-        val icon = source("java/ohi/andre/consolelauncher/tuils/TerminalPaneIcon.kt")
+        val icon = SourceFiles.kotlin("TerminalPaneIcon.kt").readText()
         assertTrue(icon.contains("dpToPx(view.context, 12)"))
         assertTrue(icon.contains("Theme.workspace_control_text_color"))
         assertTrue(icon.contains("TooltipCompat.setTooltipText"))
     }
 
     @Test fun calculatorDockBudgetIsResolvedDuringMeasurementNotFromPreviousLayout() {
-        val activity = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
+        val activity = SourceFiles.kotlin("CalculatorActivity.kt").readText()
         assertFalse("Previous dock bounds make the first viewport differ from settled mode switches",
             activity.contains("minOf(dock.height"))
         assertFalse("Layout listeners cannot correct an unchanged parent after an inset measure",
             activity.contains("val resizeDock = View.OnLayoutChangeListener"))
-        val dock = source("java/ohi/andre/consolelauncher/calculator/CalculatorKeypadScrollView.kt")
+        val dock = SourceFiles.kotlin("CalculatorKeypadScrollView.kt").readText()
         assertTrue(dock.contains("override fun onMeasure"))
         assertTrue(dock.contains("MeasureSpec.getSize(heightMeasureSpec)"))
         assertTrue(dock.contains("prompt.measure"))
@@ -94,7 +91,7 @@ class TerminalPaneLayoutTest {
     }
 
     @Test fun keypadRowsUseExplicitAlignmentRatherThanTextBaselines() {
-        val activity = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
+        val activity = SourceFiles.kotlin("CalculatorActivity.kt").readText()
         val keyLayout = activity.substringAfter("fun keyLayout(index: Int)").substringBefore("modes.getValue(mode).forEachIndexed")
         assertTrue("Numeric rows must not grow to reconcile evaluate and symbol baselines",
             keyLayout.contains("rowSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.CENTER)"))
@@ -104,7 +101,7 @@ class TerminalPaneLayoutTest {
     }
 
     @Test fun helpKeepsOnlyFourAccessibleCornerHandles() {
-        val panel = source("java/ohi/andre/consolelauncher/help/HelpWindowPanel.kt")
+        val panel = SourceFiles.kotlin("HelpWindowPanel.kt").readText()
         assertFalse("Standalone middle-right handle is removed", panel.contains("Triple(\"width\""))
         assertFalse("Standalone bottom handle is removed", panel.contains("Triple(\"height\""))
         for (kind in listOf("corner", "top-left", "top-right", "bottom-left")) {
@@ -114,9 +111,9 @@ class TerminalPaneLayoutTest {
     }
 
     @Test fun calculatorStartsExpandedWithSafeFloatingGeometryAvailable() {
-        val activity = source("java/ohi/andre/consolelauncher/calculator/CalculatorActivity.kt")
+        val activity = SourceFiles.kotlin("CalculatorActivity.kt").readText()
         assertTrue("Calculator reuses help's safe-host geometry", activity.contains("HelpWindowPanel(host, root, state,"))
-        val panel = source("java/ohi/andre/consolelauncher/help/HelpWindowPanel.kt")
+        val panel = SourceFiles.kotlin("HelpWindowPanel.kt").readText()
         assertTrue(panel.contains("initiallyMaximized: Boolean = true"))
         assertTrue(panel.contains("restoredFraction(state, \"width\", .9f)"))
         assertTrue(panel.contains("restoredFraction(state, \"height\", .9f)"))

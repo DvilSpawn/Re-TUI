@@ -4,7 +4,7 @@ package ohi.andre.consolelauncher.commands
 
 import android.content.Context
 import java.util.ArrayList
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 
 @Suppress("UNCHECKED_CAST")

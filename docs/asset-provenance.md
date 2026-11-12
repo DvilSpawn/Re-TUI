@@ -57,16 +57,17 @@ PolyForm Noncommercial license; this record does not change that license.
   obligations. They are not established infringements requiring automatic deletion.
 - Current icon provenance is resolved by replacement on 2026-10-12. The 13
   unverified Notes formatting PNGs are removed; their resource names now use
-  documented Apache-2.0 Google Material Symbols vectors. All 66 current Material
+  documented Apache-2.0 Google Material Symbols vectors. All 63 current Material
   vectors have exact source URLs/SVG checksums at revision
   `49d4db35df873165d6bd6ba09b063c7dafbac2f4` in
   `third_party/material-icons.json`, including Android output checksums.
   Existing resource names, intrinsic dimensions and the resize-arrow rotation
-  wrapper are retained. GitHub/Discord/Reddit support actions use neutral code/
-  chat/forum symbols, not unverified brand logos; destinations and accessible
-  descriptions are unchanged.
-- The wordmark and two simple tree connectors are independently authored geometric
-  paths under GPL-3.0-or-later, with no font outlines. Their exact output hashes are
+  wrapper are retained. The GitHub, Discord and Reddit support actions use the
+  owners' official marks, recorded with their sources in
+  `third_party/brand-icons.json`.
+- The wordmark, the tree connectors and the simple toolbar and edge-stack strokes
+  (gesture, home, timer, stopwatch) are independently authored geometric paths
+  under GPL-3.0-or-later, with no font outlines. Their exact output hashes are
   in `third_party/project-vector-icons.json`. Together with the 11 MIT Tabler
   vectors, every current vector is classified and checksum-checked. This resolves
   current assets, not the origin/rights of replaced files in old revisions.

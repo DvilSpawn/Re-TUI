@@ -21,8 +21,8 @@ import androidx.core.content.ContextCompat
 import android.text.SpannableString
 import android.text.TextUtils
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.TimeManager
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Ui
@@ -217,7 +217,7 @@ class KeeperService : android.app.Service() {
             val si: SpannableString = Tuils.span(inputFormat, inputColor) ?: SpannableString(inputFormat ?: Tuils.EMPTYSTRING)
 
             var s: kotlin.CharSequence? =
-                ohi.andre.consolelauncher.managers.TimeManager.instance!!.replace(si, timeColor)
+                ohi.andre.consolelauncher.managers.time.TimeManager.instance!!.replace(si, timeColor)
             s = android.text.TextUtils.replace(
                 s,
                 kotlin.arrayOf<kotlin.String>(

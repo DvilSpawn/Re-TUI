@@ -25,8 +25,8 @@ class HomeResumePerformanceTest {
         WidgetPaneIntegrationTest().fixture(keyboardOnStart = InstrumentationRegistry.getArguments().getString("homePerfKeyboard") == "true") { home, drawer ->
             instrumentation.runOnMainSync { drawer.hide() }
             if (InstrumentationRegistry.getArguments().getString("homePerfFrames") == "true") {
-                ohi.andre.consolelauncher.tuils.FrameManager.beginEdit(context).apply {
-                    applyPack(ohi.andre.consolelauncher.tuils.FrameManager.SPROUT_LANDS_PACK_ID)
+                ohi.andre.consolelauncher.tuils.frame.FrameManager.beginEdit(context).apply {
+                    applyPack(ohi.andre.consolelauncher.tuils.frame.FrameManager.SPROUT_LANDS_PACK_ID)
                     save()
                 }
             }

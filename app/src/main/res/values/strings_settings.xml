@@ -206,7 +206,7 @@
     <!-- Behavior.kt: show_weather_updates -->
     <string name="setting_behavior_show_weather_updates_description" formatted="false">"If false, Re:T-UI won\'t show information about the weather in the output field"</string>
     <!-- Behavior.kt: swipe_up_apps_drawer -->
-    <string name="setting_behavior_swipe_up_apps_drawer_description" formatted="false">"Show the apps drawer button and allow swipe-up on non-scrolling launcher surfaces. Terminal output remains scrollable"</string>
+    <string name="setting_behavior_swipe_up_apps_drawer_description" formatted="false">"Allow swipe-up on non-scrolling launcher surfaces to open the apps drawer. Terminal output remains scrollable"</string>
     <!-- Behavior.kt: show_music_widget -->
     <string name="setting_behavior_show_music_widget_description" formatted="false">"If true, the music module will be shown in the context container"</string>
     <!-- Behavior.kt: auto_show_music_widget -->
@@ -220,6 +220,10 @@
     <!-- Behavior.kt: shell_requires_prefix -->
     <string name="setting_behavior_shell_requires_prefix_description" formatted="false">"If true, embedded shell commands must be run with shell [command] instead of falling through from unknown input"</string>
     <!-- Behavior.kt: events_lookahead_days -->
+    <string name="setting_behavior_edge_sidebar_description" formatted="false">"Shows a tab on the screen edge over every app. Tap it or swipe in to open launcher search, a floating tmux terminal and your quick app. Drag it along the edge to move it. Needs permission to display over other apps"</string>
+    <string name="setting_behavior_edge_sidebar_quick_app_description" formatted="false">"The app the sidebar's third button opens. Tap Apps to pick one; empty starts a new note, filed in a folder named for today's date"</string>
+    <string name="setting_behavior_edge_pill_width_description" formatted="false">"How thick the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default; raise it for larger text and easier taps (50 to 300)"</string>
+    <string name="setting_behavior_edge_pill_length_description" formatted="false">"How long the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default (50 to 300)"</string>
     <string name="setting_behavior_events_lookahead_days_description" formatted="false">"Number of days after today to include in the launcher Events module. 0 shows only upcoming events today"</string>
     <!-- Behavior.kt: sound_boot -->
     <string name="setting_behavior_sound_boot_description" formatted="false">"Play the launcher startup sound"</string>
@@ -236,8 +240,15 @@
     <!-- Behavior.kt: sound_timer -->
     <string name="setting_behavior_sound_timer_description" formatted="false">"Play the timer completion sound"</string>
     <!-- Behavior.kt: launcher_mode -->
-    <string name="setting_behavior_launcher_mode_description" formatted="false">"Launcher layout mode: classic, search, or terminal"</string>
+    <string name="setting_behavior_launcher_mode_description" formatted="false">"Launcher layout mode: classic, search, terminal, dot, or mono"</string>
     <string name="setting_behavior_search_category_tabs_description">In Search mode, show one result category at a time with tabs. Turn off to show all category rows together in a single pane.</string>
+    <!-- Behavior.kt: mono_ink_color, mono_paper_color -->
+    <string name="setting_behavior_mono_ink_color_description">In Mono mode, the colour everything is drawn in: text, lines and selections.</string>
+    <string name="setting_behavior_mono_paper_color_description">In Mono mode, the background colour.</string>
+    <!-- Behavior.kt: dot_apps -->
+    <string name="setting_behavior_dot_apps_description">In Dot mode, the apps on the rings around the dot, innermost first, separated by commas (up to 5). Leave empty to use your most-used apps.</string>
+    <string name="dot_home_description">Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app.</string>
+    <string name="dot_home_toggle_modules">Show or hide the time, battery and temperature</string>
     <!-- Behavior.kt: search_only_mode -->
     <string name="setting_behavior_search_only_mode_description" formatted="false">"Legacy search mode toggle used only when launcher_mode is empty"</string>
     <!-- Cmd.kt: default_search -->
@@ -689,6 +700,8 @@
     <string name="setting_toolbar_show_toolbar_description" formatted="false">"If false, the toolbar is hidden"</string>
     <!-- Toolbar.kt: hide_toolbar_no_input -->
     <string name="setting_toolbar_hide_toolbar_no_input_description" formatted="false">"If true, the toolbar will be hidden when the input field is empty"</string>
+    <!-- Toolbar.kt: show_apps_drawer_button -->
+    <string name="setting_toolbar_show_apps_drawer_button_description" formatted="false">"If true, the apps drawer button is shown in the toolbar"</string>
     <!-- Toolbar.kt: shortcut_button_1_enabled -->
     <string name="setting_toolbar_shortcut_button_1_enabled_description" formatted="false">"If true, the first custom toolbar button is shown"</string>
     <!-- Toolbar.kt: shortcut_button_1_command -->

@@ -93,7 +93,7 @@ class ReminderActivity : ohi.andre.consolelauncher.localization.LocalizedActivit
             val title = EditText(this).apply { hint = getString(R.string.reminder_task_name); setText(reminder?.title.orEmpty()); styleInput(this@ReminderActivity, this) }
             val whenView = TextView(this).apply {
                 styleListItem(this@ReminderActivity, this, false)
-                textSize = 13f
+                textSize = ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(13f)
                 minHeight = title.minimumHeight
                 setPadding(dp(this@ReminderActivity, 10f), dp(this@ReminderActivity, 8f), dp(this@ReminderActivity, 10f), dp(this@ReminderActivity, 8f))
                 text = formatPickerValue(selected)

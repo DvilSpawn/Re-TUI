@@ -48,7 +48,9 @@
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
     <uses-permission
@@ -191,6 +193,38 @@
                 android:value="Maintains the launcher console state and provides persistent access to Re:T-UI commands via notification."/>
         </service>
         <service
+            android:name=".sidebar.EdgeSidebarService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_TYPE"
+                android:value="Shows the edge sidebar the user turned on: a handle drawn over other apps that opens launcher search, the user's terminal workspace or a chosen app."/>
+        </service>
+        <receiver
+            android:name=".sidebar.EdgeSidebarRestart"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <activity
+            android:name=".sidebar.FloatingTerminalActivity"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|keyboard"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.floatingterminal"
+            android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".sidebar.GlobalSearchActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:taskAffinity="${applicationId}.search"
+            android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize" />
+        <service
             android:name=".irc.IrcConnectionService"
             android:exported="false"
             android:foregroundServiceType="specialUse">
@@ -200,9 +234,41 @@
         <service
             android:name=".managers.music.MusicService"
             android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="mediaPlayback" />
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback">
+            <!-- Media controllers (system media controls, Bluetooth, other apps) find the session here. -->
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService" />
+            </intent-filter>
+        </service>
 
+        <activity
+            android:name=".managers.mediaplayer.MediaPlayerActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.media"
+            android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".managers.media.VideoPlayerActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden"
+            android:launchMode="singleTask"
+            android:resizeableActivity="true"
+            android:supportsPictureInPicture="true"
+            android:taskAffinity="${applicationId}.video"
+            android:theme="@style/Custom.Solid"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".managers.preset.PresetWallpaperPickerActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".managers.media.MediaFolderPickerActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity android:name=".commands.tuixt.PresetMarketplaceActivity" android:exported="false" android:theme="@style/Custom.Solid" />
         <activity
             android:name=".commands.tuixt.PresetImportActivity"
@@ -314,6 +380,17 @@
                 android:name="androidx.core.app.PARENT_ACTIVITY"
                 android:value=".LauncherActivity" />
         </activity>
+
+        <activity
+            android:name=".notes.JournalActivity"
+            android:alwaysRetainTaskState="true"
+            android:excludeFromRecents="false"
+            android:label="@string/activity_label_afc97f0f35"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.journal"
+            android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:exported="false" />
 
         <activity
             android:name=".notes.RememberActivity"

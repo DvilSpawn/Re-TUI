@@ -3,6 +3,7 @@ package ohi.andre.consolelauncher.managers
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.net.SearchProviderManager
 
 class SearchProviderManagerTest {
     @Test fun pinnedAppRoundTrips() {

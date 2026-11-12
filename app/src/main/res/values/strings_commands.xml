@@ -198,6 +198,13 @@
     <string name="command_luamodulecommands_lua_modules_use_module_new_lua_name_module_b0bc0">"Lua modules: %1$s\nUse module -new lua [name], module -edit [id], module -config [id], module -show [id], module -refresh [id], module -check [id], module -info [id], module -approve [id], module -copy-error [id], module -disable|-enable [id], module -export [id], module -expand|-collapse|-toggle [id].\nLegacy widget aliases still work."</string>
     <!-- LuaModuleCommands.kt: exec -->
     <string name="command_luamodulecommands_needs_approval_e0c3e" formatted="false">"needs approval"</string>
+    <string name="command_inspect_handler_launch">launch</string>
+    <string name="command_inspect_handler_share_text">share text</string>
+    <string name="command_inspect_handler_view_web">view web</string>
+    <string name="command_inspect_handler_process_text">process text</string>
+    <string name="command_module_dock_empty">&lt;empty&gt;</string>
+    <string name="command_events_example_title">Events</string>
+    <string name="command_events_example_empty">No upcoming events this month.</string>
     <!-- LuaModuleCommands.kt: exec -->
     <string name="command_luamodulecommands_no_config_surface_92c6f">"No config surface: %1$s"</string>
     <!-- LuaModuleCommands.kt: exec -->
@@ -219,7 +226,7 @@
     <!-- mode.kt: exec -->
     <string name="command_mode_search_mode_enabled_ba524" formatted="false">"Search mode enabled."</string>
     <!-- mode.kt: exec -->
-    <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">"Unknown launcher mode: %1$s\nUsage: mode classic|search|terminal"</string>
+    <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">"Unknown launcher mode: %1$s\nUsage: mode classic|search|terminal|dot|mono"</string>
     <string name="command_mode_enabled">"%1$s mode enabled."</string>
     <!-- module.kt: exec -->
     <string name="command_module_built_in_modules_cannot_be_removed_use_mod_274e3">"Built-in modules cannot be removed. Use module -hide %1$s instead."</string>

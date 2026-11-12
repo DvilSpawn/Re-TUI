@@ -1,8 +1,8 @@
 package ohi.andre.consolelauncher.managers.termux
 
+import ohi.andre.consolelauncher.SourceFiles
 import org.junit.Assert.*
 import org.junit.Test
-import java.io.File
 
 class TermuxHelperUpdateTest {
     @Test fun onlyExactSuccessfulCallbackConfirmsInstallation() {
@@ -17,13 +17,12 @@ class TermuxHelperUpdateTest {
         assertEquals("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", TermuxHelperUpdate.checksum("abc".toByteArray()))
         for (bytes in listOf(byteArrayOf(), ByteArray(TermuxHelperUpdate.MAX_BYTES + 1)))
             assertThrows(IllegalArgumentException::class.java) { TermuxHelperUpdate.checksum(bytes) }
-        val root = File("..").takeIf { File(it, "termux/retui/bin/retui").isFile } ?: File(".")
-        val helper = File(root, "termux/retui/bin/retui").readText()
+        val helper = SourceFiles.repo("termux/retui/bin/retui").readText()
         assertTrue(helper.contains("RETUI_VERSION=\"${TermuxHelperUpdate.VERSION}\""))
         assertTrue(helper.contains(TermuxHelperUpdate.PROTOCOL))
         assertTrue(TermuxHelperUpdate.probeScript.contains("RETUI_NO_CREATE=1"))
         assertFalse(TermuxHelperUpdate.probeScript.contains("curl"))
-        val installer = File(root, "termux/retui/update.sh").readText()
+        val installer = SourceFiles.repo("termux/retui/update.sh").readText()
         assertFalse(installer.contains("kill-server")); assertFalse(installer.contains("kill-session"))
         assertFalse(installer.contains("curl")); assertFalse(installer.contains("wget"))
     }

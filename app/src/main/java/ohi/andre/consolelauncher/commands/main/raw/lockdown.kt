@@ -7,8 +7,8 @@ import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.ExecutePack
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog.FormField
-import ohi.andre.consolelauncher.managers.ClockManager
-import ohi.andre.consolelauncher.managers.LockdownManager
+import ohi.andre.consolelauncher.managers.time.ClockManager
+import ohi.andre.consolelauncher.managers.apps.LockdownManager
 import ohi.andre.consolelauncher.managers.RetuiCreditManager
 import ohi.andre.consolelauncher.tuils.Tuils
 
@@ -62,7 +62,7 @@ class lockdown : CommandAbstraction {
 
     override fun priority(): Int = 2
 
-    override fun helpRes(): Int = 0
+    override fun helpRes(): Int = R.string.help_lockdown
 
     override fun onArgNotFound(pack: ExecutePack, indexNotFound: Int): String = exec(pack)
 

@@ -14,6 +14,9 @@ import android.widget.TextView
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TuiWidgetDecorator
 
 /** Native module XML and chrome shared by the live controller and passive content binder. */
 internal object ModulePanelPresentation {

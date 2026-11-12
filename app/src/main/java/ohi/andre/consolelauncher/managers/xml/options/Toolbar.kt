@@ -17,6 +17,7 @@ enum class Toolbar(
     gesture_right("", R.string.setting_toolbar_gesture_right, XMLPrefsSave.TEXT),
     show_toolbar("true", R.string.setting_toolbar_show_toolbar_description, XMLPrefsSave.BOOLEAN),
     hide_toolbar_no_input("false", R.string.setting_toolbar_hide_toolbar_no_input_description, XMLPrefsSave.BOOLEAN),
+    show_apps_drawer_button("true", R.string.setting_toolbar_show_apps_drawer_button_description, XMLPrefsSave.BOOLEAN),
     shortcut_button_1_enabled("false", R.string.setting_toolbar_shortcut_button_1_enabled_description, XMLPrefsSave.BOOLEAN),
     shortcut_button_1_command("", R.string.setting_toolbar_shortcut_button_1_command_description, XMLPrefsSave.TEXT),
     shortcut_button_1_icon("star", R.string.setting_toolbar_shortcut_button_1_icon_description, XMLPrefsSave.TEXT),

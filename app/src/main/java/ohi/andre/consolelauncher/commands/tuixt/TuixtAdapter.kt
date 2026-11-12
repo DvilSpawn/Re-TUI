@@ -34,7 +34,7 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.rowAccentColor
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.get
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.set
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.xml.options.Apps
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Cmd
@@ -236,16 +236,17 @@ class TuixtAdapter(
         styleInput(settingHolder.itemView.getContext(), settingHolder.input)
 
         val defaultApp = item is Apps && item.label()!!.startsWith("default_app_n")
-        if (item === Cmd.default_search || defaultApp) {
+        val quickApp = item === Behavior.edge_sidebar_quick_app
+        if (item === Cmd.default_search || defaultApp || quickApp) {
             settingHolder.toggle.visibility = View.GONE
             settingHolder.colorPreview.visibility = View.GONE
             settingHolder.input.visibility = View.VISIBLE
             settingHolder.input.setText(currentValue)
             settingHolder.action.visibility = View.VISIBLE
             settingHolder.action.text = settingHolder.itemView.context.getString(
-                if (defaultApp) R.string.toolbar_icon_apps else R.string.editor_tuixtadapter_providers_1bec3)
+                if (defaultApp || quickApp) R.string.toolbar_icon_apps else R.string.editor_tuixtadapter_providers_1bec3)
             styleButton(settingHolder.itemView.context, settingHolder.action, false)
-            settingHolder.action.setOnClickListener { if (defaultApp) pickDefaultApp(settingHolder, item) else onOpenSearchProviders() }
+            settingHolder.action.setOnClickListener { if (quickApp) pickQuickApp(settingHolder, item) else if (defaultApp) pickDefaultApp(settingHolder, item) else onOpenSearchProviders() }
             settingHolder.textWatcher = object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -396,6 +397,20 @@ class TuixtAdapter(
         val values = listOf(Apps.MOST_USED, Apps.NULL) + apps.map { it.write() }
         val labels = listOf(Apps.MOST_USED, Apps.NULL) + apps.map { it.publicLabel }
         TuixtDialog.showOptions(context, displayLabel(context, item), labels, values.indexOf(holder.input.text.toString())) {
+            holder.input.setText(values[it])
+        }
+    }
+
+    /** The sidebar's quick app is stored as a package name; the first choice clears it, which opens Notes. */
+    private fun pickQuickApp(holder: ViewHolder, item: XMLPrefsSave) {
+        val context = holder.itemView.context
+        val pm = context.packageManager
+        val apps = pm.queryIntentActivities(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0)
+            .map { it.activityInfo.packageName to it.loadLabel(pm).toString() }
+            .distinctBy { it.first }.sortedBy { it.second.lowercase() }
+        val values = listOf("") + apps.map { it.first }
+        val labels = listOf(context.getString(R.string.edge_sidebar_quick_app_notes)) + apps.map { it.second }
+        TuixtDialog.showOptions(context, displayLabel(context, item), labels, values.indexOf(holder.input.text.toString().trim())) {
             holder.input.setText(values[it])
         }
     }

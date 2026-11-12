@@ -5,8 +5,8 @@ import android.graphics.Color
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
-import ohi.andre.consolelauncher.managers.BackupManager
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.backup.BackupManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -49,7 +49,7 @@ object PresetMarketplace {
         }
     }
     fun load(): List<Entry> = parse(download(CATALOG, 256 * 1024, { false }) {}.toString(Charsets.UTF_8))
-    private fun download(url: String, limit: Int, cancelled: () -> Boolean, progress: (Int) -> Unit): ByteArray {
+    internal fun download(url: String, limit: Int, cancelled: () -> Boolean, progress: (Int) -> Unit): ByteArray {
         client.newCall(Request.Builder().url(url).build()).execute().use { response ->
             check(response.isSuccessful) { "Download failed (${response.code})" }
             val body = checkNotNull(response.body)

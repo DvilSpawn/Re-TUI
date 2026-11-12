@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.os.Build
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.RegexManager
+import ohi.andre.consolelauncher.managers.terminal.RegexManager
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings.appNotificationsEnabledByDefault
 import ohi.andre.consolelauncher.managers.settings.NotificationSettings.defaultColorRaw
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager

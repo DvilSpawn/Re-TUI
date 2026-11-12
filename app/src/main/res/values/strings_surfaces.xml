@@ -444,7 +444,7 @@
     <!-- renderPodcastEpisodes -->
     <string name="surface_no_show_selected_7bad6" formatted="false">"No show selected."</string>
     <!-- renderPodcastSurface -->
-    <string name="surface_no_subscriptions_yet_use_add_or_type_podcast_add_feed_url_d4398" formatted="false">"No subscriptions yet.\nUse ADD or type podcast add &lt;feed-url&gt;."</string>
+    <string name="surface_no_subscriptions_yet_use_add_or_type_podcast_add_feed_url_d4398" formatted="false">"No subscriptions yet.\nUse + or type podcast add &lt;feed-url&gt;."</string>
     <!-- buildWeatherModuleText -->
     <string name="surface_no_weather_yet_e6067" formatted="false">"No weather yet."</string>
     <!-- showLuaWidgetModule -->

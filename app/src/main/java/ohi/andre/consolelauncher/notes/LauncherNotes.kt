@@ -8,18 +8,40 @@ import java.io.File
 import java.util.UUID
 
 object LauncherNotes {
-    fun open(context: Context, id: String? = null) {
+    /** Today's journal with the keyboard up: the edge sidebar's write button. */
+    fun openNew(context: Context) = launch(context, JournalActivity.TAB_JOURNAL, write = true)
+
+    /** The quick notes list, the notes that show on the status pane. */
+    fun open(context: Context) = launch(context, JournalActivity.TAB_NOTES)
+
+    fun openJournal(context: Context) = launch(context, JournalActivity.TAB_JOURNAL)
+
+    /** The old notes library, kept as a read-back copy after the split. */
+    fun openArchive(context: Context, id: String? = null) {
         val intent = Intent(context, RememberActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra("note_id", id)
             .putExtra("show_library", id == null)
-        RetuiThemeBridge.putLauncherThemeExtras(intent, context, ohi.andre.consolelauncher.tuils.FrameTarget.OVERLAYS, context.packageName)
+        themed(context, intent)
+        context.startActivity(intent)
+    }
+
+    private fun launch(context: Context, tab: String, write: Boolean = false) {
+        val intent = Intent(context, JournalActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            .putExtra(JournalActivity.EXTRA_TAB, tab)
+            .putExtra(JournalActivity.EXTRA_WRITE, write)
+        themed(context, intent)
+        context.startActivity(intent)
+    }
+
+    private fun themed(context: Context, intent: Intent) {
+        RetuiThemeBridge.putLauncherThemeExtras(intent, context, ohi.andre.consolelauncher.tuils.frame.FrameTarget.OVERLAYS, context.packageName)
         // Notes is a terminal pane, not a module: use the same typography as Help and Calc.
         intent.putExtra(com.dvil.retui.contract.RetuiVisualContract.BODY_TEXT_SIZE,
             ohi.andre.consolelauncher.tuils.LauncherFontScale.terminalTextSizeSp().toInt())
         intent.putExtra(com.dvil.retui.contract.RetuiVisualContract.HEADER_TEXT_SIZE,
             ohi.andre.consolelauncher.managers.settings.AppearanceSettings.outputHeaderTextSize())
-        context.startActivity(intent)
     }
 
     // The original XML is retained as a recovery copy; the private index marks migration complete.

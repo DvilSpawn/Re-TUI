@@ -27,7 +27,7 @@ class BorderRefreshIntegrationTest {
         val result = mutableListOf<Int>()
         val background = view.background
         if (view.id != android.view.View.NO_ID &&
-            (background is ohi.andre.consolelauncher.tuils.TerminalBorderDrawable ||
+            (background is ohi.andre.consolelauncher.tuils.frame.TerminalBorderDrawable ||
                 background is android.graphics.drawable.GradientDrawable)
         ) {
             val bitmap = android.graphics.Bitmap.createBitmap(320, 160, android.graphics.Bitmap.Config.ARGB_8888)
@@ -142,7 +142,7 @@ class BorderRefreshIntegrationTest {
             )
             instrumentation.runOnMainSync {
                 launcher.uiManager!!.restoreTerminalState(
-                    ohi.andre.consolelauncher.managers.TerminalManager.State(
+                    ohi.andre.consolelauncher.managers.terminal.TerminalManager.State(
                         "unfinished command", "retained output\nsecond line", listOf("echo first", "pwd"), 1, false
                     )
                 )

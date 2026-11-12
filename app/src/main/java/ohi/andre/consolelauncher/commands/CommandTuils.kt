@@ -5,14 +5,14 @@ import android.graphics.Color
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.Param
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.ContactManager
-import ohi.andre.consolelauncher.managers.FileManager
-import ohi.andre.consolelauncher.managers.FileManager.DirInfo
-import ohi.andre.consolelauncher.managers.FileManager.SpecificExtensionFileFilter
-import ohi.andre.consolelauncher.managers.FileManager.SpecificNameFileFilter
-import ohi.andre.consolelauncher.managers.HTMLExtractManager
-import ohi.andre.consolelauncher.managers.RssManager
+import ohi.andre.consolelauncher.managers.file.FileManager
+import ohi.andre.consolelauncher.managers.file.FileManager.DirInfo
+import ohi.andre.consolelauncher.managers.file.FileManager.SpecificExtensionFileFilter
+import ohi.andre.consolelauncher.managers.file.FileManager.SpecificNameFileFilter
+import ohi.andre.consolelauncher.managers.net.HTMLExtractManager
+import ohi.andre.consolelauncher.managers.net.RssManager
 import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getBoolean
@@ -41,6 +41,7 @@ object CommandTuils {
 
     private val HIDDEN_COMMANDS = arrayOf<String?>(
         "cntcts",
+        "pixelgrid",
         "ctrlc",
         "data",
         "devutils",
@@ -620,14 +621,6 @@ object CommandTuils {
         }
 
         return ArgInfo(n, if (index == -1) null else input.substring(index + 1), true, 1)
-    }
-
-    fun isSuRequest(input: String): Boolean {
-        return input == "su"
-    }
-
-    fun isSuCommand(input: String): Boolean {
-        return input.startsWith("su ")
     }
 
     class ArgInfo(var arg: Any?, var residualString: String?, var found: Boolean, var n: Int)

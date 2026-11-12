@@ -1,6 +1,6 @@
 package ohi.andre.consolelauncher.managers.xml
 
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.xml.options.Apps
 import org.junit.Assert.assertEquals
 import org.junit.Test

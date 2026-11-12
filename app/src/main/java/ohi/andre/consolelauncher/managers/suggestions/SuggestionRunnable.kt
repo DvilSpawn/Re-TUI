@@ -17,13 +17,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
+import ohi.andre.consolelauncher.managers.apps.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.tuils.Tuils
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
-import ohi.andre.consolelauncher.tuils.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
 
 /*Copyright Francesco Andreuzzi
 
@@ -293,6 +293,4 @@ internal class SuggestionChipStyler(private val context: Context, private val ap
         }
         return Binding(type,bgColor,textColor)
     }
-
-    fun suggestionTextColor(type: Int): Int = textColor(type,appearance)
 }

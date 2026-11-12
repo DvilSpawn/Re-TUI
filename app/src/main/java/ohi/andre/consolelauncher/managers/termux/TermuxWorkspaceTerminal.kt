@@ -14,7 +14,16 @@ class TermuxWorkspaceTerminal(cols: Int, rows: Int, grid: TerminalGridView, priv
             else reply(data.copyOfRange(offset, offset + count))
         }
         override fun titleChanged(oldTitle: String?, newTitle: String?) {}
-        override fun onCopyTextToClipboard(text: String?) {}
+        // OSC 52 from tmux (set-buffer -w, copy mode with set-clipboard) or editors such as neovim's "+y.
+        override fun onCopyTextToClipboard(text: String?) {
+            if (text.isNullOrEmpty()) return
+            val context = grid.context.applicationContext
+            grid.post {
+                (context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager)
+                    .setPrimaryClip(android.content.ClipData.newPlainText("terminal", text))
+            }
+        }
+        // Programs in the shell may not read the phone's clipboard; paste from the selection menu instead.
         override fun onPasteTextFromClipboard() {}
         override fun onBell() {}
         override fun onColorsChanged() {}

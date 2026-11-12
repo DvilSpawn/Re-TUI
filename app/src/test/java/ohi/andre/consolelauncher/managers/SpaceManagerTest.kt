@@ -4,6 +4,7 @@ import java.nio.file.Files
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.preset.SpaceManager
 
 class SpaceManagerTest {
     @Test

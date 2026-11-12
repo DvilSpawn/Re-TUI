@@ -2,6 +2,7 @@ package ohi.andre.consolelauncher.managers
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 
 class TerminalOutputCapTest {
     @Test fun keepsOnlyTheLastLines() {

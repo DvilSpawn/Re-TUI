@@ -1,0 +1,33 @@
+{
+  "guidelines": {
+    "ic_tuixt_github_24": "https://brand.github.com/foundations/logo",
+    "ic_tuixt_discord_24": "https://my.corebook.io/1zObrQ89Q4wHhgFCfYIUhMUvmNf4XjxO/02-logo",
+    "ic_tuixt_reddit_24": "https://redditbrand.lingoapp.com/s/Logo-d9x3n2/"
+  },
+  "note": "Official brand marks used only as links to the project's own community pages. Trademarks of their owners; not covered by the project license.",
+  "files": [
+    {
+      "path": "app/src/main/res/drawable/ic_tuixt_github_24.xml",
+      "owner": "GitHub, Inc.",
+      "source": "https://brand.github.com/GitHub_Logos.zip",
+      "source_member": "GitHub Logos/SVG/GitHub_Invertocat_White.svg",
+      "source_sha256": "ccd84c89b1056345608fc3489357f8acc7397e49a3cdc2d418b6c8016911d47b",
+      "vector_sha256": "81c8e2c2fed5f88c1d57513ce86c74a580d59d70c4836f023fd92b7f294d7370"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_tuixt_discord_24.xml",
+      "owner": "Discord Inc.",
+      "source": "https://my.corebook.io/1zObrQ89Q4wHhgFCfYIUhMUvmNf4XjxO/02-logo/download",
+      "source_member": "Discord-Logo/Symbol_RGB/Discord-Symbol-White.svg",
+      "source_sha256": "de4cc484cdc0e3a8f3a58a84b0c80c5ac8acefeebf730930545ff3b279b5d0a3",
+      "vector_sha256": "80c5f492388c5e4a205b0a616dcc1c0e1f55884a27ce4367ead4e263491e1fd4"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/ic_tuixt_reddit_24.png",
+      "owner": "Reddit, Inc.",
+      "source": "https://redditbrand.lingoapp.com/s/Logo-d9x3n2/",
+      "source_member": "Reddit_Icon_2Color.png",
+      "sha256": "2e5be749050d6b3b73a3f23dd92c1c9a94436252ef06930bf6e3097d308703df"
+    }
+  ]
+}

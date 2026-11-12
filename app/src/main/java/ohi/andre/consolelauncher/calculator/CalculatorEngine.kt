@@ -16,7 +16,6 @@ object CalculatorEngine {
     fun rememberImeBottomOffset(context: Context, offset: Int) {
         if (offset > 0) prefs(context).edit().putInt(LAST_IME_BOTTOM_OFFSET, offset).apply()
     }
-    fun lastImeBottomOffset(context: Context): Int = prefs(context).getInt(LAST_IME_BOTTOM_OFFSET, 0)
     fun supported() = Build.VERSION.SDK_INT >= 24
     fun enabled(context: Context) = supported() && LauncherSettings.getBoolean(Behavior.qalculate) && WasmCalculatorRuntime.available(context)
 

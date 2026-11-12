@@ -24,14 +24,12 @@ import androidx.core.content.ContextCompat
 import it.andreuzzi.comparestring2.AlgMap
 import it.andreuzzi.comparestring2.AlgMap.Alg
 import it.andreuzzi.comparestring2.CompareObjects
-import it.andreuzzi.comparestring2.CompareStrings
 import it.andreuzzi.comparestring2.StringableObject
 import it.andreuzzi.comparestring2.algs.interfaces.Algorithm
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.Command
 import ohi.andre.consolelauncher.commands.CommandAbstraction
 import ohi.andre.consolelauncher.commands.CommandTuils
-import ohi.andre.consolelauncher.commands.CommandTuils.duoOptions
 import ohi.andre.consolelauncher.commands.CommandTuils.isHiddenCommandName
 import ohi.andre.consolelauncher.commands.CommandTuils.parse
 import ohi.andre.consolelauncher.commands.main.MainPack
@@ -41,19 +39,18 @@ import ohi.andre.consolelauncher.commands.main.raw.search
 import ohi.andre.consolelauncher.commands.main.raw.files as FilesCommand
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.commands.main.specific.PermanentSuggestionCommand
-import ohi.andre.consolelauncher.managers.AliasManager
-import ohi.andre.consolelauncher.managers.AppFinder
-import ohi.andre.consolelauncher.managers.WebSearchFallback
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.terminal.AliasManager
+import ohi.andre.consolelauncher.managers.apps.AppFinder
+import ohi.andre.consolelauncher.managers.net.WebSearchFallback
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings
-import ohi.andre.consolelauncher.managers.AppsManager.Group.GroupLaunchInfo
-import ohi.andre.consolelauncher.managers.AppsManager.LaunchInfo
+import ohi.andre.consolelauncher.managers.apps.AppsManager.Group.GroupLaunchInfo
+import ohi.andre.consolelauncher.managers.apps.AppsManager.LaunchInfo
 import ohi.andre.consolelauncher.managers.ContactManager.Contact
-import ohi.andre.consolelauncher.managers.FileManager.cd
-import ohi.andre.consolelauncher.managers.PresetManager.listAllPresetNames
-import ohi.andre.consolelauncher.managers.PresetManager.listPresets
-import ohi.andre.consolelauncher.managers.TerminalManager
-import ohi.andre.consolelauncher.managers.file.RetuiFilesContract
+import ohi.andre.consolelauncher.managers.file.FileManager.cd
+import ohi.andre.consolelauncher.managers.preset.PresetManager.listAllPresetNames
+import ohi.andre.consolelauncher.managers.preset.PresetManager.listPresets
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.displayTitle
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.getDock
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.isKnown
@@ -65,10 +62,7 @@ import ohi.andre.consolelauncher.managers.notifications.reply.ReplyManager
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getBoolean
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.dirs
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.files
-import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache.shouldRequest
 import ohi.andre.consolelauncher.managers.termux.TermuxWorkspaceLauncherManager
-import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager
-import ohi.andre.consolelauncher.managers.termux.TermuxBridgeManager.dispatchShell
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetEngine
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -83,12 +77,9 @@ import ohi.andre.consolelauncher.managers.xml.options.Suggestions
 import ohi.andre.consolelauncher.tuils.StoppableThread
 import ohi.andre.consolelauncher.tuils.Tuils
 import java.io.File
-import java.io.FilenameFilter
-import java.util.Arrays
 import java.util.Collections
 import java.util.Locale
 import java.util.regex.Pattern
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import android.os.Build
@@ -102,14 +93,14 @@ import java.util.Set
 import java.util.concurrent.atomic.AtomicLong
 import java.util.regex.Matcher
 import ohi.andre.consolelauncher.managers.ContactManager
-import ohi.andre.consolelauncher.managers.FileManager
-import ohi.andre.consolelauncher.managers.PresetManager
-import ohi.andre.consolelauncher.managers.RssManager
-import ohi.andre.consolelauncher.managers.SpaceManager
-import ohi.andre.consolelauncher.managers.SearchProviderManager
+import ohi.andre.consolelauncher.managers.file.FileManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
+import ohi.andre.consolelauncher.managers.net.RssManager
+import ohi.andre.consolelauncher.managers.preset.SpaceManager
+import ohi.andre.consolelauncher.managers.net.SearchProviderManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationManager
 import ohi.andre.consolelauncher.managers.notifications.NotificationService
-import ohi.andre.consolelauncher.managers.WebhookManager
+import ohi.andre.consolelauncher.managers.net.WebhookManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
 import ohi.andre.consolelauncher.managers.termux.TermuxBridgeCache
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
@@ -133,7 +124,6 @@ class SuggestionsManager(
     private val FIRST_INTERVAL = 6
 
     private val SPLITTERS = arrayOf<String?>(Tuils.SPACE)
-    private val FILE_SPLITTERS = arrayOf<String?>(Tuils.SPACE, "-", "_")
     private val XML_PREFS_SPLITTERS = arrayOf<String?>("_")
     private val VOLUME_SET_STREAMS = arrayOf("system", "ringer", "media", "alarm", "notification")
     private val VOLUME_GET_STREAMS = arrayOf("voice call", "system", "ringer", "media", "alarm", "notification")
@@ -185,6 +175,17 @@ class SuggestionsManager(
     private var alg: Alg? = null
 
     private val quickCompare: Int
+
+    private val fileSuggestions = SuggestionFileProvider(
+        rmQuotes,
+        { suggestionsPerCategory },
+        { suggestionsDeadline },
+        { algInstance },
+        { alg },
+        { s1, ss, suggestions, beforeLastSpace, max, exec, type, tag ->
+            quickCompare(s1, ss, suggestions, beforeLastSpace, max, exec, type, tag)
+        }
+    )
 
     private fun setAlgorithm(id: Int) {
         when (id) {
@@ -1177,7 +1178,7 @@ class SuggestionsManager(
         if (filesSubcommand != null) {
             comparator.noInput = false
             val prefix = if (beforeLastSpace.equals("files", true)) null else lastWord.ifEmpty { null }
-            suggestRetuiFiles(
+            fileSuggestions.suggestRetuiFiles(
                 pack,
                 suggestionList,
                 prefix,
@@ -1269,8 +1270,8 @@ class SuggestionsManager(
                         )
                     }
 
-                    if (isCdCommand(beforeLastSpace) || isFileOpenCommand(beforeLastSpace)) {
-                        suggestFile(pack, suggestionList, null, beforeLastSpace)
+                    if (fileSuggestions.isCdCommand(beforeLastSpace) || fileSuggestions.isFileOpenCommand(beforeLastSpace)) {
+                        fileSuggestions.suggestFile(pack, suggestionList, null, beforeLastSpace)
                         Collections.sort<Suggestion?>(suggestionList, comparator)
                         return suggestionList
                     }
@@ -1299,7 +1300,7 @@ class SuggestionsManager(
                     }
 
                     if (isShellCmd) {
-                        suggestFile(pack, suggestionList, Tuils.EMPTYSTRING, beforeLastSpace)
+                        fileSuggestions.suggestFile(pack, suggestionList, Tuils.EMPTYSTRING, beforeLastSpace)
                     } else {
 //                        ==> app
                         if (!suggestAppInsideGroup(
@@ -1344,8 +1345,8 @@ class SuggestionsManager(
                         )
                     }
 
-                    if (isCdCommand(beforeLastSpace) || isFileOpenCommand(beforeLastSpace)) {
-                        suggestFile(pack, suggestionList, lastWord, beforeLastSpace)
+                    if (fileSuggestions.isCdCommand(beforeLastSpace) || fileSuggestions.isFileOpenCommand(beforeLastSpace)) {
+                        fileSuggestions.suggestFile(pack, suggestionList, lastWord, beforeLastSpace)
                         Collections.sort<Suggestion?>(suggestionList, comparator)
                         return suggestionList
                     }
@@ -1382,7 +1383,7 @@ class SuggestionsManager(
                     }
 
                     if (isShellCmd) {
-                        suggestFile(pack, suggestionList, lastWord, beforeLastSpace)
+                        fileSuggestions.suggestFile(pack, suggestionList, lastWord, beforeLastSpace)
                     } else {
                         if (!suggestAppInsideGroup(
                                 pack,
@@ -1413,7 +1414,7 @@ class SuggestionsManager(
                 suggestAlias(pack.aliasManager, suggestionList, lastWord)
                 suggestApp(pack, suggestionList, lastWord, Tuils.EMPTYSTRING)
                 suggestAppGroup(pack, suggestionList, lastWord, beforeLastSpace)
-                suggestClockCommandRoots(suggestionList, lastWord)
+                SuggestionFlagTables.suggestClockCommandRoots(pack, suggestionList, lastWord)
             }
         }
 
@@ -1706,7 +1707,7 @@ class SuggestionsManager(
             return
         }
 
-        val matches: Array<Contact?> = CompareObjects.topMatchesWithDeadline(
+        val matches: Array<Contact?> = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline(
             Contact::class.java,
             filter,
             contacts.size,
@@ -1716,7 +1717,7 @@ class SuggestionsManager(
             SPLITTERS,
             algInstance,
             alg
-        )
+        ) }
         for (contact in matches) {
             if (contact == null) {
                 break
@@ -1866,7 +1867,7 @@ class SuggestionsManager(
         }
 
         when (type) {
-            CommandAbstraction.FILE -> suggestFile(
+            CommandAbstraction.FILE -> fileSuggestions.suggestFile(
                 info,
                 suggestions,
                 afterLastSpace,
@@ -2018,352 +2019,14 @@ class SuggestionsManager(
         return true
     }
 
-    private fun suggestClockCommandRoots(suggestions: MutableList<Suggestion?>, lastWord: String?) {
-        if (lastWord == null) {
-            return
-        }
-
-        val lower = lastWord.lowercase(Locale.getDefault())
-        if ("timer".startsWith(lower)) {
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "timer -add",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "timer -stop",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "timer -status",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            for (quick in this.timerQuickSuggestions) {
-                suggestions.add(
-                    Suggestion(
-                        null,
-                        "timer " + quick,
-                        true,
-                        Suggestion.Companion.TYPE_PERMANENT
-                    )
-                )
-            }
-        }
-
-        if ("stopwatch".startsWith(lower)) {
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "stopwatch",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            for (option in arrayOf<String>(
-                "stopwatch -stop",
-                "stopwatch -reset",
-                "stopwatch -status"
-            )) {
-                suggestions.add(Suggestion(null, option, true, Suggestion.Companion.TYPE_PERMANENT))
-            }
-        }
-
-        if ("termux".startsWith(lower)) {
-            suggestions.add(Suggestion(null, "termux", true, Suggestion.Companion.TYPE_PERMANENT))
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -status",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -setup",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -open",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -apps",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -run",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -app",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "tmux launch",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "tmux status",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "termux -rm-app",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-        }
-
-        suggestTermuxAppRoots(suggestions, lower)
-
-        if ("lua".startsWith(lower)) {
-            suggestions.add(Suggestion(null, "lua -apps", true, Suggestion.Companion.TYPE_PERMANENT))
-            suggestions.add(Suggestion(null, "lua -new app", false, Suggestion.Companion.TYPE_PERMANENT))
-            suggestions.add(Suggestion(null, "lua -app", false, Suggestion.Companion.TYPE_PERMANENT))
-            suggestions.add(Suggestion(null, "lua -edit", false, Suggestion.Companion.TYPE_PERMANENT))
-            suggestions.add(Suggestion(null, "lua -check", false, Suggestion.Companion.TYPE_PERMANENT))
-        }
-
-        if ("tbridge".startsWith(lower)) {
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "tbridge -status",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "tbridge -setup",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "tbridge -probe",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-        }
-
-        if ("shell".startsWith(lower)) {
-            suggestions.add(Suggestion(null, "shell", false, Suggestion.Companion.TYPE_PERMANENT))
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "shell pwd",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(Suggestion(null, "shell ls", true, Suggestion.Companion.TYPE_PERMANENT))
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "shell cd",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "shell cd ..",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-        }
-
-        if ("retui-token".startsWith(lower) || "retuitoken".startsWith(lower)) {
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "retui-token -status",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "retui-token -show",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "retui-token -rotate",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "retui-token -off",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-        }
-
-        if ("module".startsWith(lower)) {
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -ls",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -add",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -refresh",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -rm",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -show",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -close",
-                    true,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -dock add",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "module -dock remove",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-        }
-
-        if ("orientation".startsWith(lower)) {
-            suggestions.add(
-                Suggestion(
-                    null,
-                    "orientation",
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            for (option in arrayOf<String>("portrait", "landscape", "auto")) {
-                suggestions.add(
-                    Suggestion(
-                        null,
-                        "orientation " + option,
-                        true,
-                        Suggestion.Companion.TYPE_PERMANENT
-                    )
-                )
-            }
-        }
-
-        if (getBoolean(Behavior.duo_mode) && CommandTuils.DUO_COMMAND.startsWith(lower)) {
-            suggestions.add(
-                Suggestion(
-                    null,
-                    CommandTuils.DUO_COMMAND,
-                    false,
-                    Suggestion.Companion.TYPE_PERMANENT
-                )
-            )
-            for (option in duoOptions()) {
-                suggestions.add(
-                    Suggestion(
-                        null,
-                        CommandTuils.DUO_COMMAND + " " + option,
-                        true,
-                        Suggestion.Companion.TYPE_PERMANENT
-                    )
-                )
-            }
-        }
+    private fun suggestIntentCommandArgs(
+        pack: MainPack,
+        suggestions: MutableList<Suggestion?>,
+        afterLastSpace: String?,
+        beforeLastSpace: String?,
+        normalized: String
+    ): Boolean = SuggestionFlagTables.suggestIntentCommandArgs(pack, suggestions, afterLastSpace, beforeLastSpace, normalized) {
+        counts!![Suggestion.Companion.TYPE_APP]
     }
 
     private fun suggestClockCommandArgs(
@@ -2378,6 +2041,13 @@ class SuggestionsManager(
 
         val normalized = beforeLastSpace.trim { it <= ' ' }.lowercase(Locale.getDefault())
         if (suggestIntentCommandArgs(pack, suggestions, afterLastSpace, beforeLastSpace, normalized)) {
+            return
+        }
+
+        if ("media" == normalized || "media -rm" == normalized) {
+            val folders = ohi.andre.consolelauncher.managers.media.MediaLibrary.folders(pack.context)
+                .map(ohi.andre.consolelauncher.managers.media.MediaLibrary::label)
+            suggestions.addAll(mediaSuggestions(beforeLastSpace, normalized, afterLastSpace, folders))
             return
         }
 
@@ -2406,7 +2076,7 @@ class SuggestionsManager(
                     Suggestion.Companion.TYPE_COMMAND
                 )
             )
-            for (quick in this.timerQuickSuggestions) {
+            for (quick in SuggestionFlagTables.timerQuickSuggestions) {
                 if (afterLastSpace == null || afterLastSpace.isEmpty() || quick.startsWith(
                         afterLastSpace.lowercase(
                             Locale.getDefault()
@@ -2424,7 +2094,7 @@ class SuggestionsManager(
                 }
             }
         } else if ("timer -add" == normalized) {
-            for (quick in this.timerQuickSuggestions) {
+            for (quick in SuggestionFlagTables.timerQuickSuggestions) {
                 if (afterLastSpace == null || afterLastSpace.isEmpty() || quick.startsWith(
                         afterLastSpace.lowercase(
                             Locale.getDefault()
@@ -2783,195 +2453,10 @@ class SuggestionsManager(
         } else if ("module -dock" == normalized || normalized.startsWith("module -dock ")) {
             suggestDockCommand(suggestions, afterLastSpace, beforeLastSpace)
         } else if ("orientation" == normalized) {
-            suggestOrientationOptions(suggestions, afterLastSpace, beforeLastSpace)
+            SuggestionFlagTables.suggestOrientationOptions(suggestions, afterLastSpace, beforeLastSpace)
         } else if (getBoolean(Behavior.duo_mode) && CommandTuils.DUO_COMMAND == normalized) {
-            suggestDuoOptions(suggestions, afterLastSpace, beforeLastSpace)
+            SuggestionFlagTables.suggestDuoOptions(suggestions, afterLastSpace, beforeLastSpace)
         }
-    }
-
-    private fun suggestDuoOptions(
-        suggestions: MutableList<Suggestion?>,
-        lastWord: String?,
-        beforeLastSpace: String?
-    ) {
-        val filter = if (lastWord == null) Tuils.EMPTYSTRING else lastWord.lowercase()
-        for (option in duoOptions()) {
-            if (filter.length == 0 || option!!.startsWith(filter)) {
-                suggestions.add(
-                    SuggestionsManager.Suggestion(
-                        beforeLastSpace,
-                        option!!,
-                        true,
-                        Suggestion.Companion.TYPE_COMMAND
-                    )
-                )
-            }
-        }
-    }
-
-    private fun suggestOrientationOptions(
-        suggestions: MutableList<Suggestion?>,
-        lastWord: String?,
-        beforeLastSpace: String?
-    ) {
-        val filter =
-            if (lastWord == null) Tuils.EMPTYSTRING else lastWord.lowercase(Locale.getDefault())
-        for (option in arrayOf<String>("portrait", "landscape", "auto")) {
-            if (filter.length == 0 || option.startsWith(filter)) {
-                suggestions.add(
-                    Suggestion(
-                        beforeLastSpace,
-                        option,
-                        true,
-                        Suggestion.Companion.TYPE_COMMAND
-                    )
-                )
-            }
-        }
-    }
-
-    private fun suggestIntentCommandArgs(
-        pack: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?,
-        normalized: String
-    ): Boolean {
-        if ("inspect" == normalized) {
-            suggestIntentPackages(pack, suggestions, afterLastSpace, beforeLastSpace)
-            return true
-        }
-        if (normalized.startsWith("inspect ")) {
-            return true
-        }
-        if (!isIntentCommand(normalized)) {
-            return false
-        }
-
-        val lastToken = normalized.split("\\s+".toRegex()).lastOrNull()
-        if ("-p" == lastToken) {
-            suggestIntentPackages(pack, suggestions, afterLastSpace, beforeLastSpace)
-            return true
-        }
-
-        if (isIntentValueToken(lastToken)) {
-            return true
-        }
-
-        if ("intent" == normalized) {
-            addIntentActions(suggestions, afterLastSpace)
-            return true
-        }
-
-        if ("intent -activity" == normalized || "intent activity" == normalized) {
-            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, *INTENT_PARAMETERS)
-            return true
-        }
-
-        if ("intent -broadcast" == normalized || "intent broadcast" == normalized) {
-            addIntentOptions(suggestions, beforeLastSpace, afterLastSpace, *INTENT_BROADCAST_PARAMETERS)
-            return true
-        }
-
-        addIntentOptions(
-            suggestions,
-            beforeLastSpace,
-            afterLastSpace,
-            *INTENT_PARAMETERS
-        )
-        return true
-    }
-
-    private fun isIntentCommand(normalized: String): Boolean {
-        return "intent" == normalized || normalized.startsWith("intent ")
-    }
-
-    private fun isIntentValueToken(token: String?): Boolean {
-        return "-a" == token || "-d" == token || "-t" == token || "-n" == token
-            || "--es" == token || "--ei" == token || "--ez" == token
-    }
-
-    private fun addIntentOptions(
-        suggestions: MutableList<Suggestion?>,
-        beforeLastSpace: String?,
-        afterLastSpace: String?,
-        vararg options: Pair<String, String>
-    ) {
-        val filter = afterLastSpace?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
-        val normalizedFilter = filter.replace("-", Tuils.EMPTYSTRING)
-        for ((option, label) in options) {
-            val normalizedOption = option.replace("-", Tuils.EMPTYSTRING)
-            if (filter.length == 0 || option.startsWith(filter) || normalizedOption.startsWith(normalizedFilter)
-                || label.lowercase(Locale.getDefault()).startsWith(filter.lowercase(Locale.getDefault()))) {
-                val prefix = beforeLastSpace?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
-                val command = if (prefix.isEmpty()) option else prefix + Tuils.SPACE + option
-                suggestions.add(Suggestion(null, label, false, Suggestion.Companion.TYPE_MODULE, command))
-            }
-        }
-    }
-
-    private fun addIntentActions(suggestions: MutableList<Suggestion?>, afterLastSpace: String?) {
-        val filter = afterLastSpace?.trim()?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
-        for ((label, command) in INTENT_ROOT_ACTIONS) {
-            if (filter.isEmpty() || label.lowercase(Locale.getDefault()).startsWith(filter)
-                || command.substringAfterLast(' ').removePrefix("-").startsWith(filter.removePrefix("-"))) {
-                suggestions.add(Suggestion(null, label, false, Suggestion.Companion.TYPE_MODULE, command))
-            }
-        }
-    }
-
-    private fun suggestIntentPackages(
-        pack: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?
-    ) {
-        val apps: MutableList<LaunchInfo> = ArrayList<LaunchInfo>(pack.appsManager.shownApps())
-        try {
-            apps.addAll(pack.appsManager.hiddenApps())
-        } catch (e: Exception) {
-            Tuils.log(e)
-        }
-
-        val filter = afterLastSpace?.trim { it <= ' ' }?.lowercase(Locale.getDefault()) ?: Tuils.EMPTYSTRING
-        val added = LinkedHashSet<String?>()
-        var canInsert = counts!![Suggestion.Companion.TYPE_APP]
-        for (app in apps) {
-            if (canInsert == 0) {
-                return
-            }
-
-            val pkg = app.componentName?.getPackageName() ?: continue
-            if (!added.add(pkg)) {
-                continue
-            }
-
-            val label = app.publicLabel ?: pkg
-            if (filter.length > 0
-                && !pkg.lowercase(Locale.getDefault()).startsWith(filter)
-                && !label.lowercase(Locale.getDefault()).startsWith(filter)
-            ) {
-                continue
-            }
-
-            val prefix = beforeLastSpace?.trim { it <= ' ' } ?: Tuils.EMPTYSTRING
-            val command = if (prefix.length == 0) pkg else prefix + Tuils.SPACE + pkg
-            suggestions.add(
-                Suggestion(
-                    null,
-                    label,
-                    prefix.equals("inspect", ignoreCase = true),
-                    Suggestion.Companion.TYPE_MODULE,
-                    command
-                )
-            )
-            canInsert--
-        }
-    }
-
-    private fun suggestTermuxAppRoots(suggestions: MutableList<Suggestion?>, lower: String) {
-        if (lower.isEmpty()) return
-        suggestions.addAll(termuxLauncherSuggestions(TermuxWorkspaceLauncherManager.list(pack.context), lower))
     }
 
     private fun suggestWidgetIds(
@@ -3055,6 +2540,7 @@ class SuggestionsManager(
                 .dropLastWhile { it.isEmpty() }.toTypedArray()
 
         if (parts.size <= 2) {
+            suggestDockAction(suggestions, "-toggle", typed, prefix, clickToLaunch)
             suggestDockAction(suggestions, "add", typed, prefix)
             suggestDockAction(suggestions, "remove", typed, prefix)
             return
@@ -3091,10 +2577,11 @@ class SuggestionsManager(
         suggestions: MutableList<Suggestion?>,
         action: String,
         typed: String,
-        prefix: String?
+        prefix: String?,
+        exec: Boolean = false
     ) {
-        if (typed.length == 0 || action.startsWith(typed)) {
-            suggestions.add(Suggestion(prefix, action, false, Suggestion.Companion.TYPE_COMMAND))
+        if (typed.length == 0 || action.startsWith(typed) || action.removePrefix("-").startsWith(typed.removePrefix("-"))) {
+            suggestions.add(Suggestion(prefix, action, exec, Suggestion.Companion.TYPE_COMMAND))
         }
     }
 
@@ -3237,9 +2724,6 @@ class SuggestionsManager(
             }
         }
     }
-
-    private val timerQuickSuggestions: Array<String>
-        get() = arrayOf<String>("5m", "15m", "30m", "60m")
 
     private fun suggestWebhookHistory(
         info: MainPack,
@@ -3481,447 +2965,6 @@ class SuggestionsManager(
         )
     }
 
-    private fun suggestFile(
-        info: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?
-    ) {
-        var afterLastSpace = afterLastSpace
-        if (isCdCommand(beforeLastSpace)) {
-            suggestDirectory(info, suggestions, afterLastSpace, beforeLastSpace)
-            return
-        }
-        if (isFileOpenCommand(beforeLastSpace)) {
-            suggestOpenableFile(info, suggestions, afterLastSpace, beforeLastSpace)
-            return
-        }
-
-        val noAfterLastSpace = afterLastSpace == null || afterLastSpace.length == 0
-        val afterLastSpaceNotEndsWithSeparator =
-            noAfterLastSpace || !afterLastSpace.endsWith(File.separator)
-
-        if (noAfterLastSpace || afterLastSpaceNotEndsWithSeparator) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    File.separator,
-                    false,
-                    Suggestion.Companion.TYPE_FILE,
-                    afterLastSpace
-                )
-            )
-        }
-
-        if (Suggestion.Companion.appendQuotesBeforeFile && !noAfterLastSpace && !afterLastSpace.endsWith(
-                SINGLE_QUOTE
-            ) && !afterLastSpace.endsWith(DOUBLE_QUOTES)
-        ) suggestions.add(
-            Suggestion(
-                beforeLastSpace,
-                SINGLE_QUOTE,
-                false,
-                Suggestion.Companion.TYPE_FILE,
-                afterLastSpace
-            )
-        )
-
-        if (noAfterLastSpace) {
-            suggestFilesInDir(null, suggestions, info.currentDirectory, beforeLastSpace)
-            return
-        }
-
-        if (!afterLastSpace.contains(File.separator)) {
-            suggestFilesInDir(
-                suggestions,
-                info.currentDirectory,
-                afterLastSpace,
-                beforeLastSpace,
-                null
-            )
-        } else {
-            //            if it's ../../
-
-            if (!afterLastSpaceNotEndsWithSeparator) {
-                val total = beforeLastSpace + Tuils.SPACE + afterLastSpace
-                val quotesCount: Int =
-                    total.length - total.replace(DOUBLE_QUOTES, Tuils.EMPTYSTRING).replace(
-                        SINGLE_QUOTE, Tuils.EMPTYSTRING
-                    ).length
-
-                if (quotesCount > 0) {
-                    val singleQIndex: Int = total.lastIndexOf(SINGLE_QUOTE)
-                    val doubleQIndex: Int = total.lastIndexOf(DOUBLE_QUOTES)
-
-                    val lastQuote = max(singleQIndex, doubleQIndex)
-
-                    val file = total.substring(lastQuote + abs(quotesCount % 2 - 2))
-                    val dirInfo = cd(info.currentDirectory, file)
-                    suggestFilesInDir(afterLastSpace, suggestions, dirInfo.file, beforeLastSpace)
-                } else {
-//                    removes the /
-                    afterLastSpace = afterLastSpace.substring(0, afterLastSpace.length - 1)
-                    val dirInfo = cd(info.currentDirectory, afterLastSpace)
-                    suggestFilesInDir(
-                        afterLastSpace + File.separator,
-                        suggestions,
-                        dirInfo.file,
-                        beforeLastSpace
-                    )
-                }
-            } else {
-                val originalAfterLastSpace: String? = afterLastSpace
-                afterLastSpace = rmQuotes.matcher(afterLastSpace).replaceAll(Tuils.EMPTYSTRING)
-
-                val index = afterLastSpace.lastIndexOf(File.separator)
-                val dirInfo = cd(info.currentDirectory, afterLastSpace.substring(0, index))
-
-                val originalIndex = originalAfterLastSpace!!.lastIndexOf(File.separator)
-
-                val alsals = originalAfterLastSpace.substring(0, originalIndex + 1)
-                val als = originalAfterLastSpace.substring(originalIndex + 1)
-
-                //                beforeLastSpace  = beforeLastSpace + Tuils.SPACE + hold;
-                suggestFilesInDir(suggestions, dirInfo.file, als, beforeLastSpace, alsals)
-            }
-        }
-    }
-
-    private fun isCdCommand(beforeLastSpace: String?): Boolean {
-        if (beforeLastSpace == null) {
-            return false
-        }
-        return "cd".equals(beforeLastSpace.trim { it <= ' ' }, ignoreCase = true)
-    }
-
-    private fun isFileOpenCommand(beforeLastSpace: String?): Boolean {
-        if (beforeLastSpace == null) {
-            return false
-        }
-        val command = beforeLastSpace.trim { it <= ' ' }.lowercase(Locale.getDefault())
-        return "open" == command || "termux-open" == command || "share" == command
-    }
-
-    private fun suggestOpenableFile(
-        info: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?
-    ) {
-        if (beforeLastSpace?.trim()?.equals("termux-open", ignoreCase = true) == true) {
-            suggestTermuxFiles(info, suggestions, afterLastSpace, beforeLastSpace)
-            return
-        }
-        suggestRetuiFiles(info, suggestions, afterLastSpace, beforeLastSpace, false)
-    }
-
-    private fun suggestDirectory(
-        info: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?
-    ) {
-        suggestRetuiFiles(info, suggestions, afterLastSpace, beforeLastSpace, true)
-    }
-
-    private fun suggestRetuiFiles(
-        info: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        prefix: String?,
-        command: String?,
-        directoriesOnly: Boolean
-    ) {
-        RetuiFilesContract.entries(info.context, directoriesOnly, prefix).forEach { entry ->
-            suggestions.add(
-                Suggestion(command, entry.name, false, Suggestion.Companion.TYPE_FILE, prefix)
-            )
-        }
-    }
-
-    private fun suggestTermuxFiles(
-        info: MainPack,
-        suggestions: MutableList<Suggestion?>,
-        afterLastSpace: String?,
-        beforeLastSpace: String?
-    ) {
-        val target = termuxTarget(info.currentDirectory, afterLastSpace)
-        requestTermuxListing(info, "files", target.dir)
-        addTermuxMatches(
-            files(target.dir),
-            target.leaf,
-            suggestions,
-            beforeLastSpace,
-            target.holder
-        )
-    }
-
-    private fun requestTermuxListing(info: MainPack, type: String, path: String) {
-        if (!shouldRequest(type, path)) {
-            return
-        }
-        val script = if ("dirs" == type) tbridge.LIST_DIRS_SCRIPT else tbridge.LIST_FILES_SCRIPT
-        dispatchShell(
-            info.context,
-            type + " " + path,
-            script,
-            TermuxBridgeManager.TERMUX_HOME,
-            path
-        )
-    }
-
-    private fun termuxTarget(
-        currentDirectory: File,
-        afterLastSpace: String?
-    ): TermuxSuggestionTarget {
-        if (afterLastSpace == null || afterLastSpace.trim { it <= ' ' }.length == 0) {
-            return TermuxSuggestionTarget(
-                currentDirectory.getAbsolutePath(),
-                Tuils.EMPTYSTRING,
-                null
-            )
-        }
-
-        val original: String? = afterLastSpace
-        val clean = rmQuotes.matcher(afterLastSpace).replaceAll(Tuils.EMPTYSTRING)
-        if (clean.endsWith(File.separator)) {
-            val dir =
-                if (clean.startsWith(File.separator)) File(clean) else File(currentDirectory, clean)
-            return TermuxSuggestionTarget(dir.getAbsolutePath(), Tuils.EMPTYSTRING, original)
-        }
-
-        val index = clean.lastIndexOf(File.separator)
-        if (index < 0) {
-            return TermuxSuggestionTarget(currentDirectory.getAbsolutePath(), clean, null)
-        }
-
-        val base = clean.substring(0, index)
-        val holder = original!!.substring(0, original.lastIndexOf(File.separator) + 1)
-        val leaf = clean.substring(index + 1)
-        val dir = if (base.startsWith(File.separator)) File(base) else File(currentDirectory, base)
-        return TermuxSuggestionTarget(dir.getAbsolutePath(), leaf, holder)
-    }
-
-    private fun addTermuxMatches(
-        values: List<String>,
-        leaf: String?,
-        suggestions: MutableList<Suggestion?>,
-        beforeLastSpace: String?,
-        holder: String?
-    ) {
-        val temp = if (leaf == null) Tuils.EMPTYSTRING else leaf
-        val counter = quickCompare(
-            temp,
-            values.toTypedArray(),
-            suggestions,
-            beforeLastSpace,
-            suggestionsPerCategory,
-            false,
-            Suggestion.Companion.TYPE_FILE,
-            false
-        )
-        if (suggestionsPerCategory - counter <= 0) {
-            return
-        }
-        val matches = CompareStrings.topMatchesWithDeadline(
-            temp,
-            values.toTypedArray(),
-            suggestionsPerCategory - counter,
-            suggestionsDeadline,
-            FILE_SPLITTERS,
-            algInstance,
-            alg
-        )
-        for (match in matches) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    match,
-                    false,
-                    Suggestion.Companion.TYPE_FILE,
-                    holder
-                )
-            )
-        }
-    }
-
-    private class TermuxSuggestionTarget(val dir: String, val leaf: String?, val holder: String?)
-
-    private fun suggestFilesInDir(
-        suggestions: MutableList<Suggestion?>,
-        dir: File?,
-        afterLastSeparator: String?,
-        beforeLastSpace: String?,
-        afterLastSpaceWithoutALS: String?
-    ) {
-        if (dir == null || !dir.isDirectory()) return
-
-        if (afterLastSeparator == null || afterLastSeparator.length == 0) {
-            suggestFilesInDir(null, suggestions, dir, beforeLastSpace)
-            return
-        }
-
-        val files = dir.list()
-        if (files == null) {
-            return
-        }
-
-        //        Tuils.log("bls", beforeLastSpace);
-//        Tuils.log("als", afterLastSeparator);
-//        Tuils.log("alsals", afterLastSpaceWithoutALS);
-        val temp = rmQuotes.matcher(afterLastSeparator).replaceAll(Tuils.EMPTYSTRING)
-
-        val counter = quickCompare(
-            temp,
-            files,
-            suggestions,
-            beforeLastSpace,
-            suggestionsPerCategory,
-            false,
-            Suggestion.Companion.TYPE_FILE,
-            false
-        )
-        if (suggestionsPerCategory - counter <= 0) return
-
-        val fs = CompareStrings.topMatchesWithDeadline(
-            temp,
-            files,
-            suggestionsPerCategory - counter,
-            suggestionsDeadline,
-            FILE_SPLITTERS,
-            algInstance,
-            alg
-        )
-        for (f in fs) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    f,
-                    false,
-                    Suggestion.Companion.TYPE_FILE,
-                    afterLastSpaceWithoutALS
-                )
-            )
-        }
-    }
-
-    private fun suggestDirsInDir(
-        suggestions: MutableList<Suggestion?>,
-        dir: File?,
-        afterLastSeparator: String?,
-        beforeLastSpace: String?,
-        afterLastSpaceWithoutALS: String?
-    ) {
-        if (dir == null || !dir.isDirectory()) return
-
-        if (afterLastSeparator == null || afterLastSeparator.length == 0) {
-            suggestDirsInDir(null, suggestions, dir, beforeLastSpace)
-            return
-        }
-
-        val dirs = dir.list(FilenameFilter { current: File?, name: String? ->
-            File(
-                current,
-                name
-            ).isDirectory()
-        })
-        if (dirs == null) {
-            return
-        }
-
-        val temp = rmQuotes.matcher(afterLastSeparator).replaceAll(Tuils.EMPTYSTRING)
-        val counter = quickCompare(
-            temp,
-            dirs,
-            suggestions,
-            beforeLastSpace,
-            suggestionsPerCategory,
-            false,
-            Suggestion.Companion.TYPE_FILE,
-            false
-        )
-        if (suggestionsPerCategory - counter <= 0) return
-
-        val matches = CompareStrings.topMatchesWithDeadline(
-            temp,
-            dirs,
-            suggestionsPerCategory - counter,
-            suggestionsDeadline,
-            FILE_SPLITTERS,
-            algInstance,
-            alg
-        )
-        for (match in matches) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    match,
-                    false,
-                    Suggestion.Companion.TYPE_FILE,
-                    afterLastSpaceWithoutALS
-                )
-            )
-        }
-    }
-
-    private fun suggestFilesOnlyInDir(
-        suggestions: MutableList<Suggestion?>,
-        dir: File?,
-        afterLastSeparator: String?,
-        beforeLastSpace: String?,
-        afterLastSpaceWithoutALS: String?
-    ) {
-        if (dir == null || !dir.isDirectory()) return
-
-        if (afterLastSeparator == null || afterLastSeparator.length == 0) {
-            suggestFilesOnlyInDir(null, suggestions, dir, beforeLastSpace)
-            return
-        }
-
-        val files = dir.list(FilenameFilter { current: File?, name: String? ->
-            File(
-                current,
-                name
-            ).isFile()
-        })
-        if (files == null) {
-            return
-        }
-
-        val temp = rmQuotes.matcher(afterLastSeparator).replaceAll(Tuils.EMPTYSTRING)
-        val counter = quickCompare(
-            temp,
-            files,
-            suggestions,
-            beforeLastSpace,
-            suggestionsPerCategory,
-            false,
-            Suggestion.Companion.TYPE_FILE,
-            false
-        )
-        if (suggestionsPerCategory - counter <= 0) return
-
-        val matches = CompareStrings.topMatchesWithDeadline(
-            temp,
-            files,
-            suggestionsPerCategory - counter,
-            suggestionsDeadline,
-            FILE_SPLITTERS,
-            algInstance,
-            alg
-        )
-        for (match in matches) {
-            suggestions.add(
-                Suggestion(
-                    beforeLastSpace,
-                    match,
-                    false,
-                    Suggestion.Companion.TYPE_FILE,
-                    afterLastSpaceWithoutALS
-                )
-            )
-        }
-    }
-
     private fun quickCompare(
         s1: String,
         ss: Array<String>,
@@ -4004,112 +3047,6 @@ class SuggestionsManager(
         return counter
     }
 
-    private fun suggestFilesInDir(
-        afterLastSpaceHolder: String?,
-        suggestions: MutableList<Suggestion?>,
-        dir: File?,
-        beforeLastSpace: String?
-    ) {
-        if (dir == null || !dir.isDirectory()) {
-            return
-        }
-
-        try {
-            val files = dir.list()
-            if (files == null) {
-                return
-            }
-            Arrays.sort(files)
-            for (s in files) {
-                suggestions.add(
-                    Suggestion(
-                        beforeLastSpace,
-                        s,
-                        false,
-                        Suggestion.Companion.TYPE_FILE,
-                        afterLastSpaceHolder
-                    )
-                )
-            }
-        } catch (e: NullPointerException) {
-            Tuils.log(e)
-        }
-    }
-
-    private fun suggestDirsInDir(
-        afterLastSpaceHolder: String?,
-        suggestions: MutableList<Suggestion?>,
-        dir: File?,
-        beforeLastSpace: String?
-    ) {
-        if (dir == null || !dir.isDirectory()) {
-            return
-        }
-
-        try {
-            val dirs = dir.list(FilenameFilter { current: File?, name: String? ->
-                File(
-                    current,
-                    name
-                ).isDirectory()
-            })
-            if (dirs == null) {
-                return
-            }
-            Arrays.sort(dirs)
-            for (s in dirs) {
-                suggestions.add(
-                    Suggestion(
-                        beforeLastSpace,
-                        s,
-                        false,
-                        Suggestion.Companion.TYPE_FILE,
-                        afterLastSpaceHolder
-                    )
-                )
-            }
-        } catch (e: NullPointerException) {
-            Tuils.log(e)
-        }
-    }
-
-    private fun suggestFilesOnlyInDir(
-        afterLastSpaceHolder: String?,
-        suggestions: MutableList<Suggestion?>,
-        dir: File?,
-        beforeLastSpace: String?
-    ) {
-        if (dir == null || !dir.isDirectory()) {
-            return
-        }
-
-        try {
-            val files = dir.list(FilenameFilter { current: File?, name: String? ->
-                File(
-                    current,
-                    name
-                ).isFile()
-            })
-            if (files == null) {
-                return
-            }
-            Arrays.sort(files)
-            for (s in files) {
-                suggestions.add(
-                    Suggestion(
-                        beforeLastSpace,
-                        s,
-                        false,
-                        Suggestion.Companion.TYPE_FILE,
-                        afterLastSpaceHolder
-                    )
-                )
-            }
-        } catch (e: NullPointerException) {
-            Tuils.log(e)
-        }
-    }
-
     private fun suggestContact(
         info: MainPack,
         suggestions: MutableList<Suggestion?>,
@@ -4142,7 +3079,7 @@ class SuggestionsManager(
             )
             if (suggestionsPerCategory - counter <= 0) return
 
-            val cts: Array<Contact?> = CompareObjects.topMatchesWithDeadline(
+            val cts: Array<Contact?> = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline(
                 Contact::class.java,
                 afterLastSpace,
                 contacts.size,
@@ -4152,7 +3089,7 @@ class SuggestionsManager(
                 SPLITTERS,
                 algInstance,
                 alg
-            )
+            ) }
             for (c in cts) {
                 if (c == null) break
                 suggestions.add(
@@ -4233,7 +3170,7 @@ class SuggestionsManager(
             )
             if (suggestionsPerCategory - counter <= 0) return
 
-            val ss = CompareObjects.topMatchesWithDeadline<Song?>(
+            val ss = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline<Song?>(
                 Song::class.java,
                 afterLastSpace,
                 songs.size,
@@ -4243,7 +3180,7 @@ class SuggestionsManager(
                 SPLITTERS,
                 algInstance,
                 alg
-            )
+            ) }
             for (s in ss) {
                 if (s == null) break
                 suggestions.add(
@@ -4454,7 +3391,7 @@ class SuggestionsManager(
             )
             if (canInsert - counter <= 0) return
 
-            val infos = CompareObjects.topMatchesWithDeadline<LaunchInfo?>(
+            val infos = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline<LaunchInfo?>(
                 LaunchInfo::class.java,
                 afterLastSpace,
                 apps.size,
@@ -4464,7 +3401,7 @@ class SuggestionsManager(
                 SPLITTERS,
                 algInstance,
                 alg
-            )
+            ) }
             for (i in infos) {
                 if (i == null) break
 
@@ -4545,7 +3482,7 @@ class SuggestionsManager(
             )
             if (suggestionsPerCategory - counter <= 0) return
 
-            val saves = CompareObjects.topMatchesWithDeadline<XMLPrefsSave?>(
+            val saves = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline<XMLPrefsSave?>(
                 XMLPrefsSave::class.java,
                 afterLastSpace,
                 list.size,
@@ -4555,7 +3492,7 @@ class SuggestionsManager(
                 XML_PREFS_SPLITTERS,
                 algInstance,
                 alg
-            )
+            ) }
             for (s in saves) {
                 val label = s?.label() ?: continue
                 suggestions.add(
@@ -4659,7 +3596,7 @@ class SuggestionsManager(
             )
             if (canInsert - counter <= 0) return
 
-            val gps = CompareObjects.topMatchesWithDeadline<AppsManager.Group?>(
+            val gps = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline<AppsManager.Group?>(
                 AppsManager.Group::class.java,
                 afterLastSpace,
                 groups.size,
@@ -4669,7 +3606,7 @@ class SuggestionsManager(
                 SPLITTERS,
                 algInstance,
                 alg
-            )
+            ) }
             for (g in gps) {
                 if (g == null) break
                 suggestions.add(
@@ -4762,7 +3699,7 @@ class SuggestionsManager(
                 )
                 if (counter == apps.size) return true
 
-                val infos = CompareObjects.topMatchesWithDeadline<GroupLaunchInfo?>(
+                val infos = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline<GroupLaunchInfo?>(
                     GroupLaunchInfo::class.java,
                     app,
                     apps.size,
@@ -4772,7 +3709,7 @@ class SuggestionsManager(
                     SPLITTERS,
                     algInstance,
                     alg
-                )
+                ) }
                 for (gli in infos) {
                     if (gli == null) break
                     suggestions.add(
@@ -4823,7 +3760,7 @@ class SuggestionsManager(
             )
             if (suggestionsPerCategory - counter <= 0) return true
 
-            val b = CompareObjects.topMatchesWithDeadline<BoundApp?>(
+            val b = fuzzyMatchesOrNone { CompareObjects.topMatchesWithDeadline<BoundApp?>(
                 BoundApp::class.java,
                 afterLastSpace,
                 apps.size,
@@ -4833,7 +3770,7 @@ class SuggestionsManager(
                 SPLITTERS,
                 algInstance,
                 alg
-            )
+            ) }
             for (ba in b) {
                 if (ba == null) break
                 suggestions.add(
@@ -5021,9 +3958,6 @@ class SuggestionsManager(
     }
 
     companion object {
-        internal fun showSearchResults(inputActive: Boolean, hasQuery: Boolean, hasOutput: Boolean): Boolean =
-            inputActive || hasQuery || hasOutput
-
         const val SINGLE_QUOTE: String = "'"
         const val DOUBLE_QUOTES: String = "\""
         private const val HIDDEN_SUGGESTION_COMMAND = "time"
@@ -5048,9 +3982,6 @@ class SuggestionsManager(
             "-p" to "Package (-p)",
             "-n" to "Component (-n)"
         )
-        private val INTENT_BROADCAST_PARAMETERS = arrayOf(
-            INTENT_PARAMETERS[0], INTENT_PARAMETERS[3], INTENT_PARAMETERS[4]
-        )
         private val MODULE_ROOT_OPTIONS = arrayOf(
             "-ls" to true,
             "-library" to true,
@@ -5069,113 +4000,41 @@ class SuggestionsManager(
             "-close" to true
         )
 
+        internal fun showSearchResults(inputActive: Boolean, hasQuery: Boolean, hasOutput: Boolean): Boolean = SuggestionStatics.showSearchResults(inputActive, hasQuery, hasOutput)
+
+        internal fun mediaSuggestions(before: String, normalized: String, typed: String?, folders: List<String>): List<Suggestion> = SuggestionStatics.mediaSuggestions(before, normalized, typed, folders)
+
         internal fun termuxLauncherSuggestions(
             launchers: List<TermuxWorkspaceLauncherManager.Launcher>,
             prefix: String? = null
-        ): List<Suggestion> = launchers.filter {
-            prefix == null || it.id.startsWith(prefix, true) || it.title.startsWith(prefix, true)
-        }.map {
-            Suggestion(null, it.title, true, Suggestion.TYPE_PERMANENT, "tmux launch ${it.id}")
-        }
+        ): List<Suggestion> = SuggestionStatics.termuxLauncherSuggestions(launchers, prefix)
 
-        internal fun moduleRootOptionMatches(option: String, typed: String?): Boolean {
-            val filter = typed?.trim { it <= ' ' }?.lowercase(Locale.getDefault()).orEmpty()
-            if (filter.isEmpty()) return true
+        internal fun moduleRootOptionMatches(option: String, typed: String?): Boolean = SuggestionStatics.moduleRootOptionMatches(option, typed)
 
-            val normalizedOption = option.lowercase(Locale.getDefault())
-            return normalizedOption.startsWith(filter) ||
-                normalizedOption.removePrefix("-").startsWith(filter.removePrefix("-"))
-        }
-
-        internal fun normalizedHelpInput(input: String): String? {
-            val normalized = input.trim().lowercase(Locale.ROOT).replace(Regex("\\s+"), " ")
-            return normalized.takeIf { it == "help" || it.startsWith("help ") }
-        }
+        internal fun normalizedHelpInput(input: String): String? = SuggestionStatics.normalizedHelpInput(input)
 
         internal fun helpTopics(
             input: String,
             resourceText: (Int) -> String = { "" }
-        ): List<ohi.andre.consolelauncher.help.HelpTopic> {
-            val normalized = normalizedHelpInput(input) ?: return emptyList()
-            val query = normalized.substringAfter(' ', "").let {
-                if (it == "-topic") "" else it.removePrefix("-topic ")
-            }
-            val topics = ohi.andre.consolelauncher.help.OfflineHelpCatalog.topics
-            if (query.isEmpty()) return topics.filter { it.category == null }
-            val terms = query.split(' ')
-            fun matches(value: String): Boolean {
-                val text = value.lowercase(Locale.ROOT).replace(Regex("\\s+"), " ")
-                return terms.all(text::contains)
-            }
-            return topics.mapNotNull { topic ->
-                val direct = topic.id + " " + topic.id.replace('-', ' ') + " " + resourceText(topic.title)
-                when {
-                    matches(direct) -> topic to 0
-                    matches(direct + " " + resourceText(topic.body)) -> topic to 1
-                    else -> null
-                }
-            }.sortedBy { it.second }.map { it.first }
-        }
+        ): List<ohi.andre.consolelauncher.help.HelpTopic> = SuggestionStatics.helpTopics(input, resourceText)
 
-        internal fun helpTopicSuggestions(context: Context, input: String): List<Suggestion> =
-            helpTopicSuggestions(input) { context.getString(it) }
+        internal fun helpTopicSuggestions(context: Context, input: String): List<Suggestion> = SuggestionStatics.helpTopicSuggestions(context, input)
 
-        internal fun helpTopicSuggestions(input: String, resourceText: (Int) -> String): List<Suggestion> =
-            helpTopics(input, resourceText).map { topic ->
-                Suggestion(null, resourceText(topic.title), true, Suggestion.TYPE_PERMANENT, "help -topic ${topic.id}")
-            }
+        internal fun helpTopicSuggestions(input: String, resourceText: (Int) -> String): List<Suggestion> = SuggestionStatics.helpTopicSuggestions(input, resourceText)
 
-        internal fun commandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean {
-            return argTypes == null || argTypes.isEmpty() || "podcast".equals(commandName, ignoreCase = true)
-        }
+        internal fun commandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean = SuggestionStatics.commandSuggestionExecutes(commandName, argTypes)
 
-        internal fun searchModeCommandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean {
-            if (commandSuggestionExecutes(commandName, argTypes)) return true
-            return when (commandName?.lowercase(Locale.ROOT)) {
-                "calc", "termux", "tmux" -> true
-                else -> false
-            }
-        }
+        internal fun searchModeCommandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean = SuggestionStatics.searchModeCommandSuggestionExecutes(commandName, argTypes)
 
-        internal fun modeTarget(currentMode: String): String = LauncherMode.nextTarget(currentMode)
+        internal fun modeTarget(currentMode: String): String = SuggestionStatics.modeTarget(currentMode)
 
-        internal fun modeTargets(filter: String?): List<String> {
-            val normalized = filter?.trim()?.lowercase(Locale.ROOT).orEmpty()
-            return LauncherMode.values.filter { normalized.isEmpty() || it.startsWith(normalized) }
-        }
+        internal fun modeTargets(filter: String?): List<String> = SuggestionStatics.modeTargets(filter)
 
-        internal fun searchModeSuggestionParts(input: String): Pair<String, String>? {
-            val current = input.trimStart()
-            val lastSpace = current.lastIndexOf(Tuils.SPACE)
-            if (lastSpace < 0) return null
-            return current.substring(0, lastSpace) to current.substring(lastSpace + 1)
-        }
+        internal fun searchModeSuggestionParts(input: String): Pair<String, String>? = SuggestionStatics.searchModeSuggestionParts(input)
 
-        internal fun directSearchRank(query: String, value: String): Int? {
-            val needle = query.trim().lowercase(Locale.getDefault())
-            if (needle.isEmpty()) return null
-            val haystack = value.lowercase(Locale.getDefault())
-            if (haystack == needle) return 0
-            if (haystack.startsWith(needle)) return 1
-            if (haystack.split(Regex("[\\s._-]+")).any { it.startsWith(needle) }) return 2
-            if (haystack.contains(needle)) return 3
-            return null
-        }
+        internal fun directSearchRank(query: String, value: String): Int? = SuggestionStatics.directSearchRank(query, value)
 
-        internal fun providerTitle(name: String): String = when (name.lowercase(Locale.getDefault())) {
-            "gg" -> "Google"
-            "yt" -> "YouTube"
-            "dd" -> "DuckDuckGo"
-            "ps" -> "Play Store"
-            "mp" -> "Maps"
-            "wp" -> "Wikipedia"
-            "rd" -> "Reddit"
-            "gh" -> "GitHub"
-            "tr" -> "Translate"
-            "ym" -> "YouTube Music"
-            "u" -> "Open URL"
-            else -> name.replace('_', ' ').replaceFirstChar { it.titlecase(Locale.getDefault()) }
-        }
+        internal fun providerTitle(name: String): String = SuggestionStatics.providerTitle(name)
 
         internal fun rankSearchResults(
             query: String,
@@ -5184,47 +4043,6 @@ class SuggestionsManager(
             deadline: Float,
             algorithm: Algorithm?,
             algorithmType: Alg?
-        ): List<SearchResult> {
-            if (query.isBlank()) return emptyList()
-            val unique = LinkedHashMap<String, SearchResult>()
-            for (candidate in candidates) {
-                val key = candidate.type.toString() + "|" + candidate.title.lowercase(Locale.getDefault()) +
-                    "|" + candidate.subtitle.lowercase(Locale.getDefault())
-                if (!unique.containsKey(key)) unique[key] = candidate
-            }
-            val categories = unique.values.groupBy { it.type }.toSortedMap()
-            val directResults = categories.mapValues { (_, category) ->
-                category.mapNotNull { candidate ->
-                    directSearchRank(query, candidate.getString())?.let { candidate.copy(rank = it) }
-                }.sortedWith(
-                    compareBy<SearchResult> { it.rank }
-                        .thenBy { it.title.lowercase(Locale.getDefault()) }
-                ).take(perCategory)
-            }
-            val ranked = directResults.values.flatten().toMutableList()
-            if (ranked.isEmpty() && query.trim().length >= 2) {
-                for ((_, category) in categories) {
-                val fuzzy = CompareObjects.topMatchesWithDeadline<SearchResult?>(
-                    SearchResult::class.java,
-                    query,
-                        category.size,
-                        category.toMutableList(),
-                        perCategory,
-                    deadline,
-                    arrayOf(" ", "_", "-", "."),
-                    algorithm,
-                    algorithmType
-                )
-                fuzzy.filterNotNull().forEachIndexed { index, result ->
-                    ranked.add(result.copy(rank = 4 + index))
-                }
-                }
-            }
-            return ranked.sortedWith(
-                compareBy<SearchResult> { it.rank }
-                    .thenBy { it.type }
-                    .thenBy { it.title.lowercase(Locale.getDefault()) }
-            )
-        }
+        ): List<SearchResult> = SuggestionStatics.rankSearchResults(query, candidates, perCategory, deadline, algorithm, algorithmType)
     }
 }

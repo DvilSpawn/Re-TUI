@@ -144,14 +144,6 @@ class ContactManager(private val context: Context) {
         }.start()
     }
 
-    fun listNames(): MutableList<String?> {
-        if (contacts == null || contacts!!.size == 0) refreshContacts(context)
-
-        val names: MutableList<String?> = ArrayList<String?>()
-        for (c in contacts!!) names.add(c.string)
-        return names
-    }
-
     fun getContacts(): MutableList<Contact> {
         if (contacts == null || contacts!!.size == 0) refreshContacts(context)
 

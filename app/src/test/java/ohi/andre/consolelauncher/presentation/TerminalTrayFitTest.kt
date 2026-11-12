@@ -24,4 +24,17 @@ class TerminalTrayFitTest {
         // Room unknown: the request stands.
         assertEquals(400, TerminalTrayPresentation.fitRoom(400, 400, -1, header, false, minimum))
     }
+
+    @Test
+    fun anOpenModuleLetsTheOutputShrinkToItsHeaderTab() {
+        val open = TerminalTrayPresentation.minimumOpen(60, 30, moduleOpen = true)
+        assertEquals(header, TerminalTrayPresentation.fitRoom(400, 400, 10, header, false, open))
+    }
+
+    @Test
+    fun theTopSectionMovesOnlyByTheRemainingOverlap() {
+        assertEquals(0, TerminalTrayPresentation.overlapToMove(40, 120, 300))
+        assertEquals(90, TerminalTrayPresentation.overlapToMove(40, -50, 300))
+        assertEquals(300, TerminalTrayPresentation.overlapToMove(40, -900, 300))
+    }
 }

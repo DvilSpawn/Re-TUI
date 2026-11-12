@@ -19,7 +19,7 @@ class LauncherApplication : Application() {
         ohi.andre.consolelauncher.tuils.Tuils.init(base)
         // Startup retries recovery in the settings loader, which can show the preserved-file error.
         runCatching {
-            ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(base)
+            ohi.andre.consolelauncher.managers.backup.BackupManager.recoverInterruptedRestore(base)
             ohi.andre.consolelauncher.managers.settings.SettingsFiles.recover(base)
         }.onFailure { ohi.andre.consolelauncher.tuils.Tuils.log(it) }
         LanguagePacks.initialize(base)

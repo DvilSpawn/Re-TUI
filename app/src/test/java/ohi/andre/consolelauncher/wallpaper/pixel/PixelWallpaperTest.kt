@@ -44,4 +44,16 @@ class PixelWallpaperTest {
         assertEquals(PixelLook.MONO, PixelLook.of("nope"))
         assertEquals(PixelLook.GAMEBOY, PixelLook.of("gameboy"))
     }
+
+    @Test
+    fun customFireRampHitsEachPickedColourAtItsStop() {
+        val picked = intArrayOf(0xFF000000.toInt(), 0xFF0033FF.toInt(), 0xFF00FFCC.toInt(), 0xFFFFFFFF.toInt())
+        val ramp = DoomFireView.ramp(picked)
+        assertEquals(37, ramp.size)
+        assertEquals(picked[0], ramp[0])
+        assertEquals(picked[1], ramp[12])
+        assertEquals(picked[2], ramp[24])
+        assertEquals(picked[3], ramp[36])
+        assertTrue(DoomFireView.ramp(DoomFireView.CLASSIC_COLORS).let { it[0] == DoomFireView.CLASSIC_COLORS[0] && it[36] == 0xFFFFFFFF.toInt() })
+    }
 }

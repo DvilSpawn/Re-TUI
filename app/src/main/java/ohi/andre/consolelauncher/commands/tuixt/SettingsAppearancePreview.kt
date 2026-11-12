@@ -16,6 +16,8 @@ import ohi.andre.consolelauncher.LauncherActivity
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.presentation.*
 import ohi.andre.consolelauncher.tuils.*
+import ohi.andre.consolelauncher.tuils.frame.FrameTarget
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 
 /**
  * Status, Terminal and Modules are crops of one detached Home scene built by Home's own layout and binders
@@ -92,11 +94,14 @@ internal class SettingsAppearancePreview(
         private fun region(): android.graphics.Rect? {
             val root = scene ?: return null
             val full = android.graphics.Rect(0, 0, root.width, root.height)
+            // Pages keep the full screen width (and the status page the top edge), so display margins show as
+            // space around the section instead of being cropped away and the section stretched to fit.
             val area = when (page) {
-                0 -> bounds(root, R.id.header_container) ?: bounds(root, R.id.unified_status_host)
+                0 -> (bounds(root, R.id.header_container) ?: bounds(root, R.id.unified_status_host))
+                    ?.let { android.graphics.Rect(0, 0, root.width, it.bottom) }
                 1 -> bounds(root, R.id.terminal_tray_container)?.let { android.graphics.Rect(0, it.top, root.width, root.height) }
                 HOME -> full
-                else -> bounds(root, R.id.home_modules_root)
+                else -> bounds(root, R.id.home_modules_root)?.let { android.graphics.Rect(0, it.top, root.width, it.bottom) }
             }
             return area?.takeIf { it.intersect(full) && !it.isEmpty } ?: full
         }

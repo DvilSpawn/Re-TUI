@@ -3,7 +3,7 @@ package ohi.andre.consolelauncher.managers.settings
 import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import androidx.test.platform.app.InstrumentationRegistry
-import ohi.andre.consolelauncher.managers.TimeManager
+import ohi.andre.consolelauncher.managers.time.TimeManager
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -20,8 +20,8 @@ class LiveThemeIntegrationTest {
         val original = keys.associateWith { LauncherSettings.get(it) }
         try {
             keys.forEach { LauncherSettings.set(it, "#FF445566") }
-            assertEquals(0xff445566.toInt(), ohi.andre.consolelauncher.managers.HTMLExtractManager.outputColor)
-            assertEquals(0xff445566.toInt(), ohi.andre.consolelauncher.managers.HTMLExtractManager.linkColor)
+            assertEquals(0xff445566.toInt(), ohi.andre.consolelauncher.managers.net.HTMLExtractManager.outputColor)
+            assertEquals(0xff445566.toInt(), ohi.andre.consolelauncher.managers.net.HTMLExtractManager.linkColor)
         } finally { original.forEach { (key, value) -> LauncherSettings.set(key, value) } }
     }
     @Test fun gridPaletteRefreshRetainsFrameStylesAndTruecolor() {
@@ -126,12 +126,12 @@ class LiveThemeIntegrationTest {
             instrumentation.waitForIdleSync()
             assertNotNull(launcher.uiManager)
             instrumentation.runOnMainSync {
-                launcher.uiManager!!.restoreTerminalState(ohi.andre.consolelauncher.managers.TerminalManager.State("draft", "", listOf("pwd"), 0, false))
-                launcher.uiManager!!.setOutput("owned", ohi.andre.consolelauncher.managers.TerminalManager.CATEGORY_OUTPUT)
+                launcher.uiManager!!.restoreTerminalState(ohi.andre.consolelauncher.managers.terminal.TerminalManager.State("draft", "", listOf("pwd"), 0, false))
+                launcher.uiManager!!.setOutput("owned", ohi.andre.consolelauncher.managers.terminal.TerminalManager.CATEGORY_OUTPUT)
                 launcher.uiManager!!.setOutput(0xff112233.toInt(), "explicit")
                 val inline = android.text.SpannableString("inline")
                 inline.setSpan(ForegroundColorSpan(0xffabcdef.toInt()), 0, inline.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                launcher.uiManager!!.setOutput(inline, ohi.andre.consolelauncher.managers.TerminalManager.CATEGORY_NO_COLOR)
+                launcher.uiManager!!.setOutput(inline, ohi.andre.consolelauncher.managers.terminal.TerminalManager.CATEGORY_NO_COLOR)
                 launcher.findViewById<android.widget.EditText>(ohi.andre.consolelauncher.R.id.input_view).setSelection(1, 3)
                 launcher.uiManager!!.openTermuxConsole(null)
                 val termuxInput = launcher.uiManager!!.javaClass.getDeclaredField("termuxInput").apply { isAccessible = true }
@@ -151,8 +151,8 @@ class LiveThemeIntegrationTest {
             instrumentation.waitForIdleSync()
             assertSame("Palette changes must retain the live UI manager", manager, launcher.uiManager)
             assertSame(launcher, ohi.andre.consolelauncher.LauncherActivity.instance)
-            assertEquals("Long-lived package receiver resolves new installed color", 0xff445566.toInt(), (ohi.andre.consolelauncher.managers.AppsManager.instance as ohi.andre.consolelauncher.managers.AppsManager).appInstalledColor)
-            assertEquals(0xff445566.toInt(), (ohi.andre.consolelauncher.managers.AppsManager.instance as ohi.andre.consolelauncher.managers.AppsManager).appUninstalledColor)
+            assertEquals("Long-lived package receiver resolves new installed color", 0xff445566.toInt(), (ohi.andre.consolelauncher.managers.apps.AppsManager.instance as ohi.andre.consolelauncher.managers.apps.AppsManager).appInstalledColor)
+            assertEquals(0xff445566.toInt(), (ohi.andre.consolelauncher.managers.apps.AppsManager.instance as ohi.andre.consolelauncher.managers.apps.AppsManager).appUninstalledColor)
             instrumentation.runOnMainSync {
                 val after = launcher.uiManager!!.snapshotTerminalState()!!
                 val clock = launcher.uiManager!!.javaClass.getDeclaredField("tuiTimeManager").apply { isAccessible = true }
@@ -176,7 +176,7 @@ class LiveThemeIntegrationTest {
                 assertTrue("Old ordinary output follows palette", colors("owned").contains(0xff445566.toInt()))
                 assertEquals(listOf(0xff112233.toInt()), colors("explicit"))
                 assertEquals(listOf(0xffabcdef.toInt()), colors("inline"))
-                launcher.uiManager!!.setOutput("new", ohi.andre.consolelauncher.managers.TerminalManager.CATEGORY_OUTPUT)
+                launcher.uiManager!!.setOutput("new", ohi.andre.consolelauncher.managers.terminal.TerminalManager.CATEGORY_OUTPUT)
                 launcher.uiManager!!.openTermuxConsole(null)
                 val termuxInput = launcher.uiManager!!.javaClass.getDeclaredField("termuxInput").apply { isAccessible = true }
                     .get(launcher.uiManager) as android.widget.EditText

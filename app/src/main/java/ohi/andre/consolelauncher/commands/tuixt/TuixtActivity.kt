@@ -56,7 +56,7 @@ import java.util.ArrayList
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings.getInt
-import ohi.andre.consolelauncher.managers.SearchProviderManager
+import ohi.andre.consolelauncher.managers.net.SearchProviderManager
 import ohi.andre.consolelauncher.managers.status.AsciiAnimationManager
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi
 import ohi.andre.consolelauncher.managers.xml.options.Theme
@@ -92,7 +92,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         val intent = getIntent()
         asciiSettingsMode = MODE_ASCII_SETTINGS == intent.getStringExtra(MODE)
         val onlySection = intent.getStringExtra(ONLY_SECTION)
-        val excludeSection = intent.getStringExtra(EXCLUDE_SECTION)
+        val excludeSections = intent.getStringArrayListExtra(EXCLUDE_SECTION) ?: listOfNotNull(intent.getStringExtra(EXCLUDE_SECTION))
         val path = intent.getStringExtra(PATH)
         if (path == null && !asciiSettingsMode) {
             finish()
@@ -139,7 +139,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         TuixtTheme.stylePaneHeader(this, header)
         viewport.addView(surface, FrameLayout.LayoutParams(-1, -1))
         ohi.andre.consolelauncher.help.PanelBackdrop.install(viewport)
-        ohi.andre.consolelauncher.tuils.TerminalBorderRuntime.bind(root, header)
+        ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime.bind(root, header)
 
         // RecyclerView
         recyclerView = RecyclerView(this)
@@ -273,7 +273,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             originalRows = buildRows(xmlRoot!!, file!!).filter {
                 when {
                     onlySection != null -> it.section == onlySection
-                    excludeSection != null -> it.section != excludeSection
+                    excludeSections.isNotEmpty() -> it.section !in excludeSections
                     else -> true
                 }
             }.toMutableList()
@@ -364,7 +364,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         TuixtTheme.stylePaneHeader(this, title)
         viewport.addView(surface, FrameLayout.LayoutParams(-1, -1))
         ohi.andre.consolelauncher.help.PanelBackdrop.install(viewport)
-        ohi.andre.consolelauncher.tuils.TerminalBorderRuntime.bind(panel, title)
+        ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime.bind(panel, title)
         previewPanelViews = panel to title
         return panel
     }

@@ -266,69 +266,67 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
     <string name="changelog_continue">Continue to Launcher</string>
     <string name="changelog_pane_title">CHANGELOG</string>
     <string name="changelog_release_heading">Re:TUI V.%1$s · Build %2$d</string>
-    <string name="changelog_release_highlights">Re:TUI V.5 turns IRC into a full client for any network, lets you open your dock modules from Search and Terminal mode, and adds recent, newest and most-used views to the app drawer.
+    <string name="changelog_release_highlights">Re:TUI 6 adds a full media player for music, podcasts and video, a new two-colour Mono home, community presets you can download and share from inside the launcher, and one tabbed edge stack in place of the sidebar and its pills.
 
-## IRC, rebuilt
+## One media player
 
-The old Re:TUI chat server is retired. The IRC pane now connects to real IRC networks.
+- Music, podcasts and video now live in one player with Library, Now playing, Queue, Podcasts and Video tabs. Open it with `music -open` or by tapping the title in the music panel.
+- Music and podcasts share one queue that survives restarts and is included in backups. Add, remove, reorder, shuffle and repeat.
+- Play your own files: `media -add` picks a folder through Android's folder picker, with no storage permission. `media` lists your folders, `media -rm` removes one and `media -scan` looks again.
+- Sleep timer, equaliser with presets, gapless playback, saved lists and search across the whole library.
+- Lyrics from a `.lrc` or `.txt` file beside the song, including `[offset:]`.
+- Podcasts gain chapters, playback speed, skip silence, notes, downloads, and NEW and OFFLINE shelves.
+- Streams are cached ahead (30 minutes, or 10 on metered networks) and recover from dropped connections by themselves.
+- The system media controls, lock screen, headset and Bluetooth buttons control playback. Playback pauses when headphones are unplugged.
+- Video keeps its own full-screen player with picture-in-picture, next-up, an unwatched filter and autoplay that skips watched episodes.
+- Music keeps playing when the launcher restarts.
 
-- Pick Libera.Chat, OFTC, Rizon or hackint, or add any server that supports TLS. Connect to several networks at once.
-- Channels open side by side in a Termux-style split view. Tap a pane to start typing in it.
-- Dropped connections reconnect by themselves and rejoin your channels. They also reconnect as soon as your phone is back online.
-- Sign in with your account once, and Re:TUI can remember this phone with a device key, so you don't need the password next time. Where a network has no SASL, sign-in goes through NickServ.
-- If your nickname is taken, Re:TUI tries a variant instead of failing. When sign-in fails, the pane says why, such as a wrong password or an unverified account.
-- **Stay connected:** turn it on in the Networks page or with `/background on`. Your networks stay online after you close the pane, with an ongoing notification and a Disconnect button. Private messages and mentions of your nickname arrive as notifications; tap one to open that conversation.
+## Mono mode
 
-## Modules in Search and Terminal mode
+- `mode mono` draws Home in two colours, ink and paper, with the VT323 pixel font. Your other settings are left alone, so switching back restores them exactly.
+- A status strip, a dithered weather banner that animates with the weather and time of day, and one session pane with notes, events, reminders, notifications, music, timers and your commands with their answers.
+- An input line under the session runs commands and searches apps, modules and the web.
 
-- Search results have a new **MODULES** group that lists your dock modules.
-- Tap one to open it right under the chips. The wallpaper blurs behind it, and the search bar and other results stay where they are.
-- Swipe sideways or tap another chip to switch modules. Tap the open chip, X or Back to close the module and return to your search.
+## Community presets
 
-## Apps
+- `preset -market` now has a COMMUNITY tab next to the terminal themes. Browse presets made by other Re:TUI users, sorted by newest or most popular.
+- Open one to see its screenshot, what it changes (colours, suggestions, layout, behaviour) and whether it comes with a wallpaper or a font link.
+- Download &amp; import checks the file first and saves it beside your presets. Your look stays the same until you run `preset -apply`.
+- A preset's wallpaper can come with it and is set when you apply the preset.
+- + SHARE MINE sends your own setup for review: pick what to share, add a screenshot and an optional wallpaper. It appears for everyone once approved.
 
-- `apps -r` opens the app drawer with your recently opened apps first, `apps -n` with the newest installed and `apps -u` with the most used. Tap the header to go back to A–Z.
-- The `apps` suggestion chips now lead with the views you use most.
+## Edge stack
 
-## Output pane
+- The edge sidebar and its timer, stopwatch and podcast pills are now one tabbed stack on the screen edge.
+- Tap a small tab to bring it forward, tap the home tab to return to the sidebar, hold to open the sidebar, and drag to move the whole stack.
 
-- The output pane always keeps at least three lines, even when modules fill the screen.
-- When the output pane is collapsed, a ! on the OUTPUT tab shows that something new arrived.
+## Toolbar
 
-## Weather
+- The app drawer button has its own setting, `show_apps_drawer_button` under Toolbar, separate from swipe-up. If you had swipe-up turned off, the button stays hidden after the update, as before.
 
-- `%name` shows your location again.
-- New placeholders for `weather_format`: `%temp_min` and `%temp_max` for the next 24 hours, and `%rain` for the rain expected in the next hour.
+## Wallpapers and looks
+
+- Doom fire has a custom look. Pick your own background, ember, flame and tip colours.
+- Settings › System &amp; Support uses the official GitHub, Discord and Reddit logos.
+
+## Modules
+
+- Lua modules can make text tappable. Bookmarks 1.0.2 opens a link when you tap it.
+- With a module open, the output shrinks to its tab before notification rows push anything off screen.
 
 ## Fixes
 
-- Changes to alias.txt apply as soon as you save, without `restart`.
-- `-tutorial` on every command opens the right guide.
-- In Search and Terminal mode, the app drawer no longer closes on its own, Back closes open panes in Terminal mode, and `clear` also clears the results card.
-
-## V.5.1 · Build 701
-
-- Type text as ASCII art: Settings, Personalization, ASCII Settings, Type text as ASCII. Pick from five fonts with a live preview; saving keeps your previous art as ascii.txt.bak.
-- ASCII effects: print, decrypt, slide, wipe, rain, waves, beams, burn, middleout, colorshift and glitch animate the art each time Home appears. They work on typed, imported and coloured art. Set the speed, loop them with a rest in between, or tap the art to replay.
-- Settings search: a search box in the Settings hub finds any setting by name or description and opens it on its page. `settings clock format` opens Settings with that search.
-- Settings pages: settings that sat in the wrong section moved next to the ones they belong with, for example the alias syntax settings now sit together under Commands.
-- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.
-- Astro Chart: a new monochrome option in the World list shows a black sky with white stars and the planet, station and ships dithered to black and white.
-- Calculator: on the number pad, = now gives the result, C clears what you typed and AC starts over; hold ⌫ to clear the input. Results group their digits as 1,400,000, or as 14,00,000 in lakhs and crores: choose Digit grouping from the calculator's ? menu.
-
-## V.5.2 · Build 702
-
-- Pixel wallpapers: four new live wallpapers drawn as crisp, dithered pixels, in mono, Game Boy or your theme's colours. Pick them in Settings, Personalization, Re:TUI Wallpaper.
-- Shoreline: the time, the date or your own words in dot-matrix letters on black sand, with waves that wash over the bottom of the text and slowly give it back. Move it with the arrows.
-- Dither photo: any photo dithered into a small framed picture, with optional ripples. Ripples: a still pool that ripples where you touch. Doom fire: a classic pixel fire.
-- Use on phone: the wallpaper you set up now takes effect on phones that return straight to the home screen after applying, such as vivo.
-- ASCII Settings: the effect choices wrap into rows so every name is readable.
-
-## V.5.2 Hotfix 1 · Build 703
-
-- RE:TUI Keys: theme sync, keyboard frames and RE:TUI Keys Shortcuts work with the keyboard's new app (com.dvil.retui.keys, from Keys 0.2.1) as well as earlier versions.
-
-Reopen these notes anytime with the `changelog` command.</string>
+- Dot mode: a command's answer shows over the dot. Home or Back brings the dot back. Output nobody asked for no longer covers it.
+- A running or paused timer comes back after Android closes the launcher. A timer that ran out meanwhile is not rung late.
+- Tapping an ended or disconnected terminal tile reconnects it.
+- Adding a podcast selects the new show.
+- Mono's music line stays correct after switching modes.
+- The video library highlight clears when the player closes.
+- Fixed a crash in suggestions, kept the keyboard state across rotation, kept focus on search after a mode switch, and stopped showing unfilled notification formats.
+- Bare parameter commands, such as `apps`, show their help. `breach`, `credits`, `lockdown` and `pomodoro` now have help too.
+- Dot mode: closing the changelog or another screen no longer brings the keyboard up over the dot.
+- Android no longer tints the dot and mono homes grey.
+- The Hack overlay closes when you tap it.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -397,6 +395,8 @@ Then run: module -add events termux:/data/data/com.termux/files/home/retui/event
     <string name="command_events_events_is_an_editable_termux_module_run_ev_734cb">Events is an editable Termux module. Run events -module for the script, then module -add events termux:/data/data/com.termux/files/home/retui/events.sh</string>
     <string name="command_events_events_lookahead_days_after_today_usage_ev_98fd1">Events lookahead: %1$d days after today.
 Usage: events -lookahead [days]</string>
+    <string name="command_events_example_empty">No upcoming events this month.</string>
+    <string name="command_events_example_title">Events</string>
     <string name="command_events_invalid_lookahead_7cbc8">Invalid lookahead: %1$s</string>
     <string name="command_events_launcher_events_lookahead_set_today_days_8cdfd">Launcher events lookahead set: today + %1$d days.</string>
     <string name="command_events_launcher_events_lookahead_set_today_only_9b01c">Launcher events lookahead set: today only.</string>
@@ -408,6 +408,10 @@ Usage: events -lookahead [days]</string>
     <string name="command_inspect_exported_providers_8cbae">Exported providers</string>
     <string name="command_inspect_exported_receivers_2f5cd">Exported receivers</string>
     <string name="command_inspect_exported_services_4f00c">Exported services</string>
+    <string name="command_inspect_handler_launch">launch</string>
+    <string name="command_inspect_handler_process_text">process text</string>
+    <string name="command_inspect_handler_share_text">share text</string>
+    <string name="command_inspect_handler_view_web">view web</string>
     <string name="command_inspect_package_not_found_3c09b">Package not found: %1$s</string>
     <string name="command_install_install_is_deprecated_use_search_ps_53a0b">install is deprecated. Use search -ps %1$s.</string>
     <string name="command_intent_broadcast_sent_6b672">Broadcast sent: %1$s</string>
@@ -513,8 +517,9 @@ Stage: %1$s</string>
     <string name="command_mode_enabled">%1$s mode enabled.</string>
     <string name="command_mode_search_mode_enabled_ba524">Search mode enabled.</string>
     <string name="command_mode_unknown_launcher_mode_usage_mode_search_cl_a86ba">Unknown launcher mode: %1$s
-Usage: mode classic|search|terminal</string>
+Usage: mode classic|search|terminal|dot|mono</string>
     <string name="command_module_built_in_modules_cannot_be_removed_use_mod_274e3">Built-in modules cannot be removed. Use module -hide %1$s instead.</string>
+    <string name="command_module_dock_empty">&lt;empty&gt;</string>
     <string name="command_module_invalid_lua_module_id_123ed">Invalid Lua module id.</string>
     <string name="command_module_local_lua_modules_e9afe">
 Local Lua modules: %1$s</string>
@@ -719,9 +724,20 @@ Android AppWidgets: open the widgets pane from the toolbar.</string>
         <item quantity="other">%1$d custom frames</item>
     </plurals>
     <string name="dialog_no_apps_found">NO APPS FOUND</string>
+    <string name="dot_home_description">Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app.</string>
+    <string name="dot_home_toggle_modules">Show or hide the time, battery and temperature</string>
     <string name="duo_status">Duo command: enabled
 Duo layout: %1$s
 Usage: %2$s</string>
+    <string name="edge_pills_notification">Showing your timer on the screen edge</string>
+    <string name="edge_sidebar_channel">Edge sidebar</string>
+    <string name="edge_sidebar_handle">Re:T-UI sidebar. Tap to search, hold for more</string>
+    <string name="edge_sidebar_notification">Edge sidebar is on</string>
+    <string name="edge_sidebar_quick_app">quick app</string>
+    <string name="edge_sidebar_quick_app_notes">Journal (default)</string>
+    <string name="edge_sidebar_search">search</string>
+    <string name="edge_sidebar_terminal">terminal</string>
+    <string name="edge_sidebar_turn_off">Turn off</string>
     <string name="editor_breachdialog_breach_armed_1ca2b">BREACH ARMED</string>
     <string name="editor_breachdialog_breach_complete_1329a">BREACH COMPLETE</string>
     <string name="editor_breachdialog_breach_f0fec">BREACH</string>
@@ -953,6 +969,12 @@ Timer paused.</string>
     <string name="files_usage_cd">Usage: files -cd &lt;directory&gt;</string>
     <string name="files_usage_open">Usage: files -open &lt;file&gt;</string>
     <string name="files_usage_search">Usage: files -search &lt;name&gt; [type]</string>
+    <string name="floating_terminal_new_window">+ new window</string>
+    <string name="floating_terminal_open_workspace">open the full workspace</string>
+    <string name="floating_terminal_paste">paste</string>
+    <string name="floating_terminal_setup">Set up the tmux workspace once to use it here.</string>
+    <string name="floating_terminal_title">tmux</string>
+    <string name="floating_terminal_windows">windows</string>
     <string name="frame_border_range">Borders must be between 0 and 256 dp.</string>
     <string name="frame_bottom">Bottom</string>
     <string name="frame_center">Center</string>
@@ -1117,6 +1139,10 @@ Home aliases expand before built-in commands; avoid conflicting names. Script al
 Usage: 
 $ beep</string>
     <string name="help_bluetooth">Toggle Bluetooth on older Android versions, or open Bluetooth settings on modern Android versions where direct toggles are restricted.</string>
+    <string name="help_breach">Open the Breach minigame. Needs RE:TUI credits turned on. 
+
+Usage: 
+$ breach</string>
     <string name="help_brightness">Set the brightness of your device 
 $ brightness [0-100]</string>
     <string name="help_calc">Open the calculator with calc, or evaluate an expression with calc 2 * (3 + 4). Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g. calc 5 km to miles. Expressions always use the calc command.</string>
@@ -1150,6 +1176,10 @@ $ cd /sdcard/Download</string>
 
 Warning: keep a personal backup before broad edits. -apply is a move, not a copy or portable preset import; it may replace existing assets and its reported path does not verify a successful move. Use the Settings shareable-configuration import for portable presets. 
 Known issue: -ls rss.xml currently returns notification values, not RSS values; do not use it to inspect feed configuration.</string>
+    <string name="help_credits">Show your RE:TUI credits and breach keys. 
+
+Usage: 
+$ credits</string>
     <string name="help_ctrlc">Interrupt the current shell process and create a new one</string>
     <string name="help_debug">-settings -&gt; inspect runtime settings snapshot, notifications, music, fonts, and colors 
 -theme -&gt; inspect effective theme, auto color, and font state 
@@ -1246,6 +1276,8 @@ $ intent -view geo:0,0?q=home
 $ intent -activity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT standup notes 
 $ intent -broadcast -a net.dinglisch.android.tasker.ACTION_TASK -p net.dinglisch.android.taskerm --es task_name Work</string>
     <string name="help_irc">irc — open the IRC client. Connect to Libera.Chat, OFTC or any TLS network, several at once. /network, /server, /connect, /login, /join, /window, /query, /msg and /help.</string>
+    <string name="help_journal">Log a line to today's journal, or open it.
+Usage: journal [text]</string>
     <string name="help_landscape">Save the Re:T-UI landscape preference and enable adaptive split layout when the window is wide enough. 
 
 Usage: 
@@ -1253,6 +1285,16 @@ $ landscape
 
 Shortcut for orientation landscape.</string>
     <string name="help_location">Show your current location</string>
+    <string name="help_lockdown">Start or check a lockdown. Needs RE:TUI credits turned on. 
+
+Usage: 
+$ lockdown 
+$ lockdown [duration] [reason] 
+$ lockdown -status 
+$ lockdown -stop 
+
+Examples: 
+$ lockdown 1h deep work</string>
     <string name="help_ls">Request a listing at the remembered file path using Re:T-UI Files (com.dvil.retui.fm), which must be installed. 
 Usage: 
 $ ls 
@@ -1276,6 +1318,7 @@ $ lua -disable habit
 $ lua -enable habit 
 
 Lua apps run inside Re:T-UI, not Termux. They use the same sandbox, prefs, files, permissions, editor, and ui:render layout objects as Lua modules, but open in a focused terminal-styled surface. Inside a Lua app, plain input is sent to on_input(text), and renderer buttons with action/value are sent to on_action(value). Local commands use a colon prefix: :help, :refresh, :restart, :config, :edit, :clear, and :close.</string>
+    <string name="help_media">media: your media folders. media -add picks a folder · media -rm &lt;n&gt; drops folder n · media -scan looks through them again · media -v opens your videos. Once a folder is added, music plays from your folders.</string>
     <string name="help_mode">Switch launcher layout.
 Usage:
 $ mode classic
@@ -1318,7 +1361,8 @@ $ module -close
 Modules are the single dock/panel category in Re:T-UI. A module can be native, Termux/shell-backed, launcher-backed, or Lua-backed. Built-in modules include music, notifications, timer, calendar, reminder, notes, rss, and weather. Lua modules are edited locally in Re:T-UI, can render native buttons/layouts, and use module -new lua, module -edit, module -config, module -check, and module -approve. Termux modules execute shell scripts and render ::title, ::body, and ::suggest metadata. Suggestion-only Lua scripts remain helpers because they do not render a dock panel. 
 
 An empty dock stays empty. To hide or show the dock row live, run module -dock -toggle. You can also turn off show_module_dock in Behavior settings or run config -set show_module_dock false.</string>
-    <string name="help_music">-next -&gt; play the next song 
+    <string name="help_music">-open -&gt; open the media player 
+-next -&gt; play the next song 
 -previous -&gt; play the previous song 
 -play -&gt; play/pause the player 
 -stop -&gt; stop the player 
@@ -1374,7 +1418,7 @@ $ orientation landscape
 $ orientation auto 
 
 Re:T-UI uses split landscape only when the current window is wide enough. Portrait keeps the portrait layout.</string>
-    <string name="help_podcast">Open podcasts on the home screen. Minimize to an edge pill; expand again with podcast or the pill. 
+    <string name="help_podcast">Open podcasts in the media player. While an episode is loaded, an edge pill plays, pauses and reopens it. 
 Usage: 
 $ podcast 
 $ podcast add &lt;https-feed-url&gt; 
@@ -1383,9 +1427,17 @@ $ podcast play
 $ podcast next 
 $ podcast prev 
 $ podcast speed &lt;0.5-2.0&gt; 
-$ podcast close 
 
 Podcasts stream from RSS/Atom feeds and play oldest first for first-time listening. Now-playing title lives on the music module.</string>
+    <string name="help_pomodoro">Start or stop a pomodoro session. 
+
+Usage: 
+$ pomodoro 
+$ pomodoro [task] 
+$ pomodoro -stop 
+
+Examples: 
+$ pomodoro write report</string>
     <string name="help_portrait">Save the Re:T-UI portrait preference and keep portrait layout even if Android reports landscape. 
 
 Usage: 
@@ -1739,6 +1791,7 @@ Wiki:
     <string name="hub_credits_summary">Sign up for Retui Credits: %1$s</string>
     <string name="hub_default_system_font">Android System Font</string>
     <string name="hub_discord">Discord</string>
+    <string name="hub_edge_sidebar">Edge Sidebar</string>
     <string name="hub_fonts">Fonts</string>
     <string name="hub_frames">Frames</string>
     <string name="hub_github">GitHub</string>
@@ -1924,6 +1977,65 @@ Leaving this pane disconnects every network. Networks that were connected reconn
     <string name="irc_stay_connected_on">Staying connected after the pane closes. Mentions and private messages will notify you.</string>
     <string name="irc_title">IRC</string>
     <string name="irc_welcome">Connect as a guest to start chatting, or sign in with your account on this network.</string>
+    <string name="journal_age_now">now</string>
+    <string name="journal_archive">old notes library ↗</string>
+    <string name="journal_attach_camera">camera</string>
+    <string name="journal_attach_photo">photo</string>
+    <string name="journal_camera_denied">Camera access is needed to take a photo</string>
+    <string name="journal_cancel">Cancel editing</string>
+    <string name="journal_clear_done">clear done</string>
+    <string name="journal_copied">Copied</string>
+    <string name="journal_delete">del</string>
+    <string name="journal_edit">edit</string>
+    <string name="journal_edit_hint">edit the entry</string>
+    <string name="journal_editing">editing %1$s · %2$s · empty deletes it</string>
+    <string name="journal_empty_day">nothing logged this day.</string>
+    <string name="journal_empty_today">nothing logged today. type below and tap log.</string>
+    <plurals name="journal_entries">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
+    <string name="journal_esc">esc</string>
+    <string name="journal_find_hint">type to search every day of the journal</string>
+    <string name="journal_format_back">Back to all formats</string>
+    <string name="journal_hide">hide</string>
+    <string name="journal_hide_failed">Couldn't hide that text on this device</string>
+    <string name="journal_image_failed">Couldn't add an image</string>
+    <string name="journal_image_missing">[image missing]</string>
+    <string name="journal_log">log</string>
+    <string name="journal_logged">logged to today's journal</string>
+    <plurals name="journal_matches">
+        <item quantity="one">%1$d entry matches "%2$s"</item>
+        <item quantity="other">%1$d entries match "%2$s"</item>
+    </plurals>
+    <string name="journal_moved">Moved to today's journal</string>
+    <string name="journal_next_day">Next day</string>
+    <string name="journal_no_camera">No camera app found</string>
+    <string name="journal_no_viewer">No app can open this image</string>
+    <string name="journal_pick_day">Pick a day</string>
+    <string name="journal_pin">pin</string>
+    <string name="journal_previous_day">Previous day</string>
+    <string name="journal_prompt_hint">write… enter for a new line</string>
+    <string name="journal_prompt_hint_past">write… logs to today</string>
+    <string name="journal_quick_count">%1$d open · %2$d done</string>
+    <string name="journal_quick_edit_hint">edit the line, empty deletes it</string>
+    <string name="journal_quick_empty">nothing here yet. one line each: they show on your home screen.</string>
+    <string name="journal_quick_hint">one line…</string>
+    <string name="journal_quick_rule">one line each · long thoughts go to journal</string>
+    <string name="journal_redact_unavailable">Edit the entry to redact styled text</string>
+    <string name="journal_save">save</string>
+    <string name="journal_selection_find">find</string>
+    <string name="journal_selection_hide">redact</string>
+    <string name="journal_selection_link">Link</string>
+    <string name="journal_selection_note">→ note</string>
+    <string name="journal_selection_noted">Added to quick notes</string>
+    <string name="journal_selection_tag">#tag</string>
+    <string name="journal_show">show</string>
+    <string name="journal_tab_journal">journal</string>
+    <string name="journal_tab_notes">notes</string>
+    <string name="journal_to_journal">jrnl</string>
+    <string name="journal_today">today</string>
+    <string name="journal_unpin">unpin</string>
     <string name="language_packs_active">Active: %1$s</string>
     <string name="language_packs_browse">Browse GitHub releases</string>
     <string name="language_packs_cancel">Cancel</string>
@@ -2290,6 +2402,55 @@ Run: events -access</string>
     <string name="manager_upcomingeventsmanager_unable_to_read_android_calendar_c129e">%1$s
 Unable to read Android Calendar.</string>
     <string name="manager_upcomingeventsmanager_untitled_event_ef8d2">Untitled event</string>
+    <string name="media_add_failed">That folder could not be added.</string>
+    <string name="media_added">Added %1$s. Scanning…</string>
+    <string name="media_no_folders">No media folders yet. Add one with media -add.</string>
+    <string name="media_no_such_folder">There is no folder with that number. See media for the list.</string>
+    <string name="media_no_videos">No videos found in your media folders.</string>
+    <string name="media_removed">Removed %1$s.</string>
+    <string name="media_scanning">Scanning your media folders…</string>
+    <plurals name="media_tracks">
+        <item quantity="one">%1$d track</item>
+        <item quantity="other">%1$d tracks</item>
+    </plurals>
+    <string name="media_video_audio">AUD</string>
+    <string name="media_video_audio_desc">Audio track</string>
+    <string name="media_video_back">Back</string>
+    <string name="media_video_back10">-10</string>
+    <string name="media_video_back10_desc">Back 10 seconds, hold to seek backward</string>
+    <string name="media_video_cannot_play">This file cannot be played.</string>
+    <string name="media_video_cc">CC</string>
+    <string name="media_video_cc_desc">Subtitles</string>
+    <string name="media_video_done">done</string>
+    <string name="media_video_fill">FILL</string>
+    <string name="media_video_filter">filter videos</string>
+    <string name="media_video_fit">FIT</string>
+    <string name="media_video_fit_desc">Fit or crop</string>
+    <string name="media_video_forward10">+10</string>
+    <string name="media_video_forward10_desc">Forward 10 seconds, hold to seek forward</string>
+    <string name="media_video_list">LIST</string>
+    <string name="media_video_list_desc">Playlist</string>
+    <string name="media_video_next_up">Next: %1$s in %2$dm</string>
+    <string name="media_video_pause">PAUSE</string>
+    <string name="media_video_pip">PIP</string>
+    <string name="media_video_pip_desc">Picture in picture</string>
+    <string name="media_video_play">PLAY</string>
+    <string name="media_video_playlist">playlist · %1$s</string>
+    <string name="media_video_results">video filter results</string>
+    <string name="media_video_resume">resume %1$s from %2$s</string>
+    <string name="media_video_resume_at">resume %1$s</string>
+    <string name="media_video_resume_show">resume</string>
+    <string name="media_video_seek_desc">Seek</string>
+    <string name="media_video_seeking">seeking %1$s</string>
+    <string name="media_video_speed_desc">Playback speed</string>
+    <string name="media_video_start_over">start over</string>
+    <string name="media_video_start_show">start</string>
+    <string name="media_video_vol">vol</string>
+    <string name="media_video_volume_desc">Volume</string>
+    <plurals name="media_videos">
+        <item quantity="one">%1$d video</item>
+        <item quantity="other">%1$d videos</item>
+    </plurals>
     <string name="mobile_data_label">Mobile data:</string>
     <string name="module_action_access">access</string>
     <string name="module_action_clear">clear</string>
@@ -2334,6 +2495,20 @@ Unable to read Android Calendar.</string>
     <string name="module_library_title">Module library</string>
     <string name="module_library_unavailable">Could not load the module library: %1$s</string>
     <string name="module_library_unknown">Unknown library module. Use module -library.</string>
+    <string name="mono_banner_description">Weather scene. Tap to step through the scenes.</string>
+    <string name="mono_no_events">nothing coming up</string>
+    <string name="mono_no_music">nothing playing</string>
+    <string name="mono_no_notes">no notes · add one with notes -add</string>
+    <string name="mono_no_notifications">all quiet</string>
+    <string name="mono_no_reminders">none set · reminder 18:00 call</string>
+    <string name="mono_no_timer">not running · timer 5m</string>
+    <string name="mono_prompt_hint">search or type a command</string>
+    <string name="mono_session_title">── session ──</string>
+    <string name="mono_stopwatch_paused">stopwatch %1$s · paused</string>
+    <string name="mono_stopwatch_running">stopwatch %1$s</string>
+    <string name="mono_timer_paused">timer %1$s left · paused</string>
+    <string name="mono_timer_running">timer %1$s left</string>
+    <string name="music_songs_folder_hint">0 songs found in songs_folder. If it holds music, add the folder with media -add instead; it works without storage permission.</string>
     <string name="nagomi_choose_image">Choose image</string>
     <string name="nagomi_credit">Nagomi · by Mayank Kadam</string>
     <string name="nagomi_demo">Original Nagomi ↗</string>
@@ -4386,6 +4561,101 @@ Fix or delete the file to recover your options</string>
     <string name="picker_hour">HOUR</string>
     <string name="picker_minute">MINUTE</string>
     <string name="picker_period">AM / PM</string>
+    <string name="pixel_grid_off">off</string>
+    <string name="pixel_grid_status">Pixel grid: %1$s · %2$.1f dp cells</string>
+    <string name="pixel_grid_unsupported">The pixel grid needs Android 13 or newer.</string>
+    <string name="pixel_grid_usage">pixelgrid on|off|snap|1bit|&lt;cell size in dp, 1–6&gt;</string>
+    <string name="player_add">ADD</string>
+    <string name="player_add_desc">add from the library</string>
+    <string name="player_add_to_queue">ADD TO QUEUE</string>
+    <string name="player_albums">ALBUMS</string>
+    <string name="player_all">ALL</string>
+    <string name="player_all_watched">Everything here is watched.</string>
+    <string name="player_artists">ARTISTS</string>
+    <string name="player_ask_next">NEXT</string>
+    <string name="player_ask_queue">QUEUE</string>
+    <string name="player_back_15">back 15 seconds</string>
+    <string name="player_buffering">buffering</string>
+    <string name="player_cancel">CANCEL</string>
+    <string name="player_cant_play">Could not play %1$s. Skipping it.</string>
+    <string name="player_chapter_n">Chapter %1$d</string>
+    <string name="player_chapters">CHAPTERS</string>
+    <string name="player_chapters_none">This episode has no chapters.</string>
+    <string name="player_clear">CLEAR</string>
+    <string name="player_close">close media player</string>
+    <string name="player_continue">%1$s %2$s / %3$s</string>
+    <string name="player_delete">DELETE</string>
+    <string name="player_download">DOWNLOAD</string>
+    <string name="player_download_failed">Download failed.</string>
+    <string name="player_eq">EQ</string>
+    <string name="player_eq_none">This device has no equaliser presets.</string>
+    <string name="player_filter">search music, video, podcasts</string>
+    <string name="player_folders">FOLDERS</string>
+    <string name="player_forward_30">forward 30 seconds</string>
+    <string name="player_gave_up">Nothing in the queue could be played.</string>
+    <string name="player_library">back to library</string>
+    <string name="player_list_name">List name</string>
+    <string name="player_list_name_needed">Give the list a name.</string>
+    <string name="player_list_saved">Saved %1$s</string>
+    <string name="player_lists">LISTS</string>
+    <string name="player_lists_desc">saved playlists</string>
+    <string name="player_looking">Looking...</string>
+    <string name="player_lyrics">LYRICS</string>
+    <string name="player_lyrics_none">No lyrics found. Put a .lrc or .txt file with the same name beside the song, then run media -scan.</string>
+    <string name="player_mark_played">PLAYED</string>
+    <string name="player_mark_unplayed">UNPLAYED</string>
+    <string name="player_music_off">Music is off. Turn it on with config -set enable_music true, then restart the launcher.</string>
+    <string name="player_new">NEW</string>
+    <string name="player_newest">NEWEST</string>
+    <string name="player_next">next track</string>
+    <string name="player_no_new">No unplayed episodes.</string>
+    <string name="player_no_offline">No downloads yet. Long-press an episode to download it.</string>
+    <string name="player_no_playlists">No saved lists yet. Open the queue and tap SAVE.</string>
+    <string name="player_no_results">Nothing found.</string>
+    <string name="player_notes">NOTES</string>
+    <string name="player_notes_none">No notes for this episode. Refreshing the show may bring them back.</string>
+    <string name="player_nothing">Nothing playing</string>
+    <string name="player_now_playing">back to now playing</string>
+    <string name="player_offline">OFFLINE</string>
+    <string name="player_oldest">OLDEST</string>
+    <string name="player_pause">PAUSE</string>
+    <string name="player_play">PLAY</string>
+    <string name="player_play_next">PLAY NEXT</string>
+    <string name="player_previous">previous track</string>
+    <string name="player_queue">QUEUE</string>
+    <string name="player_queue_count">QUEUE %1$d</string>
+    <string name="player_recent">RECENT</string>
+    <string name="player_reconnecting">Reconnecting...</string>
+    <string name="player_refresh">REFRESH</string>
+    <string name="player_remove">remove from queue</string>
+    <string name="player_reorder">drag to reorder</string>
+    <string name="player_repeat">repeat</string>
+    <string name="player_repeat_all">ALL</string>
+    <string name="player_repeat_off">OFF</string>
+    <string name="player_repeat_one">ONE</string>
+    <string name="player_save_list">SAVE</string>
+    <string name="player_saved">saved</string>
+    <string name="player_search">RESULTS</string>
+    <string name="player_seek">position in track</string>
+    <string name="player_shows">SHOWS</string>
+    <string name="player_shuffle">SHUF</string>
+    <string name="player_silence">SILENCE</string>
+    <string name="player_silence_desc">skip silence in podcasts</string>
+    <string name="player_sleep">SLEEP</string>
+    <string name="player_sleep_end">End of this track</string>
+    <string name="player_sleep_end_short">END</string>
+    <string name="player_sleep_left">%1$dm</string>
+    <string name="player_sleep_minutes">%1$d minutes</string>
+    <string name="player_sleep_off">Off</string>
+    <string name="player_songs">SONGS</string>
+    <string name="player_tab_music">MUSIC</string>
+    <string name="player_tab_podcasts">PODCASTS</string>
+    <string name="player_tab_video">VIDEO</string>
+    <string name="player_title">Media player</string>
+    <string name="player_unwatched">UNWATCHED</string>
+    <string name="player_unwatched_count">%1$d of %2$d unwatched</string>
+    <string name="player_up_next">UP NEXT %1$d</string>
+    <string name="player_waiting_network">Waiting for network...</string>
     <string name="podcast_pill_description">Podcast</string>
     <string name="podcast_podcastmanager_buffering_episode_64f5f">Buffering episode...</string>
     <string name="podcast_podcastmanager_empty_feed_c88eb">empty feed</string>
@@ -4433,6 +4703,30 @@ Included behavior fields and values:
 Apply it later through preset -apply. Active settings have not changed.</string>
     <string name="portable_preset_share">Share</string>
     <string name="portable_preset_unknown_version">Not provided</string>
+    <string name="preset_community_anonymous">anonymous</string>
+    <string name="preset_community_back">Back</string>
+    <string name="preset_community_by">by %1$s · ↓ %2$d</string>
+    <string name="preset_community_checking">Checking…</string>
+    <string name="preset_community_detail_note">The file is checked before import. Your current look stays until you run preset -apply.</string>
+    <string name="preset_community_empty">No community presets yet. Be the first: + SHARE MINE.</string>
+    <string name="preset_community_extras">EXTRAS</string>
+    <string name="preset_community_font_link">Uses a custom font. Open the link in your browser, then import it with Settings › Fonts.</string>
+    <string name="preset_community_font_none">No custom font.</string>
+    <string name="preset_community_has_font">font link</string>
+    <string name="preset_community_has_wallpaper">wallpaper</string>
+    <string name="preset_community_intro">Made by Re:TUI users and reviewed before listing. Downloading checks the file, then saves it beside your presets.</string>
+    <string name="preset_community_made_on">made on build %1$s</string>
+    <string name="preset_community_open_font">Open font link</string>
+    <string name="preset_community_part_behaviour">Behaviour</string>
+    <string name="preset_community_part_colours">Colours</string>
+    <string name="preset_community_part_layout">Layout</string>
+    <string name="preset_community_part_suggestions">Suggestions</string>
+    <string name="preset_community_share_mine">+ SHARE MINE</string>
+    <string name="preset_community_sort_new">NEW</string>
+    <string name="preset_community_sort_popular">POPULAR</string>
+    <string name="preset_community_view">View &amp; download</string>
+    <string name="preset_community_wallpaper_option">Also download its wallpaper (%1$s) and set it when you apply this preset</string>
+    <string name="preset_community_what_changes">WHAT IT CHANGES</string>
     <string name="preset_market_cancelled">Download cancelled. Your active preset has not changed.</string>
     <string name="preset_market_copy">Copy apply command</string>
     <string name="preset_market_download">Download &amp; import</string>
@@ -4446,7 +4740,15 @@ $ hello world
 Your terminal, your colors.</string>
     <string name="preset_market_saved">Imported: %1$s
 To apply later: preset -apply %1$s</string>
+    <string name="preset_market_tab_community">COMMUNITY</string>
+    <string name="preset_market_tab_terminal">TERMINAL</string>
     <string name="preset_market_title">Preset marketplace</string>
+    <string name="preset_wallpaper_ask_message">Re:TUI can't read the current wallpaper. Choose the image to keep with %1$s?</string>
+    <string name="preset_wallpaper_ask_title">Preset wallpaper</string>
+    <string name="preset_wallpaper_choose">Choose image</string>
+    <string name="preset_wallpaper_failed">That image could not be used</string>
+    <string name="preset_wallpaper_saved">Wallpaper saved with preset %1$s</string>
+    <string name="preset_wallpaper_skip">Without wallpaper</string>
     <string name="private_space_compatibility_notice">Private Space requires Android 15+, Re:TUI as your default launcher, and compatible device software. Some implementations, including certain Vivo/iQOO versions, may prevent locking, unlocking, or opening private apps. Use your phone’s Private Space interface if this happens.
 
 Disabling this option hides Re:TUI access; it does not lock Private Space. Save Settings to apply your choice.</string>
@@ -4573,10 +4875,15 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_clear_on_lock_description">If true, Re:T-UI will clear the screen when you lock the phone</string>
     <string name="setting_behavior_click_commands_description">If true, you will be able to use a command again clicking on it</string>
     <string name="setting_behavior_device_format_description">Define the device format</string>
+    <string name="setting_behavior_dot_apps_description">In Dot mode, the apps on the rings around the dot, innermost first, separated by commas (up to 5). Leave empty to use your most-used apps.</string>
     <string name="setting_behavior_double_tap_cmd_description">The command that will run when you touch two times the screen quickly</string>
     <string name="setting_behavior_double_tap_lock_description">If true, Re:T-UI will lock the screen on double tap</string>
     <string name="setting_behavior_duo_mode_description">If true, enables the Duo command for manually switching landscape into a single portrait-style pane on the left or right screen</string>
     <string name="setting_behavior_duo_swap_top_panes_description">Swap Duo top panes: keep statuses with input/output and move the module dock and open module to the secondary screen. Only applies in Duo mode.</string>
+    <string name="setting_behavior_edge_pill_length_description">How long the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default (50 to 300)</string>
+    <string name="setting_behavior_edge_pill_width_description">How thick the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default; raise it for larger text and easier taps (50 to 300)</string>
+    <string name="setting_behavior_edge_sidebar_description">Shows a tab on the screen edge over every app. Tap it or swipe in to open launcher search, a floating tmux terminal and your quick app. Drag it along the edge to move it. Needs permission to display over other apps</string>
+    <string name="setting_behavior_edge_sidebar_quick_app_description">The app the sidebar's third button opens. Tap Apps to pick one; empty starts a new note, filed in a folder named for today's date</string>
     <string name="setting_behavior_enable_crt_filter_description">If true, Re:T-UI draws a CRT scanline overlay over the launcher</string>
     <string name="setting_behavior_enable_cyberdeck_mode_description">If true, Re:T-UI uses angular cyberdeck drawables while keeping the active theme colors</string>
     <string name="setting_behavior_enable_music_description">If true, you will be able to use Re:T-UI as a music player. Otherwise, the music command will try to communicate with the music player that your using</string>
@@ -4586,7 +4893,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_home_path_description">The path to your home directory</string>
     <string name="setting_behavior_htmlextractor_default_format_description">The default format used by htmlextract -use</string>
     <string name="setting_behavior_input_format_description">Define the input format </string>
-    <string name="setting_behavior_launcher_mode_description">Launcher layout mode: classic, search, or terminal</string>
+    <string name="setting_behavior_launcher_mode_description">Launcher layout mode: classic, search, terminal, dot, or mono</string>
     <string name="setting_behavior_launcher_sounds_description">If true, Re:T-UI will play its bundled launcher sound pack</string>
     <string name="setting_behavior_location_update_mindistance_description">The minimum distance (in meters) to get a location update</string>
     <string name="setting_behavior_location_update_mintime_description">The amount of time between two location updates (in minutes, must be an integer value)</string>
@@ -4595,6 +4902,8 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_long_click_vibration_duration_description">The duration (in milliseconds) of the vibration when you long click a notification or an RSS item (&lt;0 will disable the feature)</string>
     <string name="setting_behavior_max_lines_description">Set maximum number of lines that will be shown in the terminal (if -1, this feature is be disabled)</string>
     <string name="setting_behavior_max_optional_depth_description">A value which is used to tell how deep Re:T-UI can go in a nested optional value</string>
+    <string name="setting_behavior_mono_ink_color_description">In Mono mode, the colour everything is drawn in: text, lines and selections.</string>
+    <string name="setting_behavior_mono_paper_color_description">In Mono mode, the background colour.</string>
     <string name="setting_behavior_multiple_cmd_separator_description">The separator between two or more commands in a single input</string>
     <string name="setting_behavior_network_info_format_description">Define the network format</string>
     <string name="setting_behavior_not_available_text_description">The text shown when a value is not available</string>
@@ -4636,7 +4945,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_status_time_format_description">Define the time format for the status lines at the top. Letters are read as date and time codes, so wrap plain words in single quotes, for example 'Time:' HH:mm. An invalid format falls back to HH:mm:ss. You can resize parts with [size=30]HH:mm[/size], use {clock_words} for Six Fifty Seven, and use %n for a new line</string>
     <string name="setting_behavior_storage_format_description">Define the storage format</string>
     <string name="setting_behavior_swipe_down_notifications_description">If true, swiping down will expand the notification shade</string>
-    <string name="setting_behavior_swipe_up_apps_drawer_description">Show the apps drawer button and allow swipe-up on non-scrolling launcher surfaces. Terminal output remains scrollable</string>
+    <string name="setting_behavior_swipe_up_apps_drawer_description">Allow swipe-up on non-scrolling launcher surfaces to open the apps drawer. Terminal output remains scrollable</string>
     <string name="setting_behavior_time_format_separator_description">This is the separator between your different time formats</string>
     <string name="setting_behavior_toggle_output_state_description">Legacy output tray toggle. Use output_tray_mode=toggled for manual expanded/collapsed control</string>
     <string name="setting_behavior_tui_notification_click_cmd_description">The command ran when the Re:T-UI notification is clicked</string>
@@ -4974,6 +5283,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_toolbar_shortcut_button_2_command_description">Command, alias, or app name executed by the second custom toolbar button</string>
     <string name="setting_toolbar_shortcut_button_2_enabled_description">If true, the second custom toolbar button is shown</string>
     <string name="setting_toolbar_shortcut_button_2_icon_description">Icon key for the second custom toolbar button</string>
+    <string name="setting_toolbar_show_apps_drawer_button_description">If true, the apps drawer button is shown in the toolbar</string>
     <string name="setting_toolbar_show_toolbar_description">If false, the toolbar is hidden</string>
     <string name="setting_ui_android_widget_grid_columns_description">Column count for the widget pane, from 2 to 12. More columns make smaller cells for a denser pane. Rows use square cells</string>
     <string name="setting_ui_android_widget_min_columns_description">Fallback starting width when a widget app does not provide valid Android sizing metadata</string>
@@ -5114,6 +5424,38 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_preview_terminal_card">TERMINAL</string>
     <string name="settings_preview_title">Preview</string>
     <string name="settings_preview_wallpaper_full">System wallpaper is shown in the full preview.</string>
+    <string name="share_back_to_community">Back to Community</string>
+    <string name="share_behaviour">Behaviour settings… (you pick which)</string>
+    <string name="share_capture">Capture home screen</string>
+    <string name="share_captured">✓ Home screen captured</string>
+    <string name="share_choose_image">Choose an image instead</string>
+    <string name="share_choose_wallpaper">Choose wallpaper image</string>
+    <string name="share_colours">Colours &amp; suggestions (always)</string>
+    <string name="share_consent">I checked the behaviour settings I picked and removed personal paths, commands, tokens and other private data.</string>
+    <string name="share_description">DESCRIPTION</string>
+    <string name="share_failed">Not sent: %1$s</string>
+    <string name="share_font">CUSTOM FONT LINK</string>
+    <string name="share_image_error">Could not read that image.</string>
+    <string name="share_intro">Shares your current look, not a backup. It is reviewed before anyone can download it.</string>
+    <string name="share_layout">Layout</string>
+    <string name="share_log_exported">✓ exported %1$s</string>
+    <string name="share_log_screenshot">✓ attached screenshot (%1$s)</string>
+    <string name="share_log_uploaded">✓ uploaded</string>
+    <string name="share_log_wallpaper">✓ attached wallpaper (%1$s)</string>
+    <string name="share_missing">Add a name, a description and a screenshot, and tick the privacy box.</string>
+    <string name="share_name">NAME</string>
+    <string name="share_optional">optional</string>
+    <string name="share_screenshot">SCREENSHOT</string>
+    <string name="share_send">Send for review</string>
+    <string name="share_sending">Uploading…</string>
+    <string name="share_sent">%1$s is waiting for review. It shows up under Community once approved. Nothing changed on your phone.</string>
+    <string name="share_tags">TAGS</string>
+    <string name="share_tags_hint">calm, water</string>
+    <string name="share_title">SHARE MY SETUP</string>
+    <string name="share_wallpaper">Wallpaper image</string>
+    <string name="share_wallpaper_unreadable">Your current wallpaper can't be read here. Choose an image to include one.</string>
+    <string name="share_what">WHAT TO SHARE</string>
+    <string name="share_your_name">YOUR NAME</string>
     <string name="shortcut_index_greater">The index is greater than the shortcuts count</string>
     <string name="sms_hint">Enter SMS message</string>
     <string name="start_notification">Re:T-UI started</string>
@@ -5489,7 +5831,7 @@ Open editor: notes</string>
     <string name="surface_no_saved_launcher_removed_5af97">No saved launcher removed: %1$s</string>
     <string name="surface_no_show_selected_7bad6">No show selected.</string>
     <string name="surface_no_subscriptions_yet_use_add_or_type_podcast_add_feed_url_d4398">No subscriptions yet.
-Use ADD or type podcast add &lt;feed-url&gt;.</string>
+Use + or type podcast add &lt;feed-url&gt;.</string>
     <string name="surface_no_weather_yet_e6067">No weather yet.</string>
     <string name="surface_no_widget_output_yet_c383d">No widget output yet.</string>
     <string name="surface_non_interactive_termux_commands_run_from_here_80d90">Non-interactive Termux commands run from here.</string>
@@ -6302,6 +6644,7 @@ Ready for the next command</string>
     <string name="wallpaper_clouds_scene_label">Scene</string>
     <string name="wallpaper_dither_photo">dither photo</string>
     <string name="wallpaper_doom_fire">doom fire</string>
+    <string name="wallpaper_fire_pick_color">Pick Fire Color</string>
     <string name="wallpaper_hex_hint">#AARRGGBB</string>
     <string name="wallpaper_hex_invalid">Enter a valid #AARRGGBB or #RRGGBB value</string>
     <string name="wallpaper_library_back">Back</string>

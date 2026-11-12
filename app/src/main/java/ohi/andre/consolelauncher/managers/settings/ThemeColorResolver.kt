@@ -7,7 +7,7 @@ object ThemeColorResolver {
     private val previewValues = LinkedHashMap<Theme, String>()
 
     @JvmStatic
-    fun color(role: Theme): Int = resolve(
+    fun color(role: Theme): Int = if (MonoMode.active()) MonoMode.themeColor(role) else resolve(
         role,
         { LauncherSettings.get(it) },
         synchronized(previewValues) { HashMap(previewValues) }

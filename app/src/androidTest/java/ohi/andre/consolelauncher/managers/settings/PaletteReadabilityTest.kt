@@ -29,9 +29,9 @@ import ohi.andre.consolelauncher.commands.tuixt.*
 import ohi.andre.consolelauncher.irc.IrcActivity
 import ohi.andre.consolelauncher.irc.IrcMessage
 import ohi.andre.consolelauncher.irc.IrcNavigation
-import ohi.andre.consolelauncher.managers.BackupManager
+import ohi.andre.consolelauncher.managers.backup.BackupManager
 import ohi.andre.consolelauncher.managers.ChangelogManager
-import ohi.andre.consolelauncher.managers.PresetManager
+import ohi.andre.consolelauncher.managers.preset.PresetManager
 import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetPreview
@@ -108,7 +108,7 @@ class PaletteReadabilityTest {
                 finally { instrumentation.uiAutomation.dropShellPermissionIdentity(); bitmap.recycle() }
             }
             "frames" -> {
-                val frames = ohi.andre.consolelauncher.tuils.FrameManager
+                val frames = ohi.andre.consolelauncher.tuils.frame.FrameManager
                 frames.beginEdit(context).also { it.applyPack(frames.SPROUT_LANDS_PACK_ID); it.save() }
                 frames.setEnabled(context, true)
             }
@@ -228,7 +228,7 @@ class PaletteReadabilityTest {
                 when (variant) {
                     "normal" -> {
                         ui.setInput("palette sample")
-                        ui.setOutput("Readability fixture\nPlain output · https://example.test\nUnicode: café → 😀", ohi.andre.consolelauncher.managers.TerminalManager.CATEGORY_OUTPUT)
+                        ui.setOutput("Readability fixture\nPlain output · https://example.test\nUnicode: café → 😀", ohi.andre.consolelauncher.managers.terminal.TerminalManager.CATEGORY_OUTPUT)
                         for ((role, text) in listOf(Theme.error_text_color to "Synthetic error", Theme.warning_text_color to "Synthetic warning", Theme.success_text_color to "Synthetic success", Theme.link_text_color to "https://example.test"))
                             ui.setOutput(ThemeColorResolver.color(role), text)
                     }
@@ -558,7 +558,7 @@ class PaletteReadabilityTest {
         val configuration = args.getString("configuration", "baseline")
         check(emulator || configuration == "baseline")
         val frameBackup = File(context.cacheDir, "readability-frame-backup")
-        if (configuration == "frames") ohi.andre.consolelauncher.tuils.FrameManager.copyStateTo(context, frameBackup)
+        if (configuration == "frames") ohi.andre.consolelauncher.tuils.frame.FrameManager.copyStateTo(context, frameBackup)
         val widgetFolder = LuaWidgetManager.widgetDir(widget)
         check(!widgetFolder.exists()) { "Fixture name already exists" }
         val selected = args.getString("themes")?.split(',')?.toSet()
@@ -698,7 +698,7 @@ class PaletteReadabilityTest {
             widgetFolder.deleteRecursively()
             instrumentation.removeMonitor(monitor)
             if (configuration == "landscape") instrumentation.uiAutomation.setRotation(android.app.UiAutomation.ROTATION_UNFREEZE)
-            if (configuration == "frames") { ohi.andre.consolelauncher.tuils.FrameManager.applyStateFrom(context, frameBackup); frameBackup.deleteRecursively() }
+            if (configuration == "frames") { ohi.andre.consolelauncher.tuils.frame.FrameManager.applyStateFrom(context, frameBackup); frameBackup.deleteRecursively() }
             reloadPrefs()
         }
     }

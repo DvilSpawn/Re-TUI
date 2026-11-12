@@ -23,7 +23,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.managers.xml.options.Notifications
 import ohi.andre.consolelauncher.tuils.Tuils
-import ohi.andre.consolelauncher.tuils.TerminalBorderDrawable
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderDrawable
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before

@@ -27,8 +27,8 @@ import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleButton
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.styleHeader
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.stylePanel
 import ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor
-import ohi.andre.consolelauncher.managers.AliasManager
-import ohi.andre.consolelauncher.managers.PinnedShortcutManager
+import ohi.andre.consolelauncher.managers.terminal.AliasManager
+import ohi.andre.consolelauncher.managers.apps.PinnedShortcutManager
 import ohi.andre.consolelauncher.managers.settings.ThemeColorResolver
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
 import ohi.andre.consolelauncher.tuils.LauncherSystemUi.applyFullscreen
@@ -130,7 +130,7 @@ class PinShortcutConfirmActivity : ohi.andre.consolelauncher.localization.Locali
         panelShell.addView(header, headerParams)
 
         val title = terminalText(labelFor(shortcutInfo!!))
-        title.setTextSize(16f)
+        title.setTextSize(ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(16f))
         root.addView(title, blockParams())
 
         val source = terminalText(getString(R.string.editor_pinshortcutconfirmactivity_from_ad3b5, shortcutInfo!!.getPackage()))
@@ -246,7 +246,7 @@ class PinShortcutConfirmActivity : ohi.andre.consolelauncher.localization.Locali
         view.setText(text)
         view.setTextColor(textColor())
         view.setTypeface(Tuils.getTypeface(this), Typeface.BOLD)
-        view.setTextSize(13f)
+        view.setTextSize(ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(13f))
         view.setGravity(Gravity.CENTER_VERTICAL)
         return view
     }

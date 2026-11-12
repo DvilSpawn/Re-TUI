@@ -1,6 +1,6 @@
 package ohi.andre.consolelauncher.tuils.asciifx
 
-import java.io.File
+import ohi.andre.consolelauncher.SourceFiles
 import ohi.andre.consolelauncher.tuils.FigletFont
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -12,7 +12,7 @@ class AsciiEffectsTest {
     private val red = 0xFFFF0000.toInt()
 
     private fun art(): AsciiArt {
-        val lines = FigletFont.parse(File("src/main/assets/figlet/small.flf").readText()).render("Re:TUI").lines()
+        val lines = FigletFont.parse(SourceFiles.repo("app/src/main/assets/figlet/small.flf").readText()).render("Re:TUI").lines()
         // One coloured cell, as a colour-HTML import would give.
         val colors = lines.map { IntArray(it.length) }.also { it[1][lines[1].indexOfFirst { c -> !c.isWhitespace() }] = red }
         return AsciiArt(lines, colors, green)

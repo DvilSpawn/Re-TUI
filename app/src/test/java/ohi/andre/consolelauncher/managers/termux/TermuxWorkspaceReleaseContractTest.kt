@@ -1,17 +1,15 @@
 package ohi.andre.consolelauncher.managers.termux
 
-import java.io.File
+import ohi.andre.consolelauncher.SourceFiles
 import org.junit.Assert.*
 import org.junit.Test
 
 /** Wiring guards complement the rendered workspace and loopback input fixtures. */
 class TermuxWorkspaceReleaseContractTest {
-    private val root = generateSequence(File(checkNotNull(System.getProperty("user.dir")))) { it.parentFile }
-        .first { File(it, "app/src/main").isDirectory }
-    private val activity = File(root, "app/src/main/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspaceActivity.kt").readText()
+    private val activity = SourceFiles.kotlin("TermuxWorkspaceActivity.kt").readText()
 
     @Test fun settingsNotifyWorkspaceAfterFontInvalidationWithoutRequiringAnActivityContext() {
-        val settings = File(root, "app/src/main/java/ohi/andre/consolelauncher/managers/settings/SettingsRefreshCoordinator.kt").readText()
+        val settings = SourceFiles.kotlin("SettingsRefreshCoordinator.kt").readText()
         val refresh = settings.indexOf("TermuxWorkspaceActivity.refreshIfRunning()")
         assertTrue("Foreground workspace is not notified of setting changes", refresh >= 0)
         assertTrue("Workspace refresh must use the invalidated font cache", refresh > settings.indexOf("UIUtils.cancelFont()"))
@@ -62,7 +60,7 @@ class TermuxWorkspaceReleaseContractTest {
     }
 
     @Test fun workspaceFontFixtureUsesEffectiveSettingAndRealNotificationHook() {
-        val fixture = File(root, "app/src/androidTest/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspacePaneIntegrationTest.kt").readText()
+        val fixture = SourceFiles.repo("app/src/androidTest/java/ohi/andre/consolelauncher/managers/termux/TermuxWorkspacePaneIntegrationTest.kt").readText()
             .substringAfter("fun liveAppearanceAndFadeRetainBothTilesDraftAndInputSelection()").substringBefore("@Test fun twoTilesRestore")
         assertTrue("Fixture changes an ineffective legacy size instead of the grid font offset", fixture.contains("Ui.font_size_offset"))
         assertFalse("Manual style masks missing live settings notification", fixture.contains("\"style\""))
@@ -80,7 +78,7 @@ class TermuxWorkspaceReleaseContractTest {
     }
 
     @Test fun launcherFadeFixtureActuallyRefreshesAPopulatedDraft() {
-        val test = File(root, "app/src/androidTest/java/ohi/andre/consolelauncher/BreathOutIntegrationTest.kt").readText()
+        val test = SourceFiles.repo("app/src/androidTest/java/ohi/andre/consolelauncher/BreathOutIntegrationTest.kt").readText()
             .substringAfter("fun everyModeUsesSameFadeBoundaryAndRetainsDraftThroughRefresh()")
             .substringBefore("@Test fun repeatedForegroundSignal")
         val seed = test.indexOf("setText(\"retained $" + "mode draft\")")

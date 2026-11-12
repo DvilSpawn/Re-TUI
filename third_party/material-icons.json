@@ -2,7 +2,7 @@
   "revision": "49d4db35df873165d6bd6ba09b063c7dafbac2f4",
   "license": "Apache-2.0",
   "license_file": "LICENSES/Material-Symbols-Apache-2.0.txt",
-  "conversion": "Preserved SVG paths, translated origin, preserved existing intrinsic sizes/rotate wrapper; neutral support-link symbols replace brand logos.",
+  "conversion": "Preserved SVG paths, translated origin, preserved existing intrinsic sizes/rotate wrapper.",
   "files": [
     {
       "path": "app/src/main/res/drawable/hourglass_24.xml",
@@ -107,18 +107,6 @@
       "vector_sha256": "5db80563b68e2d71a91242152e832a70e88a2d18868a4a248a6728daf73eb24b"
     },
     {
-      "path": "app/src/main/res/drawable/ic_tuixt_discord_24.xml",
-      "source": "https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/chat/materialsymbolsoutlined/chat_24px.svg",
-      "source_sha256": "54cec1588b002959077443b4f673df171413cc567113d9b755ac2654f6f2f2eb",
-      "vector_sha256": "d41646ad123f13ba5bd9e27305b6c02f9bf30fbde47e7977a186b2bb15697c78"
-    },
-    {
-      "path": "app/src/main/res/drawable/ic_tuixt_github_24.xml",
-      "source": "https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/code/materialsymbolsoutlined/code_24px.svg",
-      "source_sha256": "c143cc75a602f8d003d3d1aea63e20a11a713af876f0926659f67af04f7cc026",
-      "vector_sha256": "708db59b0e295fa3ba6ef3f9963a4a384991cf58d81f12e002e8bca2ff701e0b"
-    },
-    {
       "path": "app/src/main/res/drawable/ic_tuixt_lock_24.xml",
       "source": "https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/lock/materialsymbolsoutlined/lock_24px.svg",
       "source_sha256": "148a3da500ee74920d4f80984e8f73830b1f4e613bac095502d854b9c700315c",
@@ -129,12 +117,6 @@
       "source": "https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/lock_open/materialsymbolsoutlined/lock_open_24px.svg",
       "source_sha256": "f7d530a277fc5e7e00f051a28e5976518b59c6dcc5a6d4f9a389d3895b811b1a",
       "vector_sha256": "d959425d8b9ea0a51acaf50ddd109580fa3bd10853ac15cb38149d6f01a40b29"
-    },
-    {
-      "path": "app/src/main/res/drawable/ic_tuixt_reddit_24.xml",
-      "source": "https://raw.githubusercontent.com/google/material-design-icons/49d4db35df873165d6bd6ba09b063c7dafbac2f4/symbols/web/forum/materialsymbolsoutlined/forum_24px.svg",
-      "source_sha256": "08c85b119250ffc7c094b6f31ea43eb362f2e83bca432f6a928bc34499f66938",
-      "vector_sha256": "dfc4512eaf528879f914c3e28fc3487501f629e56e3182985b8e3edb5c62d2dc"
     },
     {
       "path": "app/src/main/res/drawable/ic_tuixt_web_24.xml",

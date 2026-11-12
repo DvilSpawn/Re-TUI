@@ -134,6 +134,13 @@
     <string name="output_songnotfound">Song not found</string>
     <string name="output_musicdisabled">enable_music is false</string>
     <string name="no_songs">0 songs found</string>
+    <string name="music_songs_folder_hint">0 songs found in songs_folder. If it holds music, add the folder with media -add instead; it works without storage permission.</string>
+    <string name="preset_wallpaper_ask_title">Preset wallpaper</string>
+    <string name="preset_wallpaper_ask_message">Re:TUI can\'t read the current wallpaper. Choose the image to keep with %1$s?</string>
+    <string name="preset_wallpaper_choose">Choose image</string>
+    <string name="preset_wallpaper_skip">Without wallpaper</string>
+    <string name="preset_wallpaper_saved">Wallpaper saved with preset %1$s</string>
+    <string name="preset_wallpaper_failed">That image could not be used</string>
 
     <!-- command/args -->
     <string name="output_commandnotfound">Command not found.\nTry to use \"$ help\" or \"$ tutorial\"</string>
@@ -162,7 +169,7 @@
         \n$ files -cd &lt;directory&gt;
         \n\nOpens Re:T-UI FM, searches, lists the current directory, opens or shares a file, or changes the shared directory. Relative paths resolve from the launcher current path. Theme colors, terminal background, margins, and font are included.
     </string>
-    <string name="help_podcast">Open podcasts on the home screen. Minimize to an edge pill; expand again with podcast or the pill.
+    <string name="help_podcast">Open podcasts in the media player. While an episode is loaded, an edge pill plays, pauses and reopens it.
         \nUsage:
         \n$ podcast
         \n$ podcast add &lt;https-feed-url&gt;
@@ -171,7 +178,6 @@
         \n$ podcast next
         \n$ podcast prev
         \n$ podcast speed &lt;0.5-2.0&gt;
-        \n$ podcast close
         \n\nPodcasts stream from RSS/Atom feeds and play oldest first for first-time listening. Now-playing title lives on the music module.
     </string>
     <string name="podcast_pill_description">Podcast</string>
@@ -485,7 +491,8 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
         \n$ orientation landscape
         \n$ orientation auto
         \n\nRe:T-UI uses split landscape only when the current window is wide enough. Portrait keeps the portrait layout.</string>
-    <string name="help_music">-next -> play the next song
+    <string name="help_music">-open -> open the media player
+        \n-next -> play the next song
         \n-previous -> play the previous song
         \n-play -> play/pause the player
         \n-stop -> stop the player
@@ -768,6 +775,27 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     <string name="output_smsnotsent">SMS not sent: the message was empty.</string>
     <string name="output_smssent">SMS sent.</string>
     <string name="sms_hint">Enter SMS message</string>
+    <string name="help_breach">Open the Breach minigame. Needs RE:TUI credits turned on.
+        \n\nUsage:
+        \n$ breach</string>
+    <string name="help_credits">Show your RE:TUI credits and breach keys.
+        \n\nUsage:
+        \n$ credits</string>
+    <string name="help_lockdown">Start or check a lockdown. Needs RE:TUI credits turned on.
+        \n\nUsage:
+        \n$ lockdown
+        \n$ lockdown [duration] [reason]
+        \n$ lockdown -status
+        \n$ lockdown -stop
+        \n\nExamples:
+        \n$ lockdown 1h deep work</string>
+    <string name="help_pomodoro">Start or stop a pomodoro session.
+        \n\nUsage:
+        \n$ pomodoro
+        \n$ pomodoro [task]
+        \n$ pomodoro -stop
+        \n\nExamples:
+        \n$ pomodoro write report</string>
     <string name="help_events">Create or open the editable upcoming events Termux module.
         \nUsage:
         \n$ events
@@ -782,4 +810,96 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     <string name="help_username">Change the username and device name: username [new_user] [new_device]</string>
     <string name="help_mode">Switch launcher layout.\nUsage:\n$ mode classic\n$ mode search\n$ mode terminal</string>
     <string name="search_mode_hint">Search apps, contacts, notifications, or the web…</string>
+    <string name="player_filter">search music, video, podcasts</string>
+    <string name="player_title">Media player</string>
+    <string name="player_search">RESULTS</string>
+    <string name="player_reconnecting">Reconnecting...</string>
+    <string name="player_waiting_network">Waiting for network...</string>
+    <string name="player_cant_play">Could not play %1$s. Skipping it.</string>
+    <string name="player_gave_up">Nothing in the queue could be played.</string>
+    <string name="player_no_results">Nothing found.</string>
+    <string name="player_lists">LISTS</string>
+    <string name="player_lists_desc">saved playlists</string>
+    <string name="player_no_playlists">No saved lists yet. Open the queue and tap SAVE.</string>
+    <string name="player_delete">DELETE</string>
+    <string name="player_all">ALL</string>
+    <string name="player_unwatched">UNWATCHED</string>
+    <string name="player_unwatched_count">%1$d of %2$d unwatched</string>
+    <string name="player_all_watched">Everything here is watched.</string>
+    <string name="player_new">NEW</string>
+    <string name="player_offline">OFFLINE</string>
+    <string name="player_no_new">No unplayed episodes.</string>
+    <string name="player_no_offline">No downloads yet. Long-press an episode to download it.</string>
+    <string name="player_saved">saved</string>
+    <string name="player_ask_next">NEXT</string>
+    <string name="player_ask_queue">QUEUE</string>
+    <string name="player_download">DOWNLOAD</string>
+    <string name="player_cancel">CANCEL</string>
+    <string name="player_download_failed">Download failed.</string>
+    <string name="player_sleep">SLEEP</string>
+    <string name="player_sleep_left">%1$dm</string>
+    <string name="player_sleep_end_short">END</string>
+    <string name="player_sleep_off">Off</string>
+    <string name="player_sleep_minutes">%1$d minutes</string>
+    <string name="player_sleep_end">End of this track</string>
+    <string name="player_silence">SILENCE</string>
+    <string name="player_silence_desc">skip silence in podcasts</string>
+    <string name="player_notes">NOTES</string>
+    <string name="player_notes_none">No notes for this episode. Refreshing the show may bring them back.</string>
+    <string name="player_chapters">CHAPTERS</string>
+    <string name="player_chapters_none">This episode has no chapters.</string>
+    <string name="player_chapter_n">Chapter %1$d</string>
+    <string name="player_eq">EQ</string>
+    <string name="player_eq_none">This device has no equaliser presets.</string>
+    <string name="player_lyrics">LYRICS</string>
+    <string name="player_looking">Looking...</string>
+    <string name="player_lyrics_none">No lyrics found. Put a .lrc or .txt file with the same name beside the song, then run media -scan.</string>
+    <string name="player_save_list">SAVE</string>
+    <string name="player_add_desc">add from the library</string>
+    <string name="player_list_name">List name</string>
+    <string name="player_list_name_needed">Give the list a name.</string>
+    <string name="player_list_saved">Saved %1$s</string>
+    <string name="media_video_next_up">Next: %1$s in %2$dm</string>
+    <string name="player_shows">SHOWS</string>
+    <string name="player_recent">RECENT</string>
+    <string name="player_add">ADD</string>
+    <string name="player_refresh">REFRESH</string>
+    <string name="player_newest">NEWEST</string>
+    <string name="player_oldest">OLDEST</string>
+    <string name="player_mark_played">PLAYED</string>
+    <string name="player_mark_unplayed">UNPLAYED</string>
+    <string name="player_buffering">buffering</string>
+    <string name="player_back_15">back 15 seconds</string>
+    <string name="player_forward_30">forward 30 seconds</string>
+    <string name="player_close">close media player</string>
+    <string name="player_tab_music">MUSIC</string>
+    <string name="player_tab_video">VIDEO</string>
+    <string name="player_tab_podcasts">PODCASTS</string>
+    <string name="player_albums">ALBUMS</string>
+    <string name="player_artists">ARTISTS</string>
+    <string name="player_songs">SONGS</string>
+    <string name="player_folders">FOLDERS</string>
+    <string name="player_play_next">PLAY NEXT</string>
+    <string name="player_add_to_queue">ADD TO QUEUE</string>
+    <string name="player_seek">position in track</string>
+    <string name="player_shuffle">SHUF</string>
+    <string name="player_repeat">repeat</string>
+    <string name="player_repeat_off">OFF</string>
+    <string name="player_repeat_all">ALL</string>
+    <string name="player_repeat_one">ONE</string>
+    <string name="player_play">PLAY</string>
+    <string name="player_pause">PAUSE</string>
+    <string name="player_previous">previous track</string>
+    <string name="player_next">next track</string>
+    <string name="player_library">back to library</string>
+    <string name="player_now_playing">back to now playing</string>
+    <string name="player_queue">QUEUE</string>
+    <string name="player_clear">CLEAR</string>
+    <string name="player_nothing">Nothing playing</string>
+    <string name="player_reorder">drag to reorder</string>
+    <string name="player_remove">remove from queue</string>
+    <string name="player_music_off">Music is off. Turn it on with config -set enable_music true, then restart the launcher.</string>
+    <string name="player_continue">%1$s  %2$s / %3$s</string>
+    <string name="player_up_next">UP NEXT  %1$d</string>
+    <string name="player_queue_count">QUEUE  %1$d</string>
 </resources>

@@ -41,7 +41,7 @@ hardcoded catalogue or bundled production Lua module library in the APK.
 | Todo | Edit one task per line; Done chips remove completed tasks; Undo last restores the most recent one. | None |
 | Daily Habits | Editable daily checklist; tap Done/Undo. Resets on the next open after the local date changes. | None |
 | Focus Timer | Start/stop a 5–60 minute session; remaining time survives reopening. | Active ticking |
-| Bookmarks | Edit one `Name \| https://url` per line; open a link through a suggestion chip. Invalid entries are shown without launch actions; domains and IPv4 hosts are supported. | Intents |
+| Bookmarks | Edit one `Name \| https://url` per line; open a link by tapping it in the module or through its suggestion chip. Invalid entries are shown without launch actions; domains and IPv4 hosts are supported. | Intents |
 | Year Progress | Day, Monday-based week, month, and year progress in the phone's local time. | Active ticking |
 
 Modules with permissions first show Re:TUI's approval surface. Inspect them there

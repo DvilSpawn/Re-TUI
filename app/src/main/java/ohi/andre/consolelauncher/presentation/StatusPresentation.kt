@@ -110,7 +110,7 @@ internal object StatusPresentation {
         val parts=members.mapNotNull { ordinal ->
             if(saved!=null && ordinal==2 && listOf(Behavior.status_time_format,Behavior.time_format_separator,
                     Ui.time_size,Ui.font_size_offset,Theme.time_text_color).any { appearance.changed(it,saved) }) {
-                ohi.andre.consolelauncher.managers.TimeManager.previewStatus(view.context,
+                ohi.andre.consolelauncher.managers.time.TimeManager.previewStatus(view.context,
                     appearance.raw(Behavior.status_time_format).orEmpty(),
                     appearance.raw(Behavior.time_format_separator).orEmpty(),
                     appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color))

@@ -8,7 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import ohi.andre.consolelauncher.UIManager
-import ohi.andre.consolelauncher.managers.TerminalManager
+import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.ModuleSuggestion
 import ohi.andre.consolelauncher.managers.modules.ModuleManager.ModuleSuggestion.Companion.command
 import ohi.andre.consolelauncher.managers.modules.ReminderManager.Reminder

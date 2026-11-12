@@ -14,7 +14,7 @@ import ohi.andre.consolelauncher.managers.xml.options.Behavior
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.managers.xml.options.Ui
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
-import ohi.andre.consolelauncher.tuils.TerminalBorderRuntime
+import ohi.andre.consolelauncher.tuils.frame.TerminalBorderRuntime
 import ohi.andre.consolelauncher.tuils.Tuils
 
 /** Native Duo controls without actions; live Home attaches its own listeners afterwards. */
@@ -47,7 +47,7 @@ internal object DuoControlsPresentation {
             setColorFilter(border);this.background=background()
             root.addView(this,LinearLayout.LayoutParams(dp(48),dp(48)).apply { marginStart=dp(8) })
         }
-        val apps=if(appearance.bool(Behavior.swipe_up_apps_drawer)) icon(R.drawable.ic_menu,R.string.cd_open_app_drawer) else null
+        val apps=if(appearance.bool(ohi.andre.consolelauncher.managers.xml.options.Toolbar.show_apps_drawer_button)) icon(R.drawable.ic_menu,R.string.cd_open_app_drawer) else null
         val widgets=if(appearance.bool(Behavior.show_android_widget_drawer_button)) icon(R.drawable.ic_toolbar_widgets_24,R.string.ui_base_view_android_widgets) else null
         val margin=dp(18)
         pane.addView(root,android.widget.FrameLayout.LayoutParams(-2,dp(48),Gravity.BOTTOM or (if(moveLeft) Gravity.START else Gravity.END)).apply {

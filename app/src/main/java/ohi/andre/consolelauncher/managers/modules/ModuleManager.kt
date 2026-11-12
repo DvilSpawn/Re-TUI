@@ -4,14 +4,14 @@ import ohi.andre.consolelauncher.R
 import android.content.Context
 import android.content.SharedPreferences
 import android.text.TextUtils
-import ohi.andre.consolelauncher.managers.RssManager.Companion.firstConfiguredFeedId
+import ohi.andre.consolelauncher.managers.net.RssManager.Companion.firstConfiguredFeedId
 import ohi.andre.consolelauncher.managers.lua.LuaWidgetManager
 import java.util.Arrays
 import java.util.ArrayList
 import java.util.LinkedHashSet
 import java.util.Locale
 import java.util.Set
-import ohi.andre.consolelauncher.managers.RssManager
+import ohi.andre.consolelauncher.managers.net.RssManager
 import org.json.JSONArray
 import org.json.JSONObject
 

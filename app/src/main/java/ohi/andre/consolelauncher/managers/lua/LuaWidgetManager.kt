@@ -49,19 +49,6 @@ object LuaWidgetManager {
         "retui_platform",
         "retui_public_ip"
     )
-    private val BUNDLED_SAMPLE_MARKERS: Array<String?> = arrayOf<String?>(
-        "Persistent counter using Re:TUI prefs and dock actions",
-        "Progress Lua module using Re:TUI prefs, system state, and progress APIs",
-        "Clock Lua module using Re:TUI system helpers",
-        "Compact and expanded rendering using Re:TUI Lua module state",
-        "Active Lua module ticking lifecycle demo",
-        "Small standard library demo",
-        "Lua suggestion script demo",
-        "Preferences helper demo",
-        "Lua module-local file helper demo",
-        "System/platform helper demo",
-        "https://api.ipify.org?format=json"
-    )
     private val SENSITIVE_CAPABILITIES: MutableSet<String?> = HashSet<String?>()
 
     init {
@@ -83,25 +70,6 @@ object LuaWidgetManager {
         val ids = ArrayList<String?>()
         Collections.addAll<String?>(ids, *BUNDLED_SAMPLE_IDS)
         return ids
-    }
-
-    fun isBundledSample(id: String?): Boolean {
-        val normalized = normalizeId(id)
-        for (sampleId in BUNDLED_SAMPLE_IDS) {
-            if (TextUtils.equals(normalized, sampleId)) {
-                return true
-            }
-        }
-        val script = readScript(normalized)
-        if (TextUtils.isEmpty(script)) {
-            return false
-        }
-        for (marker in BUNDLED_SAMPLE_MARKERS) {
-            if (script!!.contains(marker!!)) {
-                return true
-            }
-        }
-        return false
     }
 
     fun widgetsDir(): File {
@@ -495,18 +463,6 @@ object LuaWidgetManager {
                 + "end\n")
     }
 
-    @Throws(Exception::class)
-    fun installSamples(): MutableList<kotlin.String?> {
-        val ids = ArrayList<kotlin.String?>()
-        for (entry in samples().entries) {
-            val id = entry.key
-            val sample: Sample = entry.value!!
-            LuaDefaultUpdater.update(id!!, sample.script.orEmpty()) { save(id, sample.name, it) }
-            ids.add(id)
-        }
-        return ids
-    }
-
     fun modulePayload(id: kotlin.String?, result: LuaWidgetEngine.RenderResult): kotlin.String {
         val out = StringBuilder()
         var title = result.title
@@ -595,10 +551,6 @@ object LuaWidgetManager {
 
     fun isTrusted(id: kotlin.String?): Boolean {
         return trustStatus(id).trusted
-    }
-
-    fun isPermissionApproved(id: kotlin.String?, permission: kotlin.String?): Boolean {
-        return approvedPermissions(id).contains(normalizePermission(permission))
     }
 
     fun approvedPermissions(id: kotlin.String?): MutableList<kotlin.String?> {

@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AtomicFile
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.AppsManager
-import ohi.andre.consolelauncher.managers.FirstRunPresetManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
+import ohi.andre.consolelauncher.managers.preset.FirstRunPresetManager
 import ohi.andre.consolelauncher.managers.onboarding.StartupMenuManager
 import ohi.andre.consolelauncher.managers.xml.AutoColorManager.init
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
@@ -113,7 +113,7 @@ object XMLPrefsManager {
         try {
             settingsContext = context.applicationContext
             Tuils.init(context)
-            ohi.andre.consolelauncher.managers.BackupManager.recoverInterruptedRestore(context)
+            ohi.andre.consolelauncher.managers.backup.BackupManager.recoverInterruptedRestore(context)
             ohi.andre.consolelauncher.managers.settings.SettingsFiles.recover(settingsContext)
             init(context)
             if (commonsLoaded) return@synchronized true
@@ -126,6 +126,7 @@ object XMLPrefsManager {
             val replacements = linkedMapOf<File, File?>()
             val migrationSources = arrayListOf<File>()
             val warnings = arrayListOf<String>()
+            var appsButtonCarryOver: Pair<Document, File>? = null
             val prepared = File.createTempFile(".settings-load-", ".tmp", folder)
             staging = prepared
             check(prepared.delete() && prepared.mkdir()) { "Unable to prepare settings" }
@@ -163,6 +164,9 @@ object XMLPrefsManager {
                         root.removeChild(node); changed = true
                     }
                 }
+                // Before Build 800 the toolbar apps button followed swipe_up_apps_drawer; carry that choice over once.
+                if (element === XMLPrefsRoot.TOOLBAR && exists && Toolbar.show_apps_drawer_button in missing)
+                    appsButtonCarryOver = d to File(prepared, element.path)
                 if (missing.isNotEmpty()) {
                     appendMissingPrefs(d, root, element, missing, values)
                     changed = true
@@ -185,6 +189,14 @@ object XMLPrefsManager {
                     val staged = File(prepared, element.path)
                     writeTo(d, staged)
                     replacements[file] = staged
+                }
+            }
+            appsButtonCarryOver?.let { (d, staged) ->
+                val swipeUp = candidates[XMLPrefsRoot.BEHAVIOR]?.get(Behavior.swipe_up_apps_drawer.label())?.value
+                if (swipeUp == "false") {
+                    findDirectChild(d.documentElement, Toolbar.show_apps_drawer_button.label())!!.setAttribute(VALUE_ATTRIBUTE, swipeUp)
+                    candidates[XMLPrefsRoot.TOOLBAR]!!.add(Toolbar.show_apps_drawer_button.label(), swipeUp)
+                    writeTo(d, staged)
                 }
             }
             // Do not create migration copies until every input file has been parsed successfully.
@@ -650,6 +662,7 @@ object XMLPrefsManager {
     }
 
     private fun behaviorSection(label: String): String = when {
+        label.startsWith("edge_sidebar") || label.startsWith("edge_pill") -> ohi.andre.consolelauncher.sidebar.EdgeSidebar.SECTION
         label == "qalculate" || label.startsWith("calculator_") -> "Commands"
         // Alias and command-line syntax sits with the other command settings, not the output formats.
         label in arrayOf("alias_param_separator", "alias_content_format", "multiple_cmd_separator", "optional_values_separator",
@@ -791,6 +804,9 @@ object XMLPrefsManager {
     }
 
     fun <T> get(c: Class<T>?, prefsSave: XMLPrefsSave?): T? = synchronized(ohi.andre.consolelauncher.managers.settings.SettingsFiles.lock) {
+        ohi.andre.consolelauncher.managers.settings.MonoMode.override(prefsSave)?.let { forced ->
+            runCatching { return transform(forced, c) as T? }
+        }
         try {
             val entry = prefsSave!!.parent()!!.getValues()!!.get(prefsSave)
             if (entry == null) throw NullPointerException("Entry not found for " + prefsSave.label())
@@ -1340,14 +1356,6 @@ object XMLPrefsManager {
             return getStringAttribute(e, attribute)!!.toInt()
         } catch (ex: Exception) {
             return -1
-        }
-    }
-
-    fun getFloatAttribute(e: Element, attribute: String?): Float {
-        try {
-            return getStringAttribute(e, attribute)!!.toFloat()
-        } catch (ex: Exception) {
-            return -1f
         }
     }
 

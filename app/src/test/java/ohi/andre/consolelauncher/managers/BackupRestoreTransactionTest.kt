@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.Files
 import org.junit.Assert.*
 import org.junit.Test
+import ohi.andre.consolelauncher.managers.backup.BackupRestoreTransaction
 
 class BackupRestoreTransactionTest {
     @Test fun restoresNestedStoresAndDeletesSupersededFiles() {

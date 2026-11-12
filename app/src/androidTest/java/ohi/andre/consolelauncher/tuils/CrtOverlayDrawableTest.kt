@@ -12,6 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.abs
 import kotlin.math.max
+import ohi.andre.consolelauncher.tuils.frame.CrtOverlayDrawable
 
 @RunWith(AndroidJUnit4::class)
 class CrtOverlayDrawableTest {

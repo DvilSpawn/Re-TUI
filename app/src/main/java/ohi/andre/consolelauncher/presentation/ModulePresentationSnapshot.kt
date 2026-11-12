@@ -13,7 +13,7 @@ import android.widget.TextView
 import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.managers.xml.options.Theme
 import ohi.andre.consolelauncher.tuils.MusicVisualizerView
-import ohi.andre.consolelauncher.tuils.TuiWidgetDecorator
+import ohi.andre.consolelauncher.tuils.frame.TuiWidgetDecorator
 
 /** Frozen native module content. No source view, provider, engine, media action or callback is retained. */
 internal class ModulePresentationSnapshot private constructor(private val kind:ModulePanelPresentation.Kind?,private val title:CharSequence,

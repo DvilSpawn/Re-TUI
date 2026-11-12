@@ -1,7 +1,7 @@
 package ohi.andre.consolelauncher.managers.xml.options
 
 import ohi.andre.consolelauncher.R
-import ohi.andre.consolelauncher.managers.AppsManager
+import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsElement
 import ohi.andre.consolelauncher.managers.xml.classes.XMLPrefsSave
 
