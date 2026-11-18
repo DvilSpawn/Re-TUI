@@ -344,7 +344,8 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         Thread(searchIndexTask, "settings-search-index").start()
         root.addView(searchBox, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             .apply { bottomMargin = dp(this@ThemerActivity, 10f) })
-        searchBox!!.visibility = if (section == SECTION_HOME) View.VISIBLE else View.GONE
+        searchBox!!.hint = searchHint(section)
+        searchBox!!.visibility = if (searchable(section)) View.VISIBLE else View.GONE
         // `settings <words>` from the command line arrives with the search filled in.
         if (savedInstanceState == null) intent?.getStringExtra(EXTRA_QUERY)?.takeIf { it.isNotBlank() }?.let { searchBox!!.setText(it) }
 
@@ -523,10 +524,28 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         SIGN_UP_FOR_RETUI_CREDITS(R.string.hub_sign_up_for_retui_credits)
     }
 
+    /** The hub's name for a top-level section, which its settings' places start with; null for other pages. */
+    private fun groupName(section: String?): String? = when (section) {
+        SECTION_APPEARANCE -> getString(R.string.hub_appearance)
+        SECTION_BEHAVIOR -> getString(R.string.hub_behavior)
+        SECTION_PERSONALIZATION -> getString(R.string.hub_personalization)
+        SECTION_INTEGRATIONS -> getString(R.string.hub_integrations)
+        SECTION_SYSTEM -> getString(R.string.hub_system_support)
+        else -> null
+    }
+
+    /** The hub searches everything; each top-level section searches just what is inside it. */
+    private fun searchable(section: String?) = section == SECTION_HOME || groupName(section) != null
+
+    private fun searchHint(section: String?): String =
+        groupName(section)?.let { getString(R.string.themer_search_section, it) } ?: getString(R.string.themer_search_all_settings)
+
     private fun refreshSearch() {
-        if (section != SECTION_HOME) return
+        if (!searchable(section)) return
         val query = searchBox?.text?.toString().orEmpty()
-        searchResults = SettingsSearch.search(searchIndex, query)
+        val group = groupName(section)
+        val scope = if (group == null) searchIndex else searchIndex.filter { it.place == group || it.place.startsWith("$group › ") }
+        searchResults = SettingsSearch.search(scope, query)
         sectionItems.clear()
         if (query.isBlank()) sectionItems.addAll(getItemsForSection(section))
         else sectionItems.addAll(searchResults.indices.map { SEARCH_RESULT_PREFIX + it })
@@ -951,8 +970,10 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
         section = targetSection
         header!!.setText(getHeaderText(section))
         searchBox?.let { box ->
-            if (section != SECTION_HOME && box.text.isNotEmpty()) box.setText("")
-            box.visibility = if (section == SECTION_HOME) View.VISIBLE else View.GONE
+            // Each page starts with an empty search: a hub query that led here is done.
+            if (box.text.isNotEmpty()) box.setText("")
+            box.hint = searchHint(section)
+            box.visibility = if (searchable(section)) View.VISIBLE else View.GONE
         }
         sectionItems.clear()
         sectionItems.addAll(getItemsForSection(section))
@@ -1784,13 +1805,9 @@ class ThemerActivity : ohi.andre.consolelauncher.localization.LocalizedAppCompat
     }
 
     private fun tintSupportIcon(button: ImageButton) {
-        // Brand logos keep their official colours rather than the theme accent.
+        // Brand logos are drawn in their official one-colour form, black or white for contrast, not the theme accent.
         val color = when (button.tag) {
-            R.drawable.ic_tuixt_reddit_24 -> {
-                button.clearColorFilter()
-                return
-            }
-            R.drawable.ic_tuixt_github_24, R.drawable.ic_tuixt_discord_24 -> {
+            R.drawable.ic_tuixt_github_24, R.drawable.ic_tuixt_discord_24, R.drawable.ic_tuixt_reddit_24 -> {
                 val background = TuixtTheme.iconButtonBackgroundColor()
                 if (ColorUtils.calculateLuminance(background) > 0.179) Color.BLACK else Color.WHITE
             }

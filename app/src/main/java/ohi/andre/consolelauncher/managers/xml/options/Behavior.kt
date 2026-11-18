@@ -280,6 +280,11 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.BOOLEAN
         }
     },
+    home_default_module {
+        override fun defaultValue(): String = ""
+        override fun infoRes(): Int = R.string.setting_behavior_home_default_module_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
     show_module_dock {
         override fun defaultValue(): String? {
             return "true"
@@ -1493,6 +1498,21 @@ enum class Behavior : XMLPrefsSave {
         override fun type(): String? {
             return XMLPrefsSave.TEXT
         }
+    },
+    edge_sidebar_color {
+        override fun defaultValue(): String = "auto"
+        override fun infoRes(): Int = R.string.setting_behavior_edge_sidebar_color_description
+        override fun type(): String = XMLPrefsSave.AUTO_COLOR
+    },
+    edge_sidebar_text_color {
+        override fun defaultValue(): String = "auto"
+        override fun infoRes(): Int = R.string.setting_behavior_edge_sidebar_text_color_description
+        override fun type(): String = XMLPrefsSave.AUTO_COLOR
+    },
+    edge_sidebar_opacity {
+        override fun defaultValue(): String = "100"
+        override fun infoRes(): Int = R.string.setting_behavior_edge_sidebar_opacity_description
+        override fun type(): String = XMLPrefsSave.INTEGER
     },
     edge_pill_width {
         override fun defaultValue(): String? {

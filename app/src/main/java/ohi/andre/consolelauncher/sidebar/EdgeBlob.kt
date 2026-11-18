@@ -126,8 +126,9 @@ class EdgeBlob(
             if (abs(blob.x - finger.x) < 1.5f && abs(blob.y - finger.y) < 1.5f && abs(vx) + abs(vy) < 40f) {
                 finished = true
                 done(targetRight, targetY)
-                // The tab redraws at its new place first, so removing the drop shows no gap.
-                view.postOnAnimation { view.postOnAnimation { runCatching { windows.removeView(view) } } }
+                // The tab shows at its new place two frames on; the drop goes two frames after that, so there is no gap.
+                fun later(frames: Int, run: () -> Unit) { if (frames == 0) run() else view.postOnAnimation { later(frames - 1, run) } }
+                later(4) { runCatching { windows.removeView(view) } }
                 return
             }
         }

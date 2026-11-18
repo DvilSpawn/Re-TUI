@@ -27,7 +27,9 @@
       "owner": "Reddit, Inc.",
       "source": "https://redditbrand.lingoapp.com/s/Logo-d9x3n2/",
       "source_member": "Reddit_Icon_2Color.png",
-      "sha256": "2e5be749050d6b3b73a3f23dd92c1c9a94436252ef06930bf6e3097d308703df"
+      "source_sha256": "2e5be749050d6b3b73a3f23dd92c1c9a94436252ef06930bf6e3097d308703df",
+      "derived": "One-colour white form of the Snoo mark, as in Reddit's one-colour logo usage; tinted black or white for contrast like the other marks",
+      "sha256": "5e50e08ffb55054675ff3d3c2372850b2cdb792eadd2191f65b4e5ec6e8064df"
     }
   ]
 }

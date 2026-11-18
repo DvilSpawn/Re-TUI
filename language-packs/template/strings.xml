@@ -345,7 +345,16 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 - Personal backups are a full snapshot: the journal, quick notes, channels, reader places and pins, wallpaper images and more.
 - Touch Grass: a downloadable wallpaper. Drag through the lawn to part it; tilt to lean it.
 - `mode` on its own suggests every other mode, and dot mode shows a faint hint on how to search.
-- Mono search results stay readable after presets with transparent suggestions or coloured app groups, and no longer push the input line under the keyboard.</string>
+- Mono search results stay readable after presets with transparent suggestions or coloured app groups, and no longer push the input line under the keyboard.
+
+## V.6 · Build 802
+
+- Status labels can colour their parts with tags such as `[#FF0088]RAM [#00BFFF]%avgb GB`; `[/]` returns to the label's colour.
+- `home_default_module` keeps a module such as notifications open on the home, also after Android closes the launcher.
+- The edge sidebar has its own bezel colour, text colour and opacity.
+- Each Settings section has its own search box.
+- The edge sidebar no longer flashes at its old spot after a drag, and the Reddit button matches the other logos.
+- The document editor has a text size button (x1, x2, x3) and lines up with the Settings hub.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -993,6 +1002,8 @@ Timer paused.</string>
     <string name="editor_widgeteditoractivity_type_id_api_capabilities_permissions_8afdd">Type: %1$s  |  ID: %2$s  |  API: %3$s  |  Capabilities: %4$s  |  Permissions: %5$s%6$s</string>
     <string name="editor_widgeteditoractivity_unsaved_document_changes_will_be_lost_21b59">Unsaved document changes will be lost.</string>
     <string name="editor_widgeteditoractivity_unsupported_f4481">  |  Unsupported: %1$s</string>
+    <string name="editor_widgeteditoractivity_zoom">x%1$d</string>
+    <string name="editor_widgeteditoractivity_zoom_description">Text size %1$d times; tap for the next size</string>
     <string name="exclude_app">Exclude app</string>
     <string name="exclude_notification">Exclude notification</string>
     <string name="files_unknown_option">Unknown files option: %1$s</string>
@@ -3934,6 +3945,7 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
+- Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
 - eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.
 - Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.
 - Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.
@@ -4364,7 +4376,17 @@ Open the Settings Hub for later changes.</string>
 Use time for configured clock output; timer and stopwatch are different commands. flash toggles the available camera torch, requests camera permission if needed and can fail on hardware/access constraints. This is not an emergency-light service with delivery guarantees.
 Breach is a local grid puzzle with alternating row/column picks and targets; it does not hack a network. Optional Dystopia uses local virtual credits and escape friction, disabled by default. Those credits are local virtual balances, not money or server accounts, and focus restrictions are not system-wide package blocking. Use config -info with an option name to read its type, default and description.
 
+## Colours inside a label
+
+A format can colour its parts: `[#FF0088]` starts a colour, which runs until the next tag, and `[/]` goes back to the label's own colour. Eight digits (`#AARRGGBB`) add transparency. For example `[#FF0088]RAM [#00BFFF]%avgb GB / %totgb GB` shows the word RAM in pink and the numbers in blue. This works in the RAM, storage, battery, network, time, device, weather and unlock formats.
+
 ## Examples
+
+```
+config -set ram_format [#FF0088]RAM [#00BFFF]%avgb GB / %totgb GB
+```
+
+Colour the RAM label and its values differently.
 
 ```
 time
@@ -5232,14 +5254,18 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_duo_swap_top_panes_description">Swap Duo top panes: keep statuses with input/output and move the module dock and open module to the secondary screen. Only applies in Duo mode.</string>
     <string name="setting_behavior_edge_pill_length_description">How long the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default (50 to 300)</string>
     <string name="setting_behavior_edge_pill_width_description">How thick the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default; raise it for larger text and easier taps (50 to 300)</string>
+    <string name="setting_behavior_edge_sidebar_color_description">The sidebar's bezel colour. auto keeps black, or your text colour when that would not show on black</string>
     <string name="setting_behavior_edge_sidebar_description">Shows a tab on the screen edge over every app. Tap it or swipe in to open launcher search, a floating tmux terminal and your quick app. Drag it along the edge to move it. Needs permission to display over other apps</string>
+    <string name="setting_behavior_edge_sidebar_opacity_description">How solid the sidebar's bezel is, in percent: 100 is solid, lower lets the home show through (20 to 100). Icons and text stay solid</string>
     <string name="setting_behavior_edge_sidebar_quick_app_description">The app the sidebar's third button opens. Tap Apps to pick one; empty starts a new note, filed in a folder named for today's date</string>
+    <string name="setting_behavior_edge_sidebar_text_color_description">The colour of the sidebar's icons and text. auto uses your text colour, or black or white when it would not show on the bezel</string>
     <string name="setting_behavior_enable_crt_filter_description">If true, Re:T-UI draws a CRT scanline overlay over the launcher</string>
     <string name="setting_behavior_enable_cyberdeck_mode_description">If true, Re:T-UI uses angular cyberdeck drawables while keeping the active theme colors</string>
     <string name="setting_behavior_enable_music_description">If true, you will be able to use Re:T-UI as a music player. Otherwise, the music command will try to communicate with the music player that your using</string>
     <string name="setting_behavior_enable_private_command_description">Enable the private command and PRI drawer entry for Android Private Space on supported devices.</string>
     <string name="setting_behavior_enable_private_command_label">Enable private command</string>
     <string name="setting_behavior_events_lookahead_days_description">Number of days after today to include in the launcher Events module. 0 shows only upcoming events today</string>
+    <string name="setting_behavior_home_default_module_description">A module that opens by itself on the home, such as notifications: when the launcher starts and when you press Home with no module open. Empty opens none</string>
     <string name="setting_behavior_home_path_description">The path to your home directory</string>
     <string name="setting_behavior_htmlextractor_default_format_description">The default format used by htmlextract -use</string>
     <string name="setting_behavior_input_format_description">Define the input format </string>
@@ -6688,6 +6714,7 @@ PRESETS · THEME · MODULES · TERMINAL OUTPUT</string>
     <string name="themer_search_all_settings">Search all settings…</string>
     <string name="themer_search_apps_ca3ce">Search apps</string>
     <string name="themer_search_no_results">No setting matches. Try fewer or shorter words.</string>
+    <string name="themer_search_section">Search %1$s…</string>
     <string name="themer_select_and_save_another_font_before_deleting_the_active_fo_add4a">Select and save another font before deleting the active font.</string>
     <string name="themer_select_wallpaper_4842b">Select wallpaper</string>
     <string name="themer_selected_font_is_no_longer_available_b914c">Selected font is no longer available.</string>

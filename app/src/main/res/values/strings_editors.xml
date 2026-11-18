@@ -387,6 +387,8 @@
     <string name="editor_widgeteditoractivity_find_replace_3ac99" formatted="false">"Find/Replace"</string>
     <!-- WidgetEditorActivity.kt: onCreate -->
     <string name="editor_widgeteditoractivity_find_replace_666ec" formatted="false">"FIND/REPLACE"</string>
+    <string name="editor_widgeteditoractivity_zoom">"x%1$d"</string>
+    <string name="editor_widgeteditoractivity_zoom_description">"Text size %1$d times; tap for the next size"</string>
     <!-- WidgetEditorActivity.kt: attemptClose -->
     <string name="editor_widgeteditoractivity_keep_editing_ced7d" formatted="false">"Keep Editing"</string>
     <!-- WidgetEditorActivity.kt: save -->

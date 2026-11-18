@@ -39,6 +39,7 @@
     <!-- Behavior.kt: show_launch_history -->
     <string name="setting_behavior_show_launch_history_description" formatted="false">"If false, Re:T-UI won\'t show the apps that you launch"</string>
     <!-- Behavior.kt: show_module_dock -->
+    <string name="setting_behavior_home_default_module_description" formatted="false">"A module that opens by itself on the home, such as notifications: when the launcher starts and when you press Home with no module open. Empty opens none"</string>
     <string name="setting_behavior_show_module_dock_description" formatted="false">"If false, Re:T-UI will hide the module dock row while keeping modules available through commands"</string>
     <!-- Behavior.kt: show_tmux_workspace_button -->
     <string name="setting_behavior_show_tmux_workspace_button_description" formatted="false">"If true, Re:T-UI will show the tmux workspace button in the launcher toolbar"</string>
@@ -222,6 +223,9 @@
     <!-- Behavior.kt: events_lookahead_days -->
     <string name="setting_behavior_edge_sidebar_description" formatted="false">"Shows a tab on the screen edge over every app. Tap it or swipe in to open launcher search, a floating tmux terminal and your quick app. Drag it along the edge to move it. Needs permission to display over other apps"</string>
     <string name="setting_behavior_edge_sidebar_quick_app_description" formatted="false">"The app the sidebar's third button opens. Tap Apps to pick one; empty starts a new note, filed in a folder named for today's date"</string>
+    <string name="setting_behavior_edge_sidebar_color_description" formatted="false">"The sidebar's bezel colour. auto keeps black, or your text colour when that would not show on black"</string>
+    <string name="setting_behavior_edge_sidebar_text_color_description" formatted="false">"The colour of the sidebar's icons and text. auto uses your text colour, or black or white when it would not show on the bezel"</string>
+    <string name="setting_behavior_edge_sidebar_opacity_description" formatted="false">"How solid the sidebar's bezel is, in percent: 100 is solid, lower lets the home show through (20 to 100). Icons and text stay solid"</string>
     <string name="setting_behavior_edge_pill_width_description" formatted="false">"How thick the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default; raise it for larger text and easier taps (50 to 300)"</string>
     <string name="setting_behavior_edge_pill_length_description" formatted="false">"How long the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default (50 to 300)"</string>
     <string name="setting_behavior_events_lookahead_days_description" formatted="false">"Number of days after today to include in the launcher Events module. 0 shows only upcoming events today"</string>

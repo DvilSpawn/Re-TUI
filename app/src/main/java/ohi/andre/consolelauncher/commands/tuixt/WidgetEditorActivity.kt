@@ -120,16 +120,18 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
 
         val root = LinearLayout(this)
         root.setOrientation(LinearLayout.VERTICAL)
-        root.setPadding(dp(this, 14f), dp(this, 50f), dp(this, 14f), dp(this, 14f))
+        // The same insets as the settings hub panel.
+        root.setPadding(dp(this, 14f), dp(this, 28f), dp(this, 14f), dp(this, 14f))
         stylePanel(this, root)
 
-        val panelLeft = dp(this, 28f)
-        val panelTop = dp(this, 34f)
+        // Placed like the settings hub panel (settings_surface.xml), so the two screens line up.
+        val panelLeft = dp(this, 8f)
+        val panelTop = dp(this, 18f)
         val panelParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.MATCH_PARENT
         )
-        panelParams.setMargins(panelLeft, panelTop, dp(this, 28f), dp(this, 28f))
+        panelParams.setMargins(panelLeft, panelTop, panelLeft, dp(this, 6f))
         contentHost.addView(root, panelParams)
 
         header = TextView(this)
@@ -179,7 +181,7 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
         codeEditor!!.setSingleLine(false)
         codeEditor!!.setHorizontallyScrolling(true)
         codeEditor!!.setTypeface(Typeface.MONOSPACE)
-        codeEditor!!.setTextSize(13f)
+        codeEditor!!.setTextSize(CODE_TEXT_SP * zoom)
         codeEditor!!.setText(originalCode)
         TuixtTheme.styleInput(this, codeEditor!!)
         root.addView(
@@ -213,12 +215,25 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
         bottomBar.setPadding(0, dp(this, 10f), 0, 0)
 
         val cancel = button(getString(R.string.editor_widgeteditoractivity_cancel_1507c), false)
+        // The first button lines up with the fields above; the gap is only between buttons.
+        (cancel.layoutParams as LinearLayout.LayoutParams).leftMargin = 0
         cancel.setOnClickListener(View.OnClickListener { v: View? -> attemptClose() })
         bottomBar.addView(cancel)
 
         val findReplace = button(getString(R.string.editor_widgeteditoractivity_find_replace_666ec), false)
         findReplace.setOnClickListener { showFindReplaceDialog() }
         bottomBar.addView(findReplace)
+
+        // Text size: each tap steps x1, x2, x3 and back to x1.
+        val zoomButton = button(getString(R.string.editor_widgeteditoractivity_zoom, zoom), false)
+        zoomButton.contentDescription = getString(R.string.editor_widgeteditoractivity_zoom_description, zoom)
+        zoomButton.setOnClickListener {
+            zoom = zoom % MAX_ZOOM + 1
+            codeEditor!!.setTextSize(CODE_TEXT_SP * zoom)
+            zoomButton.text = getString(R.string.editor_widgeteditoractivity_zoom, zoom)
+            zoomButton.contentDescription = getString(R.string.editor_widgeteditoractivity_zoom_description, zoom)
+        }
+        bottomBar.addView(zoomButton)
 
         val spacer = View(this)
         bottomBar.addView(spacer, LinearLayout.LayoutParams(0, 1, 1f))
@@ -590,6 +605,10 @@ class WidgetEditorActivity : ohi.andre.consolelauncher.localization.LocalizedAct
     }
 
     companion object {
+        private const val CODE_TEXT_SP = 13f
+        private const val MAX_ZOOM = 3
+        /** The chosen text size, kept while the launcher runs so the next file opens at it too. */
+        private var zoom = 1
         const val EXTRA_WIDGET_ID: String = "widget_id"
         const val EXTRA_FILE_PATH: String = "file_path"
 

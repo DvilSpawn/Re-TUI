@@ -17,6 +17,7 @@ object EdgeSidebar {
     const val SECTION = "Edge Sidebar"
 
     private val settings = setOf<XMLPrefsSave>(Behavior.edge_sidebar, Behavior.edge_sidebar_quick_app,
+        Behavior.edge_sidebar_color, Behavior.edge_sidebar_text_color, Behavior.edge_sidebar_opacity,
         Behavior.edge_pill_width, Behavior.edge_pill_length)
 
     fun isSetting(setting: XMLPrefsSave) = setting in settings
@@ -32,6 +33,13 @@ object EdgeSidebar {
     /** The edge pill size settings as factors, clamped to 50-300%. */
     fun widthScale() = scale(Behavior.edge_pill_width)
     fun lengthScale() = scale(Behavior.edge_pill_length)
+    /** A colour the user picked for the sidebar, or null for "auto". */
+    fun customColor(setting: XMLPrefsSave): Int? = XMLPrefsManager.get(setting).trim()
+        .takeIf { it.isNotEmpty() && !it.equals("auto", true) }?.let { runCatching { android.graphics.Color.parseColor(it) }.getOrNull() }
+
+    /** How opaque the bezel is, 0.2 to 1; the icons and text on it stay solid. */
+    fun opacity() = (runCatching { XMLPrefsManager.getInt(Behavior.edge_sidebar_opacity) }.getOrDefault(100).coerceIn(20, 100)) / 100f
+
     private fun scale(setting: XMLPrefsSave) = (runCatching { XMLPrefsManager.getInt(setting) }.getOrDefault(100).coerceIn(50, 300)) / 100f
 
     /**

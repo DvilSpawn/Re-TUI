@@ -499,7 +499,10 @@ class UIManager(
     }
 
     private val statusUpdateListener: StatusUpdateListener =
-        StatusUpdateListener { l: Label?, s: CharSequence? -> this.updateText(l!!, s) }
+        // Status formats can colour their parts with [#RRGGBB] tags; notes and ASCII art are shown as written.
+        StatusUpdateListener { l: Label?, s: CharSequence? ->
+            this.updateText(l!!, if (l == Label.notes || l == Label.ascii) s else ohi.andre.consolelauncher.managers.status.StatusColors.apply(s))
+        }
 
     private fun getLabelView(l: Label): TextView? {
         val index = labelIndexes[l.ordinal].toInt()
@@ -2351,6 +2354,18 @@ class UIManager(
         rebuildModuleDock()
         refreshSuggestionsForActiveModule()
         attachUnifiedBottomConsoleIfReady()
+        homeModulesContainer!!.post { restoreDefaultModule() }
+    }
+
+    /**
+     * Opens the module set as the home default (`home_default_module`), such as notifications, when the home is set
+     * up and when Home is pressed with no module open, so it stays in view after Android closes the launcher.
+     */
+    private fun restoreDefaultModule() {
+        if (!activeModule.isNullOrEmpty() || isSearchModulesOpen) return
+        val id = ModuleManager.normalize(LauncherSettings.get(Behavior.home_default_module))
+        if (id.isEmpty() || !ModuleManager.isKnown(mContext, id)) return
+        showHomeModule(id)
     }
 
     private fun isTermuxLandscapeKeyTray(): Boolean {
@@ -4175,11 +4190,11 @@ class UIManager(
 
         if (show[Label.device.ordinal]) {
             updateText(
-                Label.device, Tuils.span(
+                Label.device, ohi.andre.consolelauncher.managers.status.StatusColors.apply(Tuils.span(
                     mContext, ohi.andre.consolelauncher.presentation.StatusPresentation.deviceText(XMLPrefsManager::get), XMLPrefsManager.getColor(
                         Theme.device_text_color
                     ), labelSizes[Label.device.ordinal]
-                )
+                ))
             )
         }
 
@@ -7210,6 +7225,7 @@ class UIManager(
         if (isAppsDrawerOpen) hideAppsDrawer()
         if (isTermuxConsoleVisible) closeTermuxConsole()
         homeModes.active.onHome()
+        restoreDefaultModule()
     }
 
     private fun setWallpaperTouchEnabled(enabled: Boolean) {

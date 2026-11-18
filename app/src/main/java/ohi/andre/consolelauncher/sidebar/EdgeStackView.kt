@@ -199,11 +199,23 @@ class EdgeStackView(context: Context, rightEdge: Boolean) : View(context) {
 
     private fun drawIcon(canvas: Canvas, icon: Drawable?, cx: Float, cy: Float, size: Float) {
         val half = size / 2
+        // On a see-through bezel the icon keeps a solid patch, so what shows through never crosses it.
+        if (icon != null && Color.alpha(bezelColor) < 255) {
+            paint.style = Paint.Style.FILL; paint.color = bezelColor; paint.alpha = 255
+            val back = half + dp(3f)
+            canvas.drawRoundRect(cx - back, cy - back, cx + back, cy + back, dp(6f), dp(6f), paint)
+        }
         icon?.setBounds((cx - half).toInt(), (cy - half).toInt(), (cx + half).toInt(), (cy + half).toInt())
         icon?.draw(canvas)
     }
 
     private fun drawTime(canvas: Canvas, text: String, cx: Float, cy: Float, room: Float) {
+        // A see-through bezel turns solid under the numbers, which are read at a glance.
+        if (Color.alpha(bezelColor) < 255) {
+            paint.style = Paint.Style.FILL; paint.color = bezelColor; paint.alpha = 255
+            val across = wideWidth * 0.42f
+            canvas.drawRoundRect(cx - across, cy - room / 2, cx + across, cy + room / 2, dp(6f), dp(6f), paint)
+        }
         textPaint.color = textColor
         textPaint.textSize = wideWidth * 0.62f
         val measured = textPaint.measureText(text)

@@ -152,11 +152,30 @@ class EdgeSidebarService : Service() {
     }
 
     /**
-     * The bezel and the text on it. The sidebar is a black bezel with the theme's text, unless that text would not
-     * show on black (dark ink, as in Mono on light paper): then it inverts, an ink bezel with the background's colour
-     * on it, so the pill still stands out against a light home.
+     * The bezel and the text on it, as set in the sidebar settings, with the bezel at the chosen opacity. Left on
+     * auto, the sidebar is a black bezel with the theme's text, unless that text would not show on black (dark ink,
+     * as in Mono on light paper): then it inverts, an ink bezel with the background's colour on it, so the pill still
+     * stands out against a light home.
      */
     private fun sidebarColors(appearance: HomeAppearance): Pair<Int, Int> {
+        val (bezel, ink) = autoColors(appearance, EdgeSidebar.customColor(Behavior.edge_sidebar_color), EdgeSidebar.customColor(Behavior.edge_sidebar_text_color))
+        val alpha = (android.graphics.Color.alpha(bezel) * EdgeSidebar.opacity()).toInt()
+        return androidx.core.graphics.ColorUtils.setAlphaComponent(bezel, alpha) to ink
+    }
+
+    private fun autoColors(appearance: HomeAppearance, bezel: Int?, text: Int?): Pair<Int, Int> {
+        if (bezel != null && text != null) return bezel to text
+        if (bezel != null) {
+            // Only the bezel was picked: the theme's text if it shows on it, else black or white.
+            val themed = appearance.color(Theme.output_text_color) or 0xFF000000.toInt()
+            val solid = bezel or 0xFF000000.toInt()
+            return bezel to when {
+                androidx.core.graphics.ColorUtils.calculateContrast(themed, solid) >= MIN_CONTRAST -> themed
+                androidx.core.graphics.ColorUtils.calculateLuminance(solid) > 0.179 -> android.graphics.Color.BLACK
+                else -> android.graphics.Color.WHITE
+            }
+        }
+        if (text != null) return android.graphics.Color.BLACK to text
         val text = appearance.color(Theme.output_text_color) or 0xFF000000.toInt()
         if (androidx.core.graphics.ColorUtils.calculateContrast(text, android.graphics.Color.BLACK) >= MIN_CONTRAST) return android.graphics.Color.BLACK to text
         val paper = appearance.color(Theme.terminal_window_background_color) or 0xFF000000.toInt()
@@ -248,14 +267,16 @@ class EdgeSidebarService : Service() {
         val layout = tabParams ?: return null
         val (rect, shift) = screenRect(view, layout, view.stackWidth, view.stackHeight, view.rightEdge)
         view.alpha = 0f
-        return EdgeBlob(this, windows, rect, view.rightEdge, android.graphics.Color.BLACK, view.textColor, view.accentColor) { right, screenY ->
+        return EdgeBlob(this, windows, rect, view.rightEdge, view.bezelColor, view.textColor, view.accentColor) { right, screenY ->
             if (tab !== view) return@EdgeBlob
             view.rightEdge = right
             layout.gravity = Gravity.TOP or if (right) Gravity.END else Gravity.START
             centerY = (screenY - shift - view.height / 2f + layout.height / 2f).toInt().coerceIn(margin, screenHeight() - margin)
             layout.y = centerY - layout.height / 2
             runCatching { windows.updateViewLayout(view, layout) }
-            view.alpha = 1f
+            // The window moves a frame or two after it is asked to; showing the tab before then flashes it at the
+            // spot it was picked up from. The drop stays on screen until after this.
+            view.postOnAnimation { view.postOnAnimation { if (tab === view) view.alpha = 1f } }
             prefs.edit().putString("side", if (right) "right" else "left")
                 .putFloat(KEY_FRACTION, ((centerY - margin).toFloat() / (screenHeight() - 2 * margin)).coerceIn(0f, 1f)).apply()
         }.also { activeBlob = view to it }

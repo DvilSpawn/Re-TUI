@@ -149,6 +149,13 @@ class EdgeDockView(context: Context, rightEdge: Boolean) : View(context) {
                     canvas.drawRoundRect(oval, dp(10f), dp(10f), paint)
                 }
                 val half = iconSize / 2
+                // A see-through bezel keeps a solid patch under each icon, so what shows through never crosses it.
+                if (android.graphics.Color.alpha(bezelColor) < 255 && item.action != highlighted) {
+                    paint.color = bezelColor; paint.alpha = (255 * iconAlpha).toInt()
+                    val back = half + dp(6f)
+                    oval.set(x - back, cy - back, x + back, cy + back)
+                    canvas.drawRoundRect(oval, dp(10f), dp(10f), paint)
+                }
                 item.icon.setBounds((x - half).toInt(), (cy - half).toInt(), (x + half).toInt(), (cy + half).toInt())
                 item.icon.alpha = (255 * iconAlpha).toInt()
                 item.icon.draw(canvas)
