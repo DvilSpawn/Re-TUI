@@ -225,6 +225,7 @@
     <string name="setting_behavior_edge_sidebar_quick_app_description" formatted="false">"The app the sidebar's third button opens. Tap Apps to pick one; empty starts a new note, filed in a folder named for today's date"</string>
     <string name="setting_behavior_edge_sidebar_color_description" formatted="false">"The sidebar's bezel colour. auto keeps black, or your text colour when that would not show on black"</string>
     <string name="setting_behavior_edge_sidebar_text_color_description" formatted="false">"The colour of the sidebar's icons and text. auto uses your text colour, or black or white when it would not show on the bezel"</string>
+    <string name="setting_behavior_edge_sidebar_pill_color_description" formatted="false">"The colour of the pill inside the sidebar tab and of the selected icon's highlight. auto uses your terminal border colour."</string>
     <string name="setting_behavior_edge_sidebar_opacity_description" formatted="false">"How solid the sidebar's bezel is, in percent: 100 is solid, lower lets the home show through (20 to 100). Icons and text stay solid"</string>
     <string name="setting_behavior_edge_pill_width_description" formatted="false">"How thick the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default; raise it for larger text and easier taps (50 to 300)"</string>
     <string name="setting_behavior_edge_pill_length_description" formatted="false">"How long the screen-edge pills are, in percent: the sidebar tab and the timer, stopwatch and podcast pills. 100 is the default (50 to 300)"</string>
@@ -928,4 +929,8 @@
     <string name="setting_toolbar_gesture_left">Left: app launcher name or command. Empty disables this direction.</string>
     <string name="setting_toolbar_gesture_right">Right: app launcher name or command. Empty disables this direction.</string>
     <string name="toolbar_gesture_hint">Hold, drag up/down/left/right, then release</string>
+    <string name="settings_mode_filter_current">%1$s only</string>
+    <string name="settings_mode_filter_all">All modes</string>
+    <string name="settings_mode_filter_description">Show only the settings for the current home mode, or all of them</string>
+    <string name="settings_other_mode">other mode</string>
 </resources>

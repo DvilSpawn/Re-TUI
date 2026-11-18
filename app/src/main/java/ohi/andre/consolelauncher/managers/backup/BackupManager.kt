@@ -97,7 +97,7 @@ object BackupManager {
         XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path,
         SHARED_PREFS_DIR + "ui.properties"
     )
-    private val PERSONAL_PREFS = kotlin.arrayOf<kotlin.String?>(
+    internal val PERSONAL_PREFS = kotlin.arrayOf<kotlin.String?>(
         "ui",
         "apps",
         PinnedShortcutManager.PREFS,
@@ -141,7 +141,6 @@ object BackupManager {
         "terminal_home",
         "terminal_windows",
         "retui_workspace_surface",
-        "retui_focus_friction",
         "apps_last_launch",
         "retui_preset_wallpaper",
         "retui_weather",
@@ -159,7 +158,8 @@ object BackupManager {
         "retui_startup_preview", "busybox_prefs", "retui_wallpaper_pending"
     )
 
-    internal fun personalSharedPreferenceNames(): List<kotlin.String> = PERSONAL_PREFS.filterNotNull()
+    // A store listed twice would be written to the zip twice, which fails the whole backup.
+    internal fun personalSharedPreferenceNames(): List<kotlin.String> = PERSONAL_PREFS.filterNotNull().distinct()
 
     fun defaultBackupName(): kotlin.String {
         val stamp = java.text.SimpleDateFormat("yyyyMMdd-HHmmss", java.util.Locale.US)
@@ -735,7 +735,7 @@ object BackupManager {
         zip: java.util.zip.ZipOutputStream,
         context: android.content.Context
     ) {
-        for (name in ohi.andre.consolelauncher.managers.backup.BackupManager.PERSONAL_PREFS) {
+        for (name in personalSharedPreferenceNames()) {
             FileOperationCancellation.check()
             val prefs: SharedPreferences = context.getApplicationContext()
                 .getSharedPreferences(name, android.content.Context.MODE_PRIVATE)

@@ -79,6 +79,9 @@ class DotHomeView(context: Context) : PixelWallpaperView(context, GRID) {
         invalidate()
     }
 
+    /** The dot's ink, for controls drawn beside it. */
+    val inkColor: Int get() = ink
+
     override fun signatureColors(): IntArray = intArrayOf(0xFF000000.toInt(), palette[1], ink)
 
     override fun frameDelayMs(): Long =
@@ -246,7 +249,12 @@ class DotHomeView(context: Context) : PixelWallpaperView(context, GRID) {
     }
 
     /** How to search, small and half see-through at the bottom middle, above the navigation bar. */
+    /** Off when the search bar is already on screen beside the dot. */
+    var showHint = true
+        set(value) { field = value; invalidate() }
+
     private fun drawHint(canvas: Canvas) {
+        if (!showHint) return
         val bar = rootWindowInsets?.let { androidx.core.view.WindowInsetsCompat.toWindowInsetsCompat(it, this)
             .getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom } ?: 0
         labelPaint.color = palette[2] and 0x00FFFFFF or 0x80000000.toInt()

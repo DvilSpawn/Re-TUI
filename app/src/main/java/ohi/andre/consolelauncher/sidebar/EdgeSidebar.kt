@@ -17,7 +17,7 @@ object EdgeSidebar {
     const val SECTION = "Edge Sidebar"
 
     private val settings = setOf<XMLPrefsSave>(Behavior.edge_sidebar, Behavior.edge_sidebar_quick_app,
-        Behavior.edge_sidebar_color, Behavior.edge_sidebar_text_color, Behavior.edge_sidebar_opacity,
+        Behavior.edge_sidebar_color, Behavior.edge_sidebar_text_color, Behavior.edge_sidebar_pill_color, Behavior.edge_sidebar_opacity,
         Behavior.edge_pill_width, Behavior.edge_pill_length)
 
     fun isSetting(setting: XMLPrefsSave) = setting in settings
@@ -36,6 +36,10 @@ object EdgeSidebar {
     /** A colour the user picked for the sidebar, or null for "auto". */
     fun customColor(setting: XMLPrefsSave): Int? = XMLPrefsManager.get(setting).trim()
         .takeIf { it.isNotEmpty() && !it.equals("auto", true) }?.let { runCatching { android.graphics.Color.parseColor(it) }.getOrNull() }
+
+    /** The pill and highlight colour: the one picked, else the theme's terminal border colour. */
+    internal fun pillColor(appearance: ohi.andre.consolelauncher.presentation.HomeAppearance): Int =
+        customColor(Behavior.edge_sidebar_pill_color) ?: appearance.color(ohi.andre.consolelauncher.managers.xml.options.Theme.terminal_border_color)
 
     /** How opaque the bezel is, 0.2 to 1; the icons and text on it stay solid. */
     fun opacity() = (runCatching { XMLPrefsManager.getInt(Behavior.edge_sidebar_opacity) }.getOrDefault(100).coerceIn(20, 100)) / 100f

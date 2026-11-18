@@ -730,5 +730,37 @@
     ],
     "project_url": "http://www.slf4j.org",
     "license_metadata": "MIT License"
+  },
+  {
+    "coordinate": "androidx.window:window:1.4.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/window#1.4.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.window:window-core-android:1.4.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/window#1.4.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.window:window-core:1.4.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/window#1.4.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
+    "coordinate": "androidx.window:window-java:1.4.0",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/window#1.4.0",
+    "license_metadata": "The Apache Software License, Version 2.0"
   }
 ]

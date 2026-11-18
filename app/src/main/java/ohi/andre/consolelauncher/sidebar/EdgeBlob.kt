@@ -88,6 +88,33 @@ class EdgeBlob(
     fun move(rawX: Float, rawY: Float) { if (!settling) finger.set(rawX, rawY) }
 
     /** The finger lifted: flow to the edge nearer the finger, at the finger's height. */
+    private var dismissed = false
+
+    /**
+     * Takes the drop off screen once the tab has taken its place: it shrinks back into the edge and fades, so the
+     * round drop melts into the slim tab instead of swapping for it in one frame.
+     */
+    fun dismiss() {
+        if (dismissed) return
+        dismissed = true
+        if (view.width == 0) { runCatching { windows.removeView(view) }; return }
+        view.pivotX = edgeX(targetRight) - offsetX
+        view.pivotY = targetY - offsetY
+        view.animate().alpha(0f).scaleX(0.35f).scaleY(0.7f).setDuration(MELT_MS)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            // Hidden first, removed a couple of frames later: removing the window straight away can show its last
+            // full-strength frame once more.
+            .withEndAction {
+                view.visibility = View.INVISIBLE
+                view.postOnAnimation { view.postOnAnimation { runCatching { windows.removeView(view) } } }
+            }.start()
+    }
+
+    private companion object {
+        const val DISMISS_TIMEOUT_MS = 600L
+        const val MELT_MS = 180L
+    }
+
     fun release() {
         if (settling) return
         settling = true
@@ -125,10 +152,10 @@ class EdgeBlob(
             targetPool = poolRadius * (1f - toTarget / reach).coerceIn(0f, 1f)
             if (abs(blob.x - finger.x) < 1.5f && abs(blob.y - finger.y) < 1.5f && abs(vx) + abs(vy) < 40f) {
                 finished = true
+                // The drop holds its last frame until the tab has been seen at its new place ([dismiss]); the
+                // timeout only cleans up if that never comes.
+                view.postDelayed({ dismiss() }, DISMISS_TIMEOUT_MS)
                 done(targetRight, targetY)
-                // The tab shows at its new place two frames on; the drop goes two frames after that, so there is no gap.
-                fun later(frames: Int, run: () -> Unit) { if (frames == 0) run() else view.postOnAnimation { later(frames - 1, run) } }
-                later(4) { runCatching { windows.removeView(view) } }
                 return
             }
         }

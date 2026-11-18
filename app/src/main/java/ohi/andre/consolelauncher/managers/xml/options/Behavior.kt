@@ -1509,6 +1509,11 @@ enum class Behavior : XMLPrefsSave {
         override fun infoRes(): Int = R.string.setting_behavior_edge_sidebar_text_color_description
         override fun type(): String = XMLPrefsSave.AUTO_COLOR
     },
+    edge_sidebar_pill_color {
+        override fun defaultValue(): String = "auto"
+        override fun infoRes(): Int = R.string.setting_behavior_edge_sidebar_pill_color_description
+        override fun type(): String = XMLPrefsSave.AUTO_COLOR
+    },
     edge_sidebar_opacity {
         override fun defaultValue(): String = "100"
         override fun infoRes(): Int = R.string.setting_behavior_edge_sidebar_opacity_description

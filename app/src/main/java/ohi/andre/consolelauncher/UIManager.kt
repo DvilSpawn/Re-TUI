@@ -1514,6 +1514,7 @@ class UIManager(
         }
         editor.apply()
         applyResponsiveLandscapeLayoutOnMainThread()
+        ohi.andre.consolelauncher.presentation.DualScreen.changed()
         return normalized
     }
 
@@ -1883,7 +1884,8 @@ class UIManager(
             bottomMargins = getDisplayMargins(Ui.keyboard_visible_margin_override)
         }
 
-        mRootView.setPadding(systemInsetLeft, 0, systemInsetRight, systemInsetBottom)
+        mRootView.setPadding(systemInsetLeft + ohi.andre.consolelauncher.presentation.DualScreen.rootPadLeft, 0,
+            systemInsetRight + ohi.andre.consolelauncher.presentation.DualScreen.rootPadRight, systemInsetBottom)
         val metrics = mContext!!.getResources().getDisplayMetrics()
         applySectionDisplayMargins(mainContainer, topMargins, metrics,
             if (duoTopPanesSwapped) Tuils.dpToPx(mContext, 84) + imeBottomOffset else 0, systemInsetTop)
@@ -7986,6 +7988,20 @@ class UIManager(
                 return DUO_LAYOUT_RIGHT
             }
             return DUO_LAYOUT_OFF
+        }
+
+        /** The saved one-side layout ("left", "right", or "off"), as the `duo` command left it. */
+        internal fun savedDuoLayout(context: Context): String =
+            if (!LauncherSettings.getBoolean(Behavior.duo_mode)) DUO_LAYOUT_OFF
+            else normalizeDuoLayoutMode(context.getSharedPreferences(PREFS_NAME, 0).getString(DUO_LAYOUT_PREF, DUO_LAYOUT_OFF))
+
+        /** The side last chosen for the input, which the split home keeps its command line on. */
+        internal fun savedInputSide(context: Context): String =
+            normalizeDuoLayoutMode(context.getSharedPreferences(PREFS_NAME, 0).getString(DUO_LAST_SIDE_PREF, DUO_LAYOUT_RIGHT))
+                .takeIf { it != DUO_LAYOUT_OFF } ?: DUO_LAYOUT_RIGHT
+
+        internal fun saveInputSide(context: Context, side: String) {
+            context.getSharedPreferences(PREFS_NAME, 0).edit().putString(DUO_LAST_SIDE_PREF, normalizeDuoLayoutMode(side)).apply()
         }
 
         internal fun duoModulePaneIsLeft(activeMode: String?, topPanesSwapped: Boolean): Boolean =

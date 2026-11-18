@@ -208,7 +208,13 @@ class TuixtAdapter(
 
         val settingHolder = holder as ViewHolder
         val item = row.item ?: return
-        settingHolder.title.setText(displayLabel(settingHolder.itemView.context, item))
+        val title = displayLabel(settingHolder.itemView.context, item)
+        settingHolder.title.text = if (!row.otherMode) title else android.text.SpannableString(
+            title + "  " + settingHolder.itemView.context.getString(R.string.settings_other_mode)).apply {
+            setSpan(android.text.style.RelativeSizeSpan(0.75f), title.length, length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(android.text.style.ForegroundColorSpan(settingHolder.description.currentTextColor), title.length, length,
+                android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
         settingHolder.description.setText(item.info(settingHolder.itemView.context))
 
         val currentValue = getCurrentValue(item)
@@ -808,7 +814,9 @@ class TuixtAdapter(
     data class SettingsRow(
         val item: XMLPrefsSave?,
         val section: String?,
-        val sectionHeader: Boolean
+        val sectionHeader: Boolean,
+        /** A search result that does not change the current home mode. */
+        val otherMode: Boolean = false
     ) {
         companion object {
             fun section(title: String): SettingsRow = SettingsRow(null, title, true)

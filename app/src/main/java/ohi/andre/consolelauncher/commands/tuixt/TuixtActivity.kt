@@ -198,6 +198,18 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
         val spacer = View(this)
         spacer.setLayoutParams(LinearLayout.LayoutParams(0, 1, 1f))
+        // Settings for the current home mode, or all of them; search always looks through all of them.
+        modeToggle = TextView(this).also { toggle ->
+            styleButton(this, toggle, false)
+            toggle.visibility = View.GONE
+            toggle.setOnClickListener {
+                showAllModes = !showAllModes
+                runCatching { getSharedPreferences(VIEW_PREFS, MODE_PRIVATE).edit().putBoolean(KEY_ALL_MODES, showAllModes).apply() }
+                applyModeFilter()
+                filter(searchQuery)
+            }
+            btnLayout.addView(toggle, LinearLayout.LayoutParams(-2, -2).apply { marginStart = 12 })
+        }
         btnLayout.addView(spacer)
 
         val btnSave = TextView(this)
@@ -287,13 +299,17 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 override fun afterTextChanged(s: Editable?) {}
             })
         } else if (xmlRoot != null) {
-            originalRows = buildRows(xmlRoot!!, file!!).filter {
+            allRows = buildRows(xmlRoot!!, file!!).filter {
                 when {
                     onlySection != null -> it.section == onlySection
                     excludeSections.isNotEmpty() -> it.section !in excludeSections
                     else -> true
                 }
-            }.toMutableList()
+            }
+            showAllModes = runCatching { getSharedPreferences(VIEW_PREFS, MODE_PRIVATE).getBoolean(KEY_ALL_MODES, false) }.getOrDefault(false)
+            originalRows = modeRows().toMutableList()
+            modeToggle?.visibility = View.VISIBLE
+            updateModeToggle()
             adapter = TuixtAdapter(
                 originalRows!!.toMutableList(),
                 file,
@@ -504,10 +520,58 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         return rows
     }
 
+    private var allRows: List<TuixtAdapter.SettingsRow>? = null
+    private var showAllModes = false
+    private var modeToggle: TextView? = null
+    private var searchQuery = ""
+
+    /** [allRows] narrowed to the settings that change the current home mode, unless all are asked for. */
+    private fun modeRows(): List<TuixtAdapter.SettingsRow> {
+        val rows = allRows ?: return emptyList()
+        if (showAllModes) return rows
+        val mode = ohi.andre.consolelauncher.managers.settings.LauncherMode.current()
+        val kept = rows.filter { it.sectionHeader || it.item == null || ohi.andre.consolelauncher.managers.settings.SettingModes.appliesTo(it.item, mode) }
+        // Drop section headings left with nothing under them.
+        return kept.filterIndexed { index, row -> !row.sectionHeader || kept.getOrNull(index + 1)?.let { !it.sectionHeader } == true }
+    }
+
+    private fun applyModeFilter() {
+        if (allRows == null) return
+        originalRows = modeRows().toMutableList()
+        updateModeToggle()
+    }
+
+    private fun updateModeToggle() {
+        val mode = ohi.andre.consolelauncher.managers.settings.LauncherMode.current()
+        modeToggle?.text = if (showAllModes) getString(R.string.settings_mode_filter_all)
+            else getString(R.string.settings_mode_filter_current, mode.replaceFirstChar { it.titlecase(Locale.getDefault()) })
+        modeToggle?.contentDescription = getString(R.string.settings_mode_filter_description)
+    }
+
     private fun filter(query: String) {
+        searchQuery = query
         val rows = originalRows ?: return
         if (query.trim().isEmpty()) {
             adapter!!.updateRows(rows.toMutableList(), false)
+            return
+        }
+        // Search finds every setting, marking the ones that do not change the current mode.
+        allRows?.let { every ->
+            val mode = ohi.andre.consolelauncher.managers.settings.LauncherMode.current()
+            val lower = query.lowercase(Locale.getDefault())
+            val found: MutableList<TuixtAdapter.SettingsRow> = ArrayList()
+            var heading: TuixtAdapter.SettingsRow? = null
+            for (row in every) {
+                if (row.sectionHeader) { heading = row; continue }
+                val item = row.item ?: continue
+                val hit = item.label()!!.lowercase(Locale.getDefault()).contains(lower) ||
+                    settingDisplayLabel(this, item).lowercase(Locale.getDefault()).contains(lower) ||
+                    item.info(this).lowercase(Locale.getDefault()).contains(lower)
+                if (!hit) continue
+                if (heading != null && (found.isEmpty() || found.last().section != heading.section)) found.add(heading)
+                found.add(row.copy(otherMode = !ohi.andre.consolelauncher.managers.settings.SettingModes.appliesTo(item, mode)))
+            }
+            adapter!!.updateRows(found, true)
             return
         }
 
@@ -989,6 +1053,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         const val MODE: String = "mode"
         const val MODE_ASCII_SETTINGS: String = "ascii_settings"
         const val MODE_MONO_SETTINGS: String = "mono_settings"
+        private const val VIEW_PREFS = "settings_view"
+        private const val KEY_ALL_MODES = "all_modes"
 
         /** The settings that matter in mono mode, opened from the mono home's soft keys. */
         fun monoSettingsIntent(context: android.content.Context): android.content.Intent =

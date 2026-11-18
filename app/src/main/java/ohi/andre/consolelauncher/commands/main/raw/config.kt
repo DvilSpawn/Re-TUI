@@ -34,6 +34,16 @@ import ohi.andre.consolelauncher.managers.settings.StatusRowResolver
 /**
  * Created by francescoandreuzzi on 11/06/2017.
  */
+/**
+ * Runs [change] and returns the message of a value it rejected (an [IllegalArgumentException], which is how
+ * settings refuse a value), or null when it went through. Any other failure still propagates as a crash.
+ */
+internal inline fun rejectedValue(change: () -> Unit): String? = try {
+    change(); null
+} catch (rejected: IllegalArgumentException) {
+    rejected.message ?: rejected.javaClass.simpleName
+}
+
 class config : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
         set {
@@ -44,12 +54,15 @@ class config : ParamCommand() {
             override fun exec(pack: ExecutePack): String? {
                 val save = pack.getPrefsSave()
                 val value = pack.getString()
-                if (save is Ui && StatusRowResolver.isStatusIndex(save)) {
-                    LauncherSettings.setStatusIndex(pack.context, save, value)
-                } else {
-                    if (value.isEmpty()) ohi.andre.consolelauncher.managers.settings.LauncherSettings.erase(pack.context, save)
-                    else set(pack.context, save, value)
-                }
+                // A value the setting does not accept answers with the setting's own message, not a stack trace.
+                rejectedValue {
+                    if (save is Ui && StatusRowResolver.isStatusIndex(save)) {
+                        LauncherSettings.setStatusIndex(pack.context, save, value)
+                    } else {
+                        if (value.isEmpty()) ohi.andre.consolelauncher.managers.settings.LauncherSettings.erase(pack.context, save)
+                        else set(pack.context, save, value)
+                    }
+                }?.let { return it }
 
                 (pack.context as Reloadable).addMessage(
                     save.parent()!!.path(),

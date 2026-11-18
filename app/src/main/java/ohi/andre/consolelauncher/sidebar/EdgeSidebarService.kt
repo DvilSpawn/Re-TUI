@@ -37,6 +37,8 @@ import kotlin.math.abs
  */
 class EdgeSidebarService : Service() {
     companion object {
+        /** Frames to wait for the tab window to reach its new place before showing it anyway. */
+        private const val MOVE_WAIT_FRAMES = 30
         /** Below this the sidebar text is hard to read on its bezel. */
         private const val MIN_CONTRAST = 3.0
         private const val CHANNEL = "edge_sidebar"
@@ -137,7 +139,7 @@ class EdgeSidebarService : Service() {
         val (bezel, ink) = sidebarColors(appearance)
         bezelColor = bezel
         iconColor = ink
-        accentColor = appearance.color(Theme.terminal_border_color)
+        accentColor = EdgeSidebar.pillColor(appearance)
         items = dockItems(iconColor)
         contentDescription = getString(R.string.edge_sidebar_handle)
         setOnTouchListener(DockTouch())
@@ -188,7 +190,7 @@ class EdgeSidebarService : Service() {
         val (bezel, ink) = sidebarColors(appearance)
         bezelColor = bezel
         textColor = ink
-        accentColor = appearance.color(Theme.terminal_border_color)
+        accentColor = EdgeSidebar.pillColor(appearance)
         typeface = ohi.andre.consolelauncher.tuils.Tuils.getTypeface(this@EdgeSidebarService)
         fun icon(res: Int) = ContextCompat.getDrawable(this@EdgeSidebarService, res)!!.mutate().apply { setTint(textColor) }
         icons = mapOf(null to icon(R.drawable.ic_edge_home), EdgePills.Kind.TIMER to icon(R.drawable.ic_edge_timer),
@@ -267,19 +269,32 @@ class EdgeSidebarService : Service() {
         val layout = tabParams ?: return null
         val (rect, shift) = screenRect(view, layout, view.stackWidth, view.stackHeight, view.rightEdge)
         view.alpha = 0f
+        var drop: EdgeBlob? = null
         return EdgeBlob(this, windows, rect, view.rightEdge, view.bezelColor, view.textColor, view.accentColor) { right, screenY ->
-            if (tab !== view) return@EdgeBlob
+            if (tab !== view) { drop?.dismiss(); return@EdgeBlob }
+            val before = IntArray(2).also(view::getLocationOnScreen).toList()
+            val gravity = Gravity.TOP or if (right) Gravity.END else Gravity.START
+            val moves = right != view.rightEdge || gravity != layout.gravity
             view.rightEdge = right
-            layout.gravity = Gravity.TOP or if (right) Gravity.END else Gravity.START
+            layout.gravity = gravity
             centerY = (screenY - shift - view.height / 2f + layout.height / 2f).toInt().coerceIn(margin, screenHeight() - margin)
-            layout.y = centerY - layout.height / 2
+            val newY = centerY - layout.height / 2
+            val shifts = moves || newY != layout.y
+            layout.y = newY
             runCatching { windows.updateViewLayout(view, layout) }
-            // The window moves a frame or two after it is asked to; showing the tab before then flashes it at the
-            // spot it was picked up from. The drop stays on screen until after this.
-            view.postOnAnimation { view.postOnAnimation { if (tab === view) view.alpha = 1f } }
+            // The window moves when the system gets to it, not on a set frame. Show the tab only once it is really
+            // at its new place, and take the drop away only after the tab has drawn there, so neither flashes.
+            fun reveal(framesLeft: Int) {
+                if (tab !== view) { drop?.dismiss(); return }
+                val now = IntArray(2).also(view::getLocationOnScreen).toList()
+                if (shifts && now == before && framesLeft > 0) { view.postOnAnimation { reveal(framesLeft - 1) }; return }
+                view.alpha = 1f
+                view.postOnAnimation { view.postOnAnimation { drop?.dismiss() } }
+            }
+            view.postOnAnimation { reveal(MOVE_WAIT_FRAMES) }
             prefs.edit().putString("side", if (right) "right" else "left")
                 .putFloat(KEY_FRACTION, ((centerY - margin).toFloat() / (screenHeight() - 2 * margin)).coerceIn(0f, 1f)).apply()
-        }.also { activeBlob = view to it }
+        }.also { drop = it; activeBlob = view to it }
     }
 
     private fun dockItems(tint: Int): List<EdgeDockView.Item> {

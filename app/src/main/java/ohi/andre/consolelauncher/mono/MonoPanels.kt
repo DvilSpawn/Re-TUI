@@ -291,9 +291,17 @@ private class ScenePanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
 private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, host) {
     private val date = kit.tab("", MonoKit.SMALL_SP)
     private val week = kit.text("", MonoKit.SMALL_SP, kit.dim)
-    private val time = kit.text("", 64f).apply { maxLines = 1 }
+    // The time fills the room it is given, up to its full size, so a short or narrow panel still shows all of it.
+    private val time = kit.text("", 64f).apply {
+        maxLines = 1
+        includeFontPadding = false
+        gravity = Gravity.START or Gravity.CENTER_VERTICAL
+        androidx.core.widget.TextViewCompat.setAutoSizeTextTypeUniformWithConfiguration(this, 12, 64, 1, android.util.TypedValue.COMPLEX_UNIT_SP)
+    }
     private val timer = kit.text("", MonoKit.SMALL_SP).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; visibility = View.GONE }
     private val alarm = kit.text("", MonoKit.SMALL_SP, kit.dim).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; visibility = View.GONE }
+    private val meters = android.widget.FrameLayout(kit.context)
+    private var compact = false
     private val day = Row("DAY")
     private val battery = Row("BAT")
     private val disk = Row("DSK")
@@ -310,15 +318,27 @@ private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
             addView(week, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(8) })
         }, LinearLayout.LayoutParams(-1, dp(22)))
         addView(View(kit.context).apply { setBackgroundColor(kit.ink) }, LinearLayout.LayoutParams(-1, kit.line))
-        addView(LinearLayout(kit.context).apply {
+        addView(object : LinearLayout(kit.context) {
+            // Too short for the time and the meters together: keep just the time.
+            override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+                super.onSizeChanged(w, h, oldw, oldh)
+                val short = h < dp(130)
+                if (short != compact) { compact = short; post { tick(); meters.visibility = if (short) View.GONE else View.VISIBLE } }
+            }
+        }.apply {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(8), dp(4), dp(8), dp(6))
             // The time, then what is running or set, then the meters; the room left over sits above the meters.
-            addView(time)
+            // The time takes most of the room; meters that do not fit in the rest are cut off from the bottom.
+            addView(time, LinearLayout.LayoutParams(-1, 0, 3f))
             addView(timer)
             addView(alarm)
-            addView(View(kit.context), LinearLayout.LayoutParams(0, 0, 1f))
-            listOf(day, battery, disk, memory).forEach { addView(it.view, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(4) }) }
+            addView(meters.apply {
+                addView(LinearLayout(kit.context).apply {
+                    orientation = LinearLayout.VERTICAL
+                    listOf(day, battery, disk, memory).forEach { addView(it.view, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(4) }) }
+                }, android.widget.FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+            }, LinearLayout.LayoutParams(-1, 0, 2f))
         }, LinearLayout.LayoutParams(-1, 0, 1f))
     }
 
@@ -371,7 +391,7 @@ private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
         val next = runCatching { (kit.context.getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager).nextAlarmClock?.triggerTime }.getOrNull()
         alarm.text = next?.let { kit.context.getString(R.string.mono_alarm,
             SimpleDateFormat(if (twentyFour) "EEE HH:mm" else "EEE h:mm a", Locale.getDefault()).format(Date(it)).uppercase(Locale.getDefault())) }.orEmpty()
-        alarm.visibility = if (next == null) View.GONE else View.VISIBLE
+        alarm.visibility = if (next == null || compact) View.GONE else View.VISIBLE
         // A running timer or stopwatch shows under the time.
         val clock = host.source.clock()
         timer.text = clock.joinToString("  ")

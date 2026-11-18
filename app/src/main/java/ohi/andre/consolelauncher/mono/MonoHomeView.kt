@@ -20,6 +20,7 @@ import ohi.andre.consolelauncher.managers.RetuiThemeBridge
 import ohi.andre.consolelauncher.managers.settings.LauncherSettings
 import ohi.andre.consolelauncher.managers.settings.MonoMode
 import ohi.andre.consolelauncher.managers.xml.options.Behavior
+import ohi.andre.consolelauncher.presentation.DualScreen
 import ohi.andre.consolelauncher.tuils.LauncherFontScale
 import kotlin.math.roundToInt
 
@@ -178,6 +179,24 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         visibility = GONE
     }
     private var keyboardShown = false
+    private val statusStrip = LinearLayout(context)
+    private val answers = LinearLayout(context)
+    private val commandLine = LinearLayout(context)
+    private var layoutNow: DualScreen.Layout = DualScreen.Layout.Phone
+    /** Moves the command line, or with `duo` on the whole home, to the other screen. Only shown when split. */
+    private val swapKey = kit.text(">>").apply {
+        gravity = Gravity.CENTER
+        setPadding(dp(8), 0, dp(8), 0)
+        kit.pressable(this, framed = true)
+        setOnClickListener { DualScreen.swap(this@MonoHomeView, layoutNow) }
+    }
+    private val mainBezel = bezel()
+    private val pagesBezel = bezel()
+    private val inputBezel = bezel()
+    private var arrangedAs: Any? = null
+    private val onScreensChanged: () -> Unit = { post { arrange() } }
+    private val statusRule = View(context).apply { setBackgroundColor(ink) }
+    private val panelsFrame = FrameLayout(context)
 
     private val tick = object : Runnable {
         override fun run() {
@@ -197,17 +216,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         // Focusable with no background of its own, so Android would otherwise wash it grey as "focused".
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) defaultFocusHighlightEnabled = false
         descendantFocusability = FOCUS_BEFORE_DESCENDANTS
-        val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-        // The screen sits in a bezel: a heavy ink frame, a gap, then a fine dim one.
-        addView(FrameLayout(context).apply {
-            kit.frame(this)
-            setPadding(dp(3) + kit.line, dp(3) + kit.line, dp(3) + kit.line, dp(3) + kit.line)
-            addView(FrameLayout(context).apply {
-                background = GradientDrawable().apply { setColor(paper); setStroke(maxOf(1, dp(1)), kit.dim) }
-                setPadding(dp(8), dp(6), dp(8), dp(8))
-                addView(column, LayoutParams(-1, -1))
-            }, LayoutParams(-1, -1))
-        }, LayoutParams(-1, -1).apply { setMargins(dp(6), dp(6), dp(6), dp(6)) })
+        addView(mainBezel, LayoutParams(-1, -1).apply { setMargins(dp(6), dp(6), dp(6), dp(6)) })
         addView(liftLayer, LayoutParams(-1, -1))
         addView(chooser, LayoutParams(-1, -1))
         ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
@@ -215,6 +224,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             // The keyboard lifts the command line; the panels give up the room under the suggestions.
             view.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime.bottom))
+            post { arrange() }
             // Putting the keyboard away with nothing typed means done searching: close the suggestions too.
             val imeShown = ime.bottom > 0
             if (keyboardShown && !imeShown && input.text.isNullOrEmpty()) post { closeInput() }
@@ -223,7 +233,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         }
 
         // Status strip, like a handheld's: the name in an inverted block, then the signal, the time and the battery.
-        column.addView(LinearLayout(context).apply {
+        statusStrip.apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             addView(kit.tab("Re:TUI", 22f).apply { isAllCaps = false; text = "Re:TUI" }, LinearLayout.LayoutParams(-2, -1))
@@ -231,23 +241,18 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
             addView(statusSignal, LinearLayout.LayoutParams(dp(14), dp(14)).apply { marginEnd = dp(10) })
             addView(statusTime, LinearLayout.LayoutParams(-2, -2).apply { marginEnd = dp(10) })
             addView(statusBattery, LinearLayout.LayoutParams(dp(26), dp(12)))
-        }, LinearLayout.LayoutParams(-1, dp(28)))
-        column.addView(View(context).apply { setBackgroundColor(ink) }, LinearLayout.LayoutParams(-1, kit.line))
+        }
 
-        // Panels, with the answers and suggestions opening over their bottom edge.
-        column.addView(FrameLayout(context).apply {
-            addView(panelArea, LayoutParams(-1, -1))
-            addView(LinearLayout(context).apply {
-                orientation = LinearLayout.VERTICAL
-                gravity = Gravity.BOTTOM
-                addView(outputPanel, LinearLayout.LayoutParams(-1, -2))
-                addView(resultsScroll, LinearLayout.LayoutParams(-1, -2))
-            }, LayoutParams(-1, -1))
-        }, LinearLayout.LayoutParams(-1, 0, 1f).apply { topMargin = dp(8) })
-        column.addView(dots, LinearLayout.LayoutParams(-1, dp(18)).apply { topMargin = dp(4) })
+        // Answers and suggestions open over the panels' bottom edge, or fill the input screen when split.
+        answers.apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.BOTTOM
+            addView(outputPanel, LinearLayout.LayoutParams(-1, -2))
+            addView(resultsScroll, LinearLayout.LayoutParams(-1, -2))
+        }
 
         // The command line: one for every page, outside the pager.
-        column.addView(LinearLayout(context).apply {
+        commandLine.apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
             background = kit.box()
@@ -255,8 +260,9 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
             addView(prefix, LinearLayout.LayoutParams(-2, -1))
             addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(10) })
             addView(submit)
+            addView(swapKey, LinearLayout.LayoutParams(-2, -1).apply { marginStart = dp(8) })
             setOnClickListener { input.requestFocus(); showKeyboard() }
-        }, LinearLayout.LayoutParams(-1, dp(42)).apply { topMargin = dp(8) })
+        }
 
         // Soft keys: one framed strip, an icon over each name, like the printed buttons under a handheld's screen.
         listOf(
@@ -276,12 +282,94 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
                 setOnClickListener { run() }
             }, LinearLayout.LayoutParams(0, -1, 1f))
         }
-        column.addView(bottomBar, LinearLayout.LayoutParams(-1, dp(50)).apply { topMargin = dp(8) })
+        arrange()
 
         styleInput()
         input.setOnFocusChangeListener { _, focused ->
             showResults(focused)
             if (focused) input.post { RetuiThemeBridge.sendToKeyboard(context, input, source.directory(), "launcher") }
+        }
+    }
+
+
+    /** The screen sits in a bezel: a heavy ink frame, a gap, then a fine dim one, holding a column. */
+    private fun bezel() = FrameLayout(context).apply {
+        kit.frame(this)
+        setPadding(dp(3) + kit.line, dp(3) + kit.line, dp(3) + kit.line, dp(3) + kit.line)
+        addView(FrameLayout(context).apply {
+            background = GradientDrawable().apply { setColor(paper); setStroke(maxOf(1, dp(1)), kit.dim) }
+            setPadding(dp(8), dp(6), dp(8), dp(8))
+            addView(LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }, LayoutParams(-1, -1))
+        }, LayoutParams(-1, -1))
+    }
+    private fun columnOf(bezel: FrameLayout) = (bezel.getChildAt(0) as FrameLayout).getChildAt(0) as LinearLayout
+
+    override fun onAttachedToWindow() { super.onAttachedToWindow(); DualScreen.listen(onScreensChanged) }
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        post { arrange() }
+    }
+
+    /**
+     * Lays the home out for one screen or two. Split, the pages (with the status strip and soft keys) take one
+     * screen and the command line with its answers and suggestions the other; with `duo left`/`duo right` the
+     * whole phone layout moves to that screen. The swap key flips either.
+     */
+    private fun arrange() {
+        val layout = DualScreen.layout(this)
+        val key = listOf(layout, width, paddingLeft, paddingRight)
+        if (key == arrangedAs) return
+        arrangedAs = key
+        layoutNow = layout
+        val pieces = listOf(statusStrip, statusRule, panelsFrame, panelArea, answers, dots, commandLine, bottomBar)
+        pieces.forEach { (it.parent as? ViewGroup)?.removeView(it) }
+        listOf(mainBezel, pagesBezel, inputBezel).forEach { columnOf(it).removeAllViews(); (it.parent as? ViewGroup)?.removeView(it) }
+        val margin = dp(6)
+        // Pane edges in this view's content area, which starts after the system bar padding.
+        fun pane(left: Int, right: Int, bezel: FrameLayout) {
+            val from = left - paddingLeft + margin
+            val to = right - paddingLeft - margin
+            addView(bezel, 0, LayoutParams(maxOf(0, to - from), -1).apply { setMargins(from, margin, 0, margin) })
+        }
+        fun phoneColumn(column: LinearLayout) {
+            column.addView(statusStrip, LinearLayout.LayoutParams(-1, dp(28)))
+            column.addView(statusRule, LinearLayout.LayoutParams(-1, kit.line))
+            panelsFrame.addView(panelArea, LayoutParams(-1, -1))
+            panelsFrame.addView(answers, LayoutParams(-1, -1))
+            column.addView(panelsFrame, LinearLayout.LayoutParams(-1, 0, 1f).apply { topMargin = dp(8) })
+            column.addView(dots, LinearLayout.LayoutParams(-1, dp(18)).apply { topMargin = dp(4) })
+            column.addView(commandLine, LinearLayout.LayoutParams(-1, dp(42)).apply { topMargin = dp(8) })
+            column.addView(bottomBar, LinearLayout.LayoutParams(-1, dp(50)).apply { topMargin = dp(8) })
+        }
+        when (layout) {
+            DualScreen.Layout.Phone -> {
+                swapKey.visibility = GONE
+                phoneColumn(columnOf(mainBezel))
+                addView(mainBezel, 0, LayoutParams(-1, -1).apply { setMargins(margin, margin, margin, margin) })
+            }
+            is DualScreen.Layout.OneSide -> {
+                swapKey.visibility = VISIBLE
+                swapKey.text = if (layout.side == DualScreen.LEFT) ">>" else "<<"
+                phoneColumn(columnOf(mainBezel))
+                if (layout.side == DualScreen.LEFT) pane(0, layout.split.start, mainBezel) else pane(layout.split.end, width, mainBezel)
+            }
+            is DualScreen.Layout.Both -> {
+                swapKey.visibility = VISIBLE
+                val inputLeft = layout.inputSide == DualScreen.LEFT
+                swapKey.text = if (inputLeft) ">>" else "<<"
+                val pages = columnOf(pagesBezel)
+                pages.addView(statusStrip, LinearLayout.LayoutParams(-1, dp(28)))
+                pages.addView(statusRule, LinearLayout.LayoutParams(-1, kit.line))
+                panelsFrame.addView(panelArea, LayoutParams(-1, -1))
+                pages.addView(panelsFrame, LinearLayout.LayoutParams(-1, 0, 1f).apply { topMargin = dp(8) })
+                pages.addView(dots, LinearLayout.LayoutParams(-1, dp(18)).apply { topMargin = dp(4) })
+                pages.addView(bottomBar, LinearLayout.LayoutParams(-1, dp(50)).apply { topMargin = dp(8) })
+                val inputs = columnOf(inputBezel)
+                inputs.addView(answers, LinearLayout.LayoutParams(-1, 0, 1f))
+                inputs.addView(commandLine, LinearLayout.LayoutParams(-1, dp(42)).apply { topMargin = dp(8) })
+                if (inputLeft) { pane(0, layout.split.start, inputBezel); pane(layout.split.end, width, pagesBezel) }
+                else { pane(0, layout.split.start, pagesBezel); pane(layout.split.end, width, inputBezel) }
+            }
         }
     }
 
@@ -909,6 +997,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
     }
 
     override fun onDetachedFromWindow() {
+        DualScreen.unlisten(onScreensChanged)
         stop()
         handler.removeCallbacksAndMessages(null)
         super.onDetachedFromWindow()

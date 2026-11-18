@@ -60,6 +60,9 @@ object MonoMode {
     private val fixedZero: Set<XMLPrefsSave> = setOf(Ui.dashed_border_corner_radius, Ui.module_corner_radius,
         Ui.output_corner_radius, Ui.header_corner_radius)
 
+    /** Whether Mono replaces [setting]'s value, so changing it has no effect there. The font size offset still counts. */
+    fun overrides(setting: XMLPrefsSave): Boolean = setting != Ui.font_size_offset && takesOver(setting)
+
     /** Whether mono mode takes [setting] over at all; cheap, so ordinary reads cost nothing extra. */
     private fun takesOver(setting: XMLPrefsSave): Boolean = when (setting) {
         Behavior.launcher_mode, Behavior.search_only_mode, Behavior.mono_ink_color, Behavior.mono_paper_color, Behavior.mono_preset -> false

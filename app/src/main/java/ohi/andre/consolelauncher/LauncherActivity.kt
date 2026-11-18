@@ -498,6 +498,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         this@LauncherActivity.uiManager =
             UIManager(this, rootView, main!!.mainPack, canApplyTheme, main!!.executer())
         uiManager!!.scheduleTypefaceRefreshes()
+        ohi.andre.consolelauncher.presentation.DualScreen.setDuoSide = { side -> uiManager?.setDuoLayoutMode(side) }
+        ohi.andre.consolelauncher.presentation.DualScreen.start(this)
         installWindowInsetsHandler(rootView)
 
         main!!.setRedirectionListener(uiManager!!.buildRedirectionListener())
@@ -747,6 +749,8 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     override fun onDestroy() {
+        ohi.andre.consolelauncher.presentation.DualScreen.stop()
+        ohi.andre.consolelauncher.presentation.DualScreen.setDuoSide = null
         dispose()
         if (instance === this) {
             instance = null
@@ -901,6 +905,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+        ohi.andre.consolelauncher.presentation.DualScreen.changed()
         if (launcherResumed && newConfig.orientation != inputFocusOrientation) {
             rotatedSinceWindowFocus = true
             keyboardOpenBeforeRotation = keyboardOpen()

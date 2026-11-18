@@ -360,7 +360,15 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 
 - Applying Touch Grass, Matrix Rain, Astro Chart or Clouds over another live wallpaper no longer closes the launcher.
 - With the built-in player off, `music` commands play, pause and skip in your other music app; `preferred_music_app` picks which one.
-- Removing a panel from the Mono home stays removed when you add a page or change other settings.</string>
+- Removing a panel from the Mono home stays removed when you add a page or change other settings.
+
+## V.6 · Build 804
+
+- Backups work again. Since Build 801 they stopped with “duplicate entry: shared_prefs/retui_focus_friction.properties”.
+- Mono and Dot use both screens on wide windows, foldables and the Surface Duo: Mono puts its pages on one screen and the command line on the other, Dot keeps the dot on one and the search bar on the other. A swap key moves them, and `duo left` / `duo right` keep everything on one screen.
+- Settings show the settings for your current mode, with a button for all modes; search still finds everything.
+- Dropping the sidebar no longer flashes, and `edge_sidebar_pill_color` colours the pill inside the tab.
+- `config -set` with a value a setting does not accept says what it accepts.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -3951,7 +3959,7 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
-- Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
+- Build 804: backups work again, Mono and Dot use both screens on foldables and the Duo, and Settings show the current mode's settings first. Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
 - eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.
 - Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.
 - Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.
@@ -5263,6 +5271,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_edge_sidebar_color_description">The sidebar's bezel colour. auto keeps black, or your text colour when that would not show on black</string>
     <string name="setting_behavior_edge_sidebar_description">Shows a tab on the screen edge over every app. Tap it or swipe in to open launcher search, a floating tmux terminal and your quick app. Drag it along the edge to move it. Needs permission to display over other apps</string>
     <string name="setting_behavior_edge_sidebar_opacity_description">How solid the sidebar's bezel is, in percent: 100 is solid, lower lets the home show through (20 to 100). Icons and text stay solid</string>
+    <string name="setting_behavior_edge_sidebar_pill_color_description">The colour of the pill inside the sidebar tab and of the selected icon's highlight. auto uses your terminal border colour.</string>
     <string name="setting_behavior_edge_sidebar_quick_app_description">The app the sidebar's third button opens. Tap Apps to pick one; empty starts a new note, filed in a folder named for today's date</string>
     <string name="setting_behavior_edge_sidebar_text_color_description">The colour of the sidebar's icons and text. auto uses your text colour, or black or white when it would not show on the bezel</string>
     <string name="setting_behavior_enable_crt_filter_description">If true, Re:T-UI draws a CRT scanline overlay over the launcher</string>
@@ -5786,6 +5795,10 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
 
 %1$s</string>
     <string name="settings_load_retry">Retry loading settings</string>
+    <string name="settings_mode_filter_all">All modes</string>
+    <string name="settings_mode_filter_current">%1$s only</string>
+    <string name="settings_mode_filter_description">Show only the settings for the current home mode, or all of them</string>
+    <string name="settings_other_mode">other mode</string>
     <string name="settings_preview_ansi">ANSI</string>
     <string name="settings_preview_ansi_caption">ANSI SAMPLE · Draft palette · Save to apply</string>
     <string name="settings_preview_current_home">YOUR LAUNCHER · Unsaved preview · Tap to expand</string>

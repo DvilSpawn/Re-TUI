@@ -56,6 +56,13 @@ class BackupManagerTest {
     }
 
     @Test
+    fun personalBackupListsEachStoreOnce() {
+        val listed = BackupManager.PERSONAL_PREFS.filterNotNull()
+        val twice = listed.groupBy { it }.filterValues { it.size > 1 }.keys
+        assertTrue("Listed more than once: $twice", twice.isEmpty())
+    }
+
+    @Test
     fun personalBackupKeepsCalculatorHistoryAndOptions() {
         assertTrue(BackupManager.personalSharedPreferenceNames().contains("calculator"))
     }
