@@ -389,6 +389,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     override fun onResume() {
         super.onResume()
         applyFullscreen(this)
+        adapter?.reloadSaved()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

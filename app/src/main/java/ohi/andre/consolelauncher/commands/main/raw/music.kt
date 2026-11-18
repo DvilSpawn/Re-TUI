@@ -9,7 +9,7 @@ import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.commands.main.specific.ParamCommand
 import ohi.andre.consolelauncher.managers.music.MusicManager2
 import ohi.andre.consolelauncher.tuils.Tuils
-import ohi.andre.consolelauncher.tuils.libsuperuser.Shell
+import ohi.andre.consolelauncher.managers.music.ExternalMusicControl
 import java.util.Locale
 import ohi.andre.consolelauncher.managers.media.MediaLibrary
 import ohi.andre.consolelauncher.managers.xml.XMLPrefsManager
@@ -38,7 +38,7 @@ class music : ParamCommand() {
         next {
             override fun exec(pack: ExecutePack): String? {
                 if ((pack as MainPack).player == null) {
-                    execute("NEXT")
+                    execute(pack, ExternalMusicControl.Action.NEXT)
                     return null
                 }
 
@@ -53,7 +53,7 @@ class music : ParamCommand() {
         previous {
             override fun exec(pack: ExecutePack): String? {
                 if ((pack as MainPack).player == null) {
-                    execute("PREVIOUS")
+                    execute(pack, ExternalMusicControl.Action.PREVIOUS)
                     return null
                 }
 
@@ -75,7 +75,7 @@ class music : ParamCommand() {
         play {
             override fun exec(pack: ExecutePack): String? {
                 if ((pack as MainPack).player == null) {
-                    execute("PLAY_PAUSE")
+                    execute(pack, ExternalMusicControl.Action.PLAY_PAUSE)
                     return null
                 }
 
@@ -88,7 +88,7 @@ class music : ParamCommand() {
         stop {
             override fun exec(pack: ExecutePack): String? {
                 if ((pack as MainPack).player == null) {
-                    execute("CLOSE")
+                    execute(pack, ExternalMusicControl.Action.STOP)
                     return null
                 }
 
@@ -234,8 +234,8 @@ class music : ParamCommand() {
     }
 
     companion object {
-        private fun execute(code: String?) {
-            Shell.SH.run("input keyevent KEYCODE_MEDIA_" + code)
+        private fun execute(pack: ExecutePack, action: ExternalMusicControl.Action) {
+            ExternalMusicControl.send(pack.context, action)
         }
     }
 }

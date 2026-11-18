@@ -155,6 +155,9 @@ class RetuiWallpaperService : WallpaperService() {
         private var interactionEnabled = false
         private var touchEnabled = true
         private var fullRedrawPending = true
+        // A surface connects to the CPU or the GPU on its first lock and cannot switch until it is recreated;
+        // a GPU lock after a CPU one aborts the process in HWUI. Null until this surface has been drawn.
+        private var surfaceUsesHardware: Boolean? = null
         private var receiverRegistered = false
         private var mediaReceiverRegistered = false
         private var mediaPlaying = false
@@ -284,7 +287,13 @@ class RetuiWallpaperService : WallpaperService() {
             view.layout(0, 0, width, height)
         }
 
+        override fun onSurfaceCreated(holder: SurfaceHolder) {
+            surfaceUsesHardware = null
+            super.onSurfaceCreated(holder)
+        }
+
         override fun onSurfaceDestroyed(holder: SurfaceHolder) {
+            surfaceUsesHardware = null
             visible = false
             updateTouchHandling()
             handler.removeCallbacks(drawFrame)
@@ -379,11 +388,16 @@ class RetuiWallpaperService : WallpaperService() {
                     surfaceHolder.lockCanvas()
                 }
             }
-            // Bitmap layers need the same GPU path as the picker; CPU compositing is costly.
-            val hardware = if ((current is CloudsView || current is AstroChartView || current is MatrixRainView || current is PixelWallpaperView) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Bitmap layers need the same GPU path as the picker; CPU compositing is costly. A surface keeps the
+            // path it started with, so switching scenes never mixes the two on one surface.
+            val wantsHardware = current is CloudsView || current is AstroChartView || current is MatrixRainView || current is PixelWallpaperView
+            val useHardware = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && (surfaceUsesHardware ?: wantsHardware)
+            val hardware = if (useHardware) {
                 try { surfaceHolder.lockHardwareCanvas() } catch (_: Exception) { null }
             } else null
+            if (hardware == null && surfaceUsesHardware == true) return false
             val canvas = hardware ?: (try { lockSoftware() } catch (_: Exception) { null }) ?: return false
+            surfaceUsesHardware = hardware != null
             try {
                 when (current) {
                     is BlackHoleView -> current.advance()

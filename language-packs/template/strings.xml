@@ -354,7 +354,13 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 - The edge sidebar has its own bezel colour, text colour and opacity.
 - Each Settings section has its own search box.
 - The edge sidebar no longer flashes at its old spot after a drag, and the Reddit button matches the other logos.
-- The document editor has a text size button (x1, x2, x3) and lines up with the Settings hub.</string>
+- The document editor has a text size button (x1, x2, x3) and lines up with the Settings hub.
+
+## V.6 · Build 803
+
+- Applying Touch Grass, Matrix Rain, Astro Chart or Clouds over another live wallpaper no longer closes the launcher.
+- With the built-in player off, `music` commands play, pause and skip in your other music app; `preferred_music_app` picks which one.
+- Removing a panel from the Mono home stays removed when you add a page or change other settings.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -3945,7 +3951,7 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
-- Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
+- Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
 - eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.
 - Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.
 - Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.

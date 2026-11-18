@@ -132,8 +132,16 @@ class TuixtAdapter(
             if (position == RecyclerView.NO_POSITION) continue
             val item = visibleRows[position].item ?: continue
             val value = holder.input.text.toString()
+            // Only text changed since the row was filled: a field left open across another edit (the home writing
+            // mono_layout, say) still shows the old value, and saving that back would undo the other edit.
+            if (item in pendingChanges || value == holder.boundValue) continue
             pendingChanges[item] = value
         }
+    }
+
+    /** Fills the rows again from the saved settings, which may have changed while this screen was away. */
+    fun reloadSaved() {
+        if (pendingChanges.isEmpty()) notifyDataSetChanged()
     }
 
     fun hasPendingChanges(): Boolean {
@@ -204,6 +212,7 @@ class TuixtAdapter(
         settingHolder.description.setText(item.info(settingHolder.itemView.context))
 
         val currentValue = getCurrentValue(item)
+        settingHolder.boundValue = currentValue.orEmpty()
 
         settingHolder.input.removeTextChangedListener(settingHolder.textWatcher)
         settingHolder.input.inputType = when {
@@ -781,6 +790,8 @@ class TuixtAdapter(
         var colorPreview: View
         var input: EditText
         var textWatcher: TextWatcher? = null
+        /** The value the input was filled with, to tell a typed change from a stale one. */
+        var boundValue: String = ""
 
         init {
             title = itemView.findViewById<TextView>(R.id.setting_title)
