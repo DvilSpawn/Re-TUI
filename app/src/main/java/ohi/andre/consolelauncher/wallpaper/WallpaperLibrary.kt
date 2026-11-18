@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import ohi.andre.consolelauncher.BuildConfig
 import ohi.andre.consolelauncher.tuils.Tuils
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -16,7 +17,8 @@ object WallpaperLibrary {
      * Schema 2 only grows. Rows this build cannot use (a newer wallpaper, a newer pack api) are skipped rather than
      * failing the whole catalogue, and unknown fields are ignored. A breaking change needs a new file, because builds
      * reading this one stay installed. catalog.json is frozen at schema 1 for builds before Astro Chart: they reject
-     * any id they do not know.
+     * any id they do not know. A row's optional "minBuild" hides it from launcher builds older than that versionCode
+     * (honoured from Build 803), so a wallpaper can be published before the build it needs is out.
      */
     const val CATALOG_URL = "https://re-tui.pages.dev/wallpaper-packs/catalog-v2.json"
     private const val CATALOG_SCHEMA = 2
@@ -30,7 +32,7 @@ object WallpaperLibrary {
         WallpaperPackStore.SCENES.entries.firstOrNull { it.value == scene }?.let { store(context).installed(it.key) } ?: true
     fun effectiveScene(context: Context, saved: String) = saved.takeIf { available(context, it) } ?: "csakura"
 
-    internal fun parse(text: String): List<Entry> {
+    internal fun parse(text: String, build: Int = BuildConfig.VERSION_CODE): List<Entry> {
         val root = JSONObject(text)
         require(root.getInt("schema") == CATALOG_SCHEMA) { "Unsupported wallpaper catalogue" }
         val list = root.getJSONArray("wallpapers")
@@ -38,12 +40,13 @@ object WallpaperLibrary {
         val seen = HashSet<String>()
         // The first usable row per id wins, so a catalogue can list a newer pack api before a fallback for older builds.
         return (0 until list.length()).mapNotNull { index ->
-            runCatching { entry(list.getJSONObject(index)) }.getOrNull()?.takeIf { seen.add(it.id) }
+            runCatching { entry(list.getJSONObject(index), build) }.getOrNull()?.takeIf { seen.add(it.id) }
         }
     }
-    private fun entry(item: JSONObject): Entry? {
+    private fun entry(item: JSONObject, build: Int): Entry? {
         val id = item.getString("id")
         if (id !in WallpaperPackStore.SCENES || item.getInt("api") != 1) return null
+        if (item.has("minBuild") && item.getInt("minBuild") > build) return null
         val title = item.getString("name"); val description = item.getString("description")
         require(title.length in 1..80 && description.length in 1..400)
         val hash = item.getString("sha256"); require(hash.matches(Regex("[a-f0-9]{64}")))

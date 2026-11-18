@@ -53,6 +53,11 @@ class WallpaperPackStoreTest {
         for (text in listOf(catalog(row(), schema = 1), catalog(row(), schema = 3), """{"schema":2}""", "[]",
             catalog(*Array(257) { row() })))
             try { WallpaperLibrary.parse(text); fail(text) } catch (_: Exception) { }
+        // minBuild hides a row from older launcher builds.
+        val gated = catalog(row(id = "astro", extra = ""","minBuild":804"""), row(id = "matrix", extra = ""","minBuild":803"""))
+        assertEquals(listOf("matrix"), WallpaperLibrary.parse(gated, build = 803).map { it.id })
+        assertEquals(listOf("astro", "matrix"), WallpaperLibrary.parse(gated, build = 804).map { it.id })
+        assertEquals(emptyList<String>(), WallpaperLibrary.parse(gated, build = 802).map { it.id })
     }
     @Test fun retainsOnlyVerifiedArchiveAndCancellationPreservesInstalledPack() {
         val root = Files.createTempDirectory("wallpaper-transaction").toFile()
