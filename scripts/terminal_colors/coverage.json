@@ -8386,6 +8386,8 @@
     ".managers.mediaplayer.MediaPlayerActivity": "Media player music, video and podcast libraries, now playing and queue; draws with the same workspace panel, frame and control colors as the Help pane.",
     ".managers.media.VideoPlayerActivity": "Video library and player; colors come straight from ThemeColorResolver over a fixed black video background.",
     ".managers.media.MediaFolderPickerActivity": "Invisible host for the system folder picker; draws no launcher surface.",
+    ".managers.reader.ReaderLibraryActivity": "Book library; draws with the same workspace panel, frame and control colors as the media player.",
+    ".managers.reader.ReaderActivity": "eReader pages; e-ink paper and ink are fixed reading colors, and the THEME look uses the workspace panel colors.",
     ".managers.preset.PresetWallpaperPickerActivity": "Invisible host for the system photo picker; draws no launcher surface."
   },
   "limits": [

@@ -24,7 +24,7 @@ class WallpaperGalleryTest(unittest.TestCase):
             self.assertEqual(1, legacy['schema'])
             self.assertEqual(['topo', 'pixel', 'clouds', 'nagomi'], [row['id'] for row in legacy['wallpapers']])
             self.assertEqual(2, catalog['schema'])
-            self.assertEqual(['topo', 'pixel', 'clouds', 'nagomi', 'astro', 'matrix'], [row['id'] for row in catalog['wallpapers']])
+            self.assertEqual(['topo', 'pixel', 'clouds', 'nagomi', 'astro', 'matrix', 'grass'], [row['id'] for row in catalog['wallpapers']])
             self.assertEqual(legacy['wallpapers'], catalog['wallpapers'][:4])
             page = (output / 'index.html').read_text()
             self.assertNotIn('{{', page)

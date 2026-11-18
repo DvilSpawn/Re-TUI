@@ -66,6 +66,18 @@ class SettingsCompatibilityTest {
             }
         }
     }
+    @Test fun oldMonoDefaultsMoveToTheNewPairButChosenColoursStay() {
+        fun migrate(ink: String, paper: String): Pair<String, String> {
+            val doc=DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+                "<BEHAVIOR><mono_ink_color value=\"$ink\"/><mono_paper_color value=\"$paper\"/></BEHAVIOR>".byteInputStream())
+            XMLPrefsManager.migrateRootValues(doc,doc.documentElement,XMLPrefsManager.XMLPrefsRoot.BEHAVIOR)
+            fun value(name: String)=(doc.getElementsByTagName(name).item(0) as org.w3c.dom.Element).getAttribute("value")
+            return value("mono_ink_color") to value("mono_paper_color")
+        }
+        assertEquals(Behavior.mono_ink_color.defaultValue() to Behavior.mono_paper_color.defaultValue(), migrate("#FFF2F0E6","#FF0A0A0A"))
+        assertEquals("#FFF2F0E6" to "#FF101010", migrate("#FFF2F0E6","#FF101010"))
+        assertEquals("#FF336699" to "#FF0A0A0A", migrate("#FF336699","#FF0A0A0A"))
+    }
     @Test fun unknownRepeatableXmlIsPreservedWhenAddingSectionComments() {
         val document=DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
             "<UI><input_output_size value=\"14\"/><future_option value=\"first\"/><future_option value=\"second\"/></UI>".byteInputStream())

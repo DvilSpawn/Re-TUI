@@ -10,6 +10,11 @@
         <intent>
             <action android:name="android.service.wallpaper.WallpaperService" />
         </intent>
+        <!-- Apps that work on selected text, such as Translate, offered when text is selected in the reader. -->
+        <intent>
+            <action android:name="android.intent.action.PROCESS_TEXT" />
+            <data android:mimeType="text/plain" />
+        </intent>
     </queries>
 
     <supports-screens
@@ -109,7 +114,7 @@
         android:label="${applicationLabel}"
         android:supportsRtl="true"
         android:theme="@style/Custom.Solid"
-        android:usesCleartextTraffic="false"
+        android:usesCleartextTraffic="true"
         android:requestLegacyExternalStorage="true">
 
         <provider
@@ -269,6 +274,20 @@
             android:exported="false"
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".managers.reader.ReaderLibraryActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.books"
+            android:theme="@style/Custom.Floating"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".managers.reader.ReaderActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden"
+            android:launchMode="singleTop"
+            android:taskAffinity="${applicationId}.books"
+            android:theme="@style/Custom.Solid" />
         <activity android:name=".commands.tuixt.PresetMarketplaceActivity" android:exported="false" android:theme="@style/Custom.Solid" />
         <activity
             android:name=".commands.tuixt.PresetImportActivity"

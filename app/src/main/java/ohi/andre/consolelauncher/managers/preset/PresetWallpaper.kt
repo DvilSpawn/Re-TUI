@@ -22,7 +22,8 @@ import org.json.JSONObject
  * for the image.
  */
 object PresetWallpaper {
-    enum class Saved { IMAGE, LIVE, UNKNOWN }
+    /** What was kept of the wallpaper; NONE when the preset was saved without it. */
+    enum class Saved { IMAGE, LIVE, UNKNOWN, NONE }
 
     private const val PREFS = "retui_preset_wallpaper"
     private const val KEY_FILE = "file"

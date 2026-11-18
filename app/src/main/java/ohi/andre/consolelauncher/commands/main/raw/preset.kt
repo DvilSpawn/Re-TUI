@@ -19,18 +19,42 @@ class preset : ParamCommand() {
         save {
             override fun exec(pack: ExecutePack): String {
                 val name = pack.getString()!!
-                try {
-                    if (PresetManager.save(pack.context, name) == PresetWallpaper.Saved.UNKNOWN)
-                        PresetWallpaperPickerActivity.ask(pack.context, name.trim())
-                    if (pack.context is Reloadable) {
-                        (pack.context as Reloadable).addMessage("preset", pack.context.getString(R.string.command_preset_saved_preset_4a339, name.trim()))
+                val context = pack.context
+                // First, what the preset should hold: everything is ticked, untick what it should leave alone.
+                val parts = LinkedHashSet(PresetManager.Part.entries)
+                val list = android.widget.LinearLayout(context).apply {
+                    orientation = android.widget.LinearLayout.VERTICAL
+                    addView(android.widget.TextView(context).apply {
+                        text = context.getString(R.string.command_preset_parts_note)
+                        typeface = Tuils.getTypeface(context); textSize = 12f
+                        setTextColor(ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor())
+                        setPadding(0, 0, 0, Tuils.dpToPx(context, 8))
+                    })
+                    PresetManager.Part.entries.forEach { part ->
+                        addView(android.widget.CheckBox(context).apply {
+                            text = context.getString(Parts.partLabel(part))
+                            isChecked = true
+                            typeface = Tuils.getTypeface(context); textSize = 13f
+                            setTextColor(ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.textColor())
+                            buttonTintList = android.content.res.ColorStateList.valueOf(ohi.andre.consolelauncher.commands.tuixt.TuixtTheme.accentColor())
+                            minHeight = Tuils.dpToPx(context, 44)
+                            setOnCheckedChangeListener { _, on -> if (on) parts.add(part) else parts.remove(part) }
+                        })
                     }
-                    return pack.context.getString(R.string.command_preset_preset_saved_c599d, name.trim())
-                } catch (e: IllegalArgumentException) {
-                    return e.message!!
-                } catch (e: Exception) {
-                    return e.message ?: pack.context.getString(R.string.output_error)
                 }
+                TuixtDialog.showContent(context, context.getString(R.string.command_preset_parts_title, name.trim()), list,
+                    context.getString(R.string.command_preset_save), context.getString(R.string.command_preset_cancel_77dfd),
+                    TuixtDialog.ConfirmAction {
+                        val message = try {
+                            if (PresetManager.save(context, name, parts) == PresetWallpaper.Saved.UNKNOWN)
+                                PresetWallpaperPickerActivity.ask(context, name.trim())
+                            context.getString(R.string.command_preset_saved_preset_4a339, name.trim())
+                        } catch (e: Exception) {
+                            e.message ?: context.getString(R.string.output_error)
+                        }
+                        if (context is Reloadable) context.addMessage("preset", message)
+                    })
+                return context.getString(R.string.command_preset_choose_parts, name.trim())
             }
 
             override fun args(): IntArray = intArrayOf(CommandAbstraction.PRESET_NAME)
@@ -147,6 +171,17 @@ class preset : ParamCommand() {
     }
 
     override fun params(): Array<String> = Param.labels()
+
+    private object Parts {
+        fun partLabel(part: PresetManager.Part): Int = when (part) {
+            PresetManager.Part.COLOURS -> R.string.command_preset_part_colours
+            PresetManager.Part.LOOK -> R.string.command_preset_part_look
+            PresetManager.Part.MODE -> R.string.command_preset_part_mode
+            PresetManager.Part.MONO -> R.string.command_preset_part_mono
+            PresetManager.Part.BEHAVIOUR -> R.string.command_preset_part_behaviour
+            PresetManager.Part.WALLPAPER -> R.string.command_preset_part_wallpaper
+        }
+    }
 
     override fun paramForString(pack: MainPack, param: String): ohi.andre.consolelauncher.commands.main.Param? =
         Param.get(param)

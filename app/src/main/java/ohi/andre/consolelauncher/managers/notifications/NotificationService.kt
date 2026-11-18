@@ -914,7 +914,9 @@ class NotificationService : NotificationListenerService() {
      * mark them external and stop their progress updates. The video player has no other route, so it stays visible.
      */
     private fun isOwnMusicSession(controller: MediaController): Boolean =
-        controller.packageName == packageName && controller.tag?.endsWith(".video") != true
+        controller.packageName == packageName &&
+            // Sessions have tags from Android 11; before that the video player can't be told apart and stays hidden.
+            (Build.VERSION.SDK_INT < Build.VERSION_CODES.R || controller.tag?.endsWith(".video") != true)
 
     private fun handleMediaSessionToken(token: MediaSession.Token, packageName: String?) {
         synchronized(activeControllers) {

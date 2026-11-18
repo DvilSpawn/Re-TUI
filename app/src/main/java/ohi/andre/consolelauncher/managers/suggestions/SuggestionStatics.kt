@@ -109,6 +109,12 @@ internal object SuggestionStatics {
 
     internal fun modeTarget(currentMode: String): String = LauncherMode.nextTarget(currentMode)
 
+    /** Every mode but the one in use, the usual next one first. */
+    internal fun otherModes(currentMode: String): List<String> {
+        val next = modeTarget(currentMode)
+        return listOf(next) + LauncherMode.values.filter { it != currentMode && it != next }
+    }
+
     internal fun modeTargets(filter: String?): List<String> {
         val normalized = filter?.trim()?.lowercase(Locale.ROOT).orEmpty()
         return LauncherMode.values.filter { normalized.isEmpty() || it.startsWith(normalized) }

@@ -183,6 +183,12 @@ class SearchModeTest {
     }
 
     @Test
+    fun bareModeOffersEveryOtherLayoutNextFirst() {
+        assertEquals(listOf("search", "terminal", "dot", "mono"), SuggestionsManager.otherModes(LauncherMode.CLASSIC))
+        assertEquals(listOf("classic", "search", "terminal", "dot"), SuggestionsManager.otherModes(LauncherMode.MONO))
+    }
+
+    @Test
     fun modeParameterSuggestionsIncludeEveryLauncherMode() {
         assertEquals(listOf("classic", "search", "terminal", "dot", "mono"), SuggestionsManager.modeTargets(""))
         assertEquals(listOf("terminal"), SuggestionsManager.modeTargets("ter"))

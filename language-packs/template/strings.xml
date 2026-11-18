@@ -326,7 +326,26 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 - Bare parameter commands, such as `apps`, show their help. `breach`, `credits`, `lockdown` and `pomodoro` now have help too.
 - Dot mode: closing the changelog or another screen no longer brings the keyboard up over the dot.
 - Android no longer tints the dot and mono homes grey.
-- The Hack overlay closes when you tap it.</string>
+- The Hack overlay closes when you tap it.
+
+## V.6 · Build 801
+
+- Mono home: a handheld PDA frame with panels on a four-column grid: a pixel-art weather scene, a clock with battery, storage and memory meters, apps as name chips grouped into scrolling sections, media, quick commands, tasks, what's next and alerts. Hold a panel to swap it for another.
+- Mono now defaults to blue ink on navy. If you never changed the old cream on black, you get the new pair; colours you picked are kept.
+- Mono keeps the CRT filter and vignette when they are on, and its Settings soft key opens just the settings that change the Mono home.
+- Live TV: the media player has a TV tab. Import channels from an M3U playlist, from a file or an https link. Channels on plain http:// are explained and left out unless you accept the risk.
+- In Mono, the media panel plays your last channel dithered in ink, with a library of channels, videos to carry on with, shows and music. Full screen plays it in colour from where the panel was, and Back or Home returns it to the panel. A live broadcast always rejoins live; a video at a link keeps its place.
+- eReader: `books` opens a library of EPUB, PDF, text, Markdown and CBZ books from folders you pick. Pages look like e-ink paper, with ghosting and an optional refresh. Turn by tap, swipe or volume keys, left to right, right to left or scrolling.
+- Hold a word to select text: copy, share, pin, or send it to your own apps such as a translator. Pinned lines and pages are listed in the PINS tab. The footer cycles between time and pages left, learning how fast you read.
+- Mono gets a READ panel with the last book of each kind and a read row in Quick; the other modes get a READ module.
+- Mono panels sit on pages you swipe between, with the command line fixed below them, or on one page that scrolls (`mono_layout_style`). Add panels from the add slot, resize, move or remove them on hold, and add terminal panels: a tmux window each, in three sizes. Tap one and it fills the screen above the keyboard with the terminal keys; hold text to copy or paste.
+- Mono colour presets: e-ink lite, e-ink dark or your own ink and paper. Cyberdeck frames work in Mono, and the clock panel shows a running timer, your next alarm, a day meter and AM/PM.
+- The edge sidebar stays visible on a light Mono home.
+- `preset -save` asks what the preset keeps, and presets saved in Mono keep your own colours and fonts.
+- Personal backups are a full snapshot: the journal, quick notes, channels, reader places and pins, wallpaper images and more.
+- Touch Grass: a downloadable wallpaper. Drag through the lawn to part it; tilt to lean it.
+- `mode` on its own suggests every other mode, and dot mode shows a faint hint on how to search.
+- Mono search results stay readable after presets with transparent suggestions or coloured app groups, and no longer push the input line under the keyboard.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -577,15 +596,25 @@ Usage: orientation portrait|landscape|auto</string>
     <string name="command_post_sending_post_request_2dba0">Sending POST request...</string>
     <string name="command_preset_applied_preset_c132b">Applied preset: %1$s</string>
     <string name="command_preset_cancel_77dfd">Cancel</string>
+    <string name="command_preset_choose_parts">Choose what preset %1$s keeps.</string>
     <string name="command_preset_duplicate_972d5">Duplicate</string>
     <string name="command_preset_duplicate_preset_76c16">Duplicate Preset</string>
     <string name="command_preset_duplicated_as_0b74a">Duplicated '%1$s' as '%2$s'.</string>
     <string name="command_preset_enter_a_name_for_the_duplicate_e815f">Enter a name for the duplicate.</string>
     <string name="command_preset_new_preset_name_0ee29">New preset name</string>
     <string name="command_preset_no_presets_found_a6efc">No presets found.</string>
+    <string name="command_preset_part_behaviour">Behaviour: sounds, output, gestures and everything else</string>
+    <string name="command_preset_part_colours">Colours: theme and suggestion colours</string>
+    <string name="command_preset_part_look">Look: fonts, borders, status rows, frames, cyberdeck, CRT and ASCII effects</string>
+    <string name="command_preset_part_mode">Mode: launcher mode, orientation and Duo layout</string>
+    <string name="command_preset_part_mono">Mono: preset, ink and paper, and panel layout</string>
+    <string name="command_preset_part_wallpaper">Wallpaper</string>
+    <string name="command_preset_parts_note">Choose what this preset keeps. Anything left out stays as it is when the preset is applied.</string>
+    <string name="command_preset_parts_title">Save preset %1$s</string>
     <string name="command_preset_preset_applied_0611f">Preset '%1$s' applied.</string>
     <string name="command_preset_preset_removed_0fa34">Preset '%1$s' removed.</string>
     <string name="command_preset_preset_saved_c599d">Preset '%1$s' saved.</string>
+    <string name="command_preset_save">Save</string>
     <string name="command_preset_saved_preset_4a339">Saved preset: %1$s</string>
     <string name="command_reminder_reminder_not_found_032c9">Reminder not found.
 %1$s</string>
@@ -725,6 +754,7 @@ Android AppWidgets: open the widgets pane from the toolbar.</string>
     </plurals>
     <string name="dialog_no_apps_found">NO APPS FOUND</string>
     <string name="dot_home_description">Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app.</string>
+    <string name="dot_home_search_hint">double-tap the dot to search</string>
     <string name="dot_home_toggle_modules">Show or hide the time, battery and temperature</string>
     <string name="duo_status">Duo command: enabled
 Duo layout: %1$s
@@ -1139,6 +1169,7 @@ Home aliases expand before built-in commands; avoid conflicting names. Script al
 Usage: 
 $ beep</string>
     <string name="help_bluetooth">Toggle Bluetooth on older Android versions, or open Bluetooth settings on modern Android versions where direct toggles are restricted.</string>
+    <string name="help_books">books: your eReader. books opens the library · books -last carries on with the book you read last · books -last epub, pdf, text or comic carries on with the last of that kind. Reads EPUB, PDF, TXT, Markdown and CBZ comics from folders you pick, with no storage permission. In a book, tap the edges to turn and the middle for the menu; hold a word to copy, share, translate or pin it. help -topic ereader has the full guide.</string>
     <string name="help_breach">Open the Breach minigame. Needs RE:TUI credits turned on. 
 
 Usage: 
@@ -1319,11 +1350,13 @@ $ lua -enable habit
 
 Lua apps run inside Re:T-UI, not Termux. They use the same sandbox, prefs, files, permissions, editor, and ui:render layout objects as Lua modules, but open in a focused terminal-styled surface. Inside a Lua app, plain input is sent to on_input(text), and renderer buttons with action/value are sent to on_action(value). Local commands use a colon prefix: :help, :refresh, :restart, :config, :edit, :clear, and :close.</string>
     <string name="help_media">media: your media folders. media -add picks a folder · media -rm &lt;n&gt; drops folder n · media -scan looks through them again · media -v opens your videos. Once a folder is added, music plays from your folders.</string>
-    <string name="help_mode">Switch launcher layout.
+    <string name="help_mode">Switch launcher layout. mode on its own shows the current one.
 Usage:
 $ mode classic
 $ mode search
-$ mode terminal</string>
+$ mode terminal
+$ mode dot
+$ mode mono</string>
     <string name="help_module">Show and manage Re:T-UI modules. 
 
 Usage: 
@@ -1451,7 +1484,7 @@ $ post [url] [body]
 
 Example: 
 $ post https://httpbin.org/post hello world</string>
-    <string name="help_preset">-save [name] -&gt; save theme.xml and suggestions.xml colors, shareable ui.xml values, local behavior.xml settings, and frame state as a local preset 
+    <string name="help_preset">-save [name] -&gt; save the current setup as a local preset; a checklist asks what it keeps: colours, look (ui.xml, frames, effects), mode, Mono, the rest of behavior.xml, and the wallpaper. What is left out stays as it is when the preset is applied. Saved in Mono, a preset keeps your own colours and fonts, not Mono's 
 -apply [name] -&gt; apply a saved or built-in preset; saved presets can restore UI, selected behavior settings, and frames as well as colors; disable auto_color_pick 
 -duplicate [saved name] -&gt; copy a saved preset and prompt for its new name 
 -ls -&gt; list saved and built-in presets 
@@ -2482,6 +2515,7 @@ Unable to read Android Calendar.</string>
     <string name="module_label_music">MUSIC</string>
     <string name="module_label_notes">NOTES</string>
     <string name="module_label_notifications">NOTIFICATIONS</string>
+    <string name="module_label_read">READ</string>
     <string name="module_label_reminder">REMINDER</string>
     <string name="module_label_rss">RSS</string>
     <string name="module_label_timer">TIMER</string>
@@ -2495,19 +2529,94 @@ Unable to read Android Calendar.</string>
     <string name="module_library_title">Module library</string>
     <string name="module_library_unavailable">Could not load the module library: %1$s</string>
     <string name="module_library_unknown">Unknown library module. Use module -library.</string>
+    <string name="mono_add_panel">add panel</string>
+    <string name="mono_add_terminal">terminal</string>
+    <string name="mono_add_title">add to this page</string>
+    <string name="mono_alarm">ALARM %1$s</string>
+    <string name="mono_alerts_title">Alerts</string>
+    <string name="mono_apps_top">top</string>
     <string name="mono_banner_description">Weather scene. Tap to step through the scenes.</string>
+    <string name="mono_bar_apps">Apps</string>
+    <string name="mono_bar_search">Search</string>
+    <string name="mono_bar_settings">Settings</string>
+    <string name="mono_bar_widgets">Widgets</string>
+    <string name="mono_library_add_channels">add channels</string>
+    <string name="mono_library_close">Close the library</string>
+    <string name="mono_library_continue">continue</string>
+    <string name="mono_library_more_channels">import more channels</string>
+    <string name="mono_library_music">music</string>
+    <string name="mono_library_open_music">open the music library</string>
+    <string name="mono_library_title">Library</string>
+    <string name="mono_library_tv">tv</string>
+    <string name="mono_library_video">video</string>
+    <string name="mono_media_full">full</string>
+    <string name="mono_media_idle">idle</string>
+    <string name="mono_media_last_watched">last watched</string>
+    <string name="mono_media_library">library</string>
+    <string name="mono_media_live">● LIVE</string>
+    <string name="mono_media_music">music</string>
+    <string name="mono_media_paused">paused</string>
+    <string name="mono_media_play">play</string>
+    <string name="mono_media_playing">♪ playing</string>
+    <string name="mono_media_resume">resume</string>
+    <string name="mono_media_resume_live">resume live</string>
+    <string name="mono_media_stopped">stopped</string>
+    <string name="mono_media_stopped_by_you">Stopped</string>
+    <string name="mono_media_stopped_title">Stopped when you left</string>
+    <string name="mono_media_title">Media</string>
+    <string name="mono_media_tuning">tuning</string>
+    <string name="mono_media_tv">live tv</string>
+    <string name="mono_media_video_playing">▶ playing</string>
+    <string name="mono_media_watch">watch</string>
+    <string name="mono_menu_move">move</string>
+    <string name="mono_menu_on_page">page %1$d</string>
+    <string name="mono_menu_shown">on home</string>
+    <string name="mono_menu_size">size</string>
+    <string name="mono_menu_swap">swap for</string>
+    <string name="mono_move_down">down</string>
+    <string name="mono_move_up">up</string>
+    <string name="mono_next_title">Next</string>
+    <string name="mono_no_apps">no apps here</string>
     <string name="mono_no_events">nothing coming up</string>
     <string name="mono_no_music">nothing playing</string>
     <string name="mono_no_notes">no notes · add one with notes -add</string>
     <string name="mono_no_notifications">all quiet</string>
-    <string name="mono_no_reminders">none set · reminder 18:00 call</string>
-    <string name="mono_no_timer">not running · timer 5m</string>
+    <string name="mono_output_close">Close the output</string>
+    <string name="mono_page_add">add a page</string>
+    <string name="mono_page_remove">remove this page and its panels</string>
+    <string name="mono_pages_title">pages</string>
     <string name="mono_prompt_hint">search or type a command</string>
-    <string name="mono_session_title">── session ──</string>
+    <string name="mono_quick_calc">calc</string>
+    <string name="mono_quick_clipboard">clipboard</string>
+    <string name="mono_quick_note">note</string>
+    <string name="mono_quick_read">read</string>
+    <string name="mono_quick_reminder">reminder</string>
+    <string name="mono_quick_timer">timer</string>
+    <string name="mono_quick_title">Quick</string>
+    <string name="mono_read_continue">&gt; continue</string>
+    <string name="mono_read_library">&gt; open library</string>
+    <string name="mono_read_none">No book yet</string>
+    <string name="mono_read_title">Read</string>
+    <string name="mono_remove_panel">remove</string>
+    <string name="mono_settings_all">All settings</string>
+    <string name="mono_settings_home">Home</string>
+    <string name="mono_settings_mode">Mode</string>
+    <string name="mono_settings_preset">Preset</string>
+    <string name="mono_settings_screen">Screen</string>
+    <string name="mono_settings_title">Mono settings</string>
+    <string name="mono_settings_weather">Weather</string>
     <string name="mono_stopwatch_paused">stopwatch %1$s · paused</string>
     <string name="mono_stopwatch_running">stopwatch %1$s</string>
+    <string name="mono_tasks_title">Tasks</string>
+    <string name="mono_term_done">done ×</string>
+    <string name="mono_term_pick">pick a window</string>
+    <string name="mono_term_tap">tap to type</string>
+    <string name="mono_term_title">Term</string>
+    <string name="mono_term_typing">typing</string>
+    <string name="mono_term_window">window</string>
     <string name="mono_timer_paused">timer %1$s left · paused</string>
     <string name="mono_timer_running">timer %1$s left</string>
+    <string name="mono_week">WK %1$d</string>
     <string name="music_songs_folder_hint">0 songs found in songs_folder. If it holds music, add the folder with media -add instead; it works without storage permission.</string>
     <string name="nagomi_choose_image">Choose image</string>
     <string name="nagomi_credit">Nagomi · by Mayank Kadam</string>
@@ -2654,7 +2763,7 @@ Unable to read Android Calendar.</string>
     <string name="notes_storage_error_4">Missing note file</string>
     <string name="notification_reader">Re:T-UI notification reader</string>
     <string name="notification_settings">Notification settings</string>
-    <string name="offline_help_appearance_body">Fonts, colors, floating tools and optional idle fade. Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_appearance_body">Fonts, colors, the Mono home, floating tools and optional idle fade. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_appearance_title">Appearance</string>
     <string name="offline_help_apps_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_apps_title">Apps</string>
@@ -3321,6 +3430,61 @@ shell pwd
 
 Inspect the shell’s current directory without modifying files.</string>
     <string name="offline_help_article_embedded_shell_title">Run a shell command without confusing app commands</string>
+    <string name="offline_help_article_ereader_body">## Open the library
+
+Enter `books` at Launcher Home. ADD FOLDER picks a folder of books through Android's folder picker, so Launcher needs no storage permission; OPEN FILE opens one book. SCAN looks through your folders again. The shelves ALL, EPUB, PDF, TEXT and COMIC filter by kind, and the search box filters by name or folder. The book you were reading stays at the top. Hold a book to remove it from the library; the file itself stays where it is.
+
+The eReader opens EPUB, PDF, plain text, Markdown and CBZ comics.
+
+## Turn pages
+
+- Tap the left or right quarter of the page to turn back or forward. Tap the wide middle to open the menu.
+- Swipe sideways to turn, when SWIPE TO TURN is on.
+- The volume keys turn pages when VOLUME KEYS TURN is on. Arrow keys, Page Up, Page Down and Space work on a keyboard.
+- In SCROLL direction the book is one long column. Drag or fling it; edge taps and keys move it by most of a screen.
+
+## The footer
+
+The bottom left shows the page. Tap the footer to cycle what the right side shows: time left in the chapter, time left in the book, pages left in the chapter, or how much you have read. Your choice is kept.
+
+Time estimates learn how fast you read. Each forward stretch of at least a few seconds at a believable pace nudges the estimate; quick flips, jumps and time with the book closed are left out. Until it has learned, it assumes about 220 words a minute.
+
+## Select, copy and translate
+
+Hold a word to select it, then drag either handle to stretch the selection; it settles on whole words when you let go. The toolbar offers Copy, Share, Pin and every app on your phone that works on selected text, such as a translator or dictionary. Tap anywhere else to clear the selection. A translator only sees the words you send it.
+
+## Pins
+
+Pin keeps the selected lines. A pinned passage is dotted underneath, with a pin beside it in the margin when the margin has room. Select over a pinned passage and the toolbar offers Unpin instead.
+
+The pin at the top of the menu pins the whole page you are on; it fills in when the page is pinned. PDFs and comics have no text to select, so pinned pages are how you mark them.
+
+The PINS tab lists PINNED LINES as quotes, with their chapter and page, then PINNED PAGES. Tap one to go there; hold it to copy or remove it. SHARE ALL sends every pinned line, with where it is, to any app as plain text. Pins stay on this phone with your place in the book.
+
+## The menu
+
+- The top bar: LIBRARY, search in the book (text books), and the page pin.
+- The slider jumps through the book.
+- CONTENTS: the book's chapters and their pages; the current one is marked.
+- TEXT: font (Literata, Mono or Sans), size, margins, line spacing and justification.
+- PAGES: DIRECTION, either L → R, R → L or SCROLL, kept separately for text books and for PDFs and comics, so R → L can suit manga alone. Also SWIPE TO TURN and VOLUME KEYS TURN.
+- E-INK: LOOK, either E-INK paper or THEME (your launcher colours, with cyberdeck frames when that is on); grey, warm, cool or night PAPER; GRAIN; REFRESH; GHOSTING.
+
+## E-ink
+
+GHOSTING leaves the last page faintly behind the new one, fading over the next few turns, as an e-ink screen does. REFRESH washes the screen grey and back every 6 turns or every turn, and clears the ghosts, like an e-ink panel's full refresh. Either can be off.
+
+PDFs and comics are shown in greys on the E-INK look. Double-tap a page to zoom in, drag to look around, and double-tap again to fit. In SCROLL, comic pages run on without a gap, for webtoons.
+
+## Carry on from Home
+
+```
+books -last
+books -last comic
+```
+
+`books -last` opens the book you read last; add epub, pdf, text or comic for the last book of that kind. In Mono, the READ panel shows your book and the last one of each other kind, and Quick has a read row. In the other modes, the READ module does the same.</string>
+    <string name="offline_help_article_ereader_title">Read books with the eReader</string>
     <string name="offline_help_article_feed_and_text_automation_body">regex supports -add, -get, -test and -rm with integer rule IDs. -get reads a saved pattern. htmlextract -query takes a filter ID, optional format ID and URL; -add takes a store type, integer ID and expression. Editing/removal changes saved expressions, and queries fetch remote URLs.
 
 RSS command rules take a rule ID, feed-selector token, regex token and remaining command text. Matches can trigger launcher commands. Do not register rules from untrusted sources or use them without understanding their side effects.
@@ -3544,7 +3708,15 @@ Messages appear immediately with their confirmation state. Server echo confirms 
     <string name="offline_help_article_irc_community_title">IRC: connect, join and talk</string>
     <string name="offline_help_article_language_packs_body">Language packs supply text, not scripts. Import validates the pack archive, resource keys and formatting arguments. Missing translations fall back to bundled English. Installed packs and the selected language stay local to Launcher; an older pack version cannot replace a newer installed version. Selecting a pack changes launcher text and layout direction, not command names or flags. External app labels, feed titles, your documents, and native calculator definitions/messages are not automatically translated. Acceptance of a partial pack does not establish translation quality.</string>
     <string name="offline_help_article_language_packs_title">Use language packs with English fallback</string>
-    <string name="offline_help_article_launcher_modes_body">Classic shows the command terminal; Search presents categorized results and inline output around the search field. Search is a different layout, not a sandbox or an assurance that text cannot execute commands: both layouts keep the launcher command path. Use mode to inspect the current mode, mode search to switch, or mode classic to return. A mode change refreshes the existing launcher UI. An active command guide can control the normal suggestion row, so use guide -off when you want normal suggestions again.
+    <string name="offline_help_article_launcher_modes_body">Launcher has five modes. `mode` on its own shows the current one and suggests the others.
+
+- classic: the command terminal.
+- search: categorized results and inline output around the search field. It still runs commands; it is a layout, not a sandbox.
+- terminal: a scrolling grid of Termux panes. It needs the Termux setup.
+- dot: a black screen with one dot. Hold the dot for a ring of apps, slide to one and lift to open it. Tap the dot for a clock, battery and temperature; double-tap it to search.
+- mono: the classic layout in one ink on one paper, with a panel home. Read Arrange the Mono home in Appearance.
+
+A mode change refreshes the launcher and keeps your settings; Mono's colours apply only while it is on. An active command guide can take over the suggestion row; use guide -off to get normal suggestions back.
 
 ## Examples
 
@@ -3552,20 +3724,34 @@ Messages appear immediately with their confirmation state. Server echo confirms 
 mode
 ```
 
-Show the selected launcher mode.
+Show the current mode and suggest the others.
+
+```
+mode mono
+```
+
+Switch to Mono.
 
 ```
 mode classic
 ```
 
-Change layout to Classic.
+Back to Classic.</string>
+    <string name="offline_help_article_launcher_modes_title">Classic, Search, Terminal, Dot and Mono</string>
+    <string name="offline_help_article_live_tv_body">## Add channels
 
-```
-mode search
-```
+`media -v` opens the media player at Videos; the TV tab is beside it. Import an M3U playlist from a file or an https link. Channels are kept on this phone; the last one you watched is remembered.
 
-Change layout to Search.</string>
-    <string name="offline_help_article_launcher_modes_title">Classic terminal and Search layout</string>
+Streams on plain http:// are not encrypted, so others on the network can see or change them. Launcher explains this before adding them: accept to keep them, or skip to leave them out.
+
+## Watch
+
+Tap a channel to play it in the video player. In Mono, the media panel plays your last channel on Home, drawn in ink. Tap it once to show its name and controls; they hide again after a few seconds. The library button opens channels, videos to carry on with, shows and music without leaving Home.
+
+Full screen plays the channel in colour from where the panel was. Back or Home hands it back to the panel. A live channel always rejoins live; a video at a link keeps its place.
+
+Leaving Home stops a live channel and frees the player, so nothing streams in the background; the panel offers to resume it when you come back. Streaming uses your connection and can use mobile data.</string>
+    <string name="offline_help_article_live_tv_title">Watch live TV channels</string>
     <string name="offline_help_article_local_profile_body">The profile card stores your name, phone, photo reference and QR entries locally in the app’s private storage. A masked phone shows only its last two characters; masking is a display feature, not encryption or authentication. A contact QR contains a generated vCard, so review the information before displaying or sharing it. QR links reject YouTube destinations and known shortened-link hosts, but that is not a guarantee that every accepted link is safe. The local profile is not a verified online identity or a synchronized account.
 
 ## Examples
@@ -3680,6 +3866,33 @@ module -dock -toggle
 
 Toggle dock visibility without removing modules.</string>
     <string name="offline_help_article_module_workflow_title">Show a native panel or register a script module</string>
+    <string name="offline_help_article_mono_home_body">## Mono
+
+`mode mono` turns Launcher into two colours: one ink on one paper, with a pixel font and square frames. Pick the pair under Preset in Mono's settings: e-ink lite (dark ink on grey paper), e-ink dark (light ink on dark paper) or custom, which shows mono_ink_color and mono_paper_color for your own pair. Everything else follows them. Your own colours, font and borders come back when you switch to another mode, because Mono changes nothing in your settings. The CRT filter, vignette and cyberdeck frames still apply when you turn them on.
+
+## The panels
+
+Home is a handheld frame: a status strip with signal, time and battery, panels on a four-column grid, an output panel over the command line, and soft keys for Apps, Search, Widgets and Settings.
+
+- scene: pixel-art weather over a skyline.
+- clock: time, date, week, battery, storage and memory.
+- apps: your apps as name chips, the most used first, then each app group.
+- media: music, or a video or TV channel drawn in ink.
+- quick: note, timer, clipboard, reminder, calc and read.
+- tasks, next and alerts: notes, what is coming up, and notifications.
+- read: the book you are reading and the last book of each other kind.
+- term: one window of the tmux workspace. Tap it and it fills the screen above the keyboard, with the terminal keys under it; hold text there to copy it, or hold empty space to paste. Back puts the keyboard away, Back again or done puts the panel back. Add as many as you like, in three sizes.
+
+Panels sit on pages: swipe left and right between them, away from the screen's edges. The squares above the command line show the page; hold them to add or remove a page. The command line stays put on every page. Set mono_layout_style to scroll to put every panel on one page that scrolls down instead.
+
+Hold a panel to change its size, move it up or down the page, swap it for another or remove it; hold a terminal to change its size or window. Each panel takes the first free spot its size fits, so a tall read:2x4 can have two small panels stacked beside it. The add panel slot at the end of a page adds one. The order is kept in mono_layout, comma separated, with a | between pages; panels fill rows left to right.
+
+```
+config -set mono_layout scene,clock,apps,media,quick,tasks|term:4x4,read,term:2x2
+```
+
+Panels only run while Home is in front. The Settings soft key opens the settings that shape this home: mode, colour preset, layout, CRT filter, vignette and weather. All settings opens the full hub.</string>
+    <string name="offline_help_article_mono_home_title">Arrange the Mono home</string>
     <string name="offline_help_article_music_and_podcasts_body">Local music needs enable_music and readable MediaStore tracks or configured folders, potentially with Android media/storage access. music -ls lists known tracks. Without a local player, next/previous/play/stop fall back to Android media key events, but listing/selection/info/seek require the local player. Notification Access provides external media sessions; preferred_music_app can filter their package. Local music enablement does not grant that access.
 
 podcast opens a separate home surface with a minimized edge pill and the shared internal player. It stores subscriptions, tags/filter/order, recent episodes, played flags and resumable progress locally. add requires an HTTPS feed; parser limits feed size/episode count and rejects DOCTYPE. refresh updates the selected show; play/next/prev control playback, rewind/forward move 30 seconds and speed accepts 0.5–2x.
@@ -3721,6 +3934,12 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
+- eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.
+- Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.
+- Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.
+- Modes: `mode` on its own suggests the other modes, and Dot mode shows how to search.
+- Presets and backups: `preset -save` asks what a preset keeps, and personal backups are a full snapshot of the launcher. Read Keep personal backup separate in Presets.
+- Touch Grass: a downloadable wallpaper you can part with a finger. Find it under Get more wallpapers in the wallpaper picker.
 - Pixel wallpapers: shoreline (time, date or your own words with waves washing over them), dither photo, ripples and doom fire, in Settings, Personalization, Re:TUI Wallpaper.
 - ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.
 - Settings search: find any setting by name or description from the Settings hub, or with settings &lt;words&gt;. Read Settings search in Appearance.
@@ -3856,23 +4075,35 @@ Switch to classic launcher layout.</string>
     <string name="offline_help_article_orientation_and_layout_title">Choose portrait, landscape, or a launcher mode</string>
     <string name="offline_help_article_permissions_and_flavors_body">F-Droid requests shared-storage access and includes direct SMS sending. On Android 11 and later, it may open Android all-files access settings before normal launcher initialization. The Play Store build uses app-owned storage instead and does not include the F-Droid direct-SMS command. Direct SMS needs the relevant contacts/number access and SEND_SMS permission; sending a message is a real action, not a preview. Android Notification Access for reading notifications is separate from permission to post the app’s own notifications. Termux and Tasker require their own companion apps and bridge/task permissions. Enabling a launcher feature does not install its companion or grant access. Available commands can differ by build and Android version.</string>
     <string name="offline_help_article_permissions_and_flavors_title">Grant only the access needed by the feature</string>
-    <string name="offline_help_article_personal_backup_body">## Protect the archive
+    <string name="offline_help_article_personal_backup_body">## What a backup holds
 
-Settings Export Backup creates a .retui-backup personal archive. Choose encryption with a password if the archive may leave trusted storage; export without password is still available. Password protection uses authenticated AES-GCM with a derived key. Forgotten passwords are not recoverable by the importer. Keep the password outside the archive.
-Personal backup includes launcher configuration folder contents and an explicit preferences allowlist, including bindings, callback auth and Space state. It can contain secrets, commands, local data and personal identifiers: do not publish it like a theme. Restore Backup validates the archive and, for a personal manifest, deletes/replaces current launcher-root files and restores included preferences. This is a destructive local restore, unlike preset-only import.
-The label full/personal does not mean every app-private asset or device setting. The current Remember note database and Markdown/assets are stored outside the archived configuration folder. Android-widget drawer and companion-keyboard shortcut preferences are also omitted. These are not protected by this backup. Termux files/apps and other Android apps are not a device-wide backup.
+Settings, Export Backup creates a .retui-backup personal archive: a snapshot of the whole launcher, to restore on this phone or a new one. It holds:
 
-## Restore is destructive
+- every file in the launcher's configuration folder: settings, presets and their wallpapers, frames, fonts, Spaces, Lua modules, RSS and webhooks;
+- your launcher settings stores: apps and groups, modules and their dock, the edge sidebar, Terminal-mode tiles, keyboard shortcuts, reminders, podcasts, playlists, the reader's settings, places and pins, media folders, TV channels and video positions;
+- private files: notes, the journal, quick notes, language packs, the book list, and the images behind Re:TUI wallpapers (dither photo, Nagomi background, wallpaper packs).
 
-## Examples
+## What it cannot hold
 
-## Coverage limits
+- Android widgets on the widgets pane, because their ids belong to this phone. Add them again.
+- Folder permissions. Android grants book and media folders to this install only: after restoring on a new phone, add the same folders again in books and media, and your places and pins come back with them.
+- A wallpaper set by another app, which Android does not let launchers read.
+- Running timers, downloaded wallpapers, calculator engines and other caches, which come back on their own or download again.
+- Termux files and other apps' data. This is not a device backup.
+
+## Protect the archive
+
+A backup can contain secrets, commands, webhooks, callback keys and personal notes: never publish it like a theme. Choose encryption with a password if the archive may leave trusted storage. It uses authenticated AES-GCM with a derived key, and a forgotten password cannot be recovered.
+
+## Restore replaces
+
+Restore Backup checks the archive, then replaces the launcher's configuration folder, the private files the backup holds and the settings stores it includes. An older backup only replaces what it knew about, so newer data such as the journal or TV channels stays. This is a destructive restore, unlike importing a preset.
 
 ```
 settings
 ```
 
-Use Export Backup/Restore Backup actions; verify file kind before restoring.</string>
+Open Settings, then use Export Backup or Restore Backup.</string>
     <string name="offline_help_article_personal_backup_title">Keep personal backup separate from portable preset sharing</string>
     <string name="offline_help_article_portable_preset_import_body">## Save first, apply later
 
@@ -4464,7 +4695,7 @@ private -lock
     <string name="offline_help_resize_width">Resize width: drag, tap to grow, long press to shrink</string>
     <string name="offline_help_root">Help home</string>
     <string name="offline_help_title">Offline manual</string>
-    <string name="offline_help_tools_body">IRC, Calculator, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher.</string>
+    <string name="offline_help_tools_body">IRC, Calculator, the eReader, live TV, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher.</string>
     <string name="offline_help_tools_title">Tools</string>
     <string name="offline_help_topics">Topics</string>
     <string name="offline_help_troubleshooting_body">Choose a numbered topic. Use 0 to return to the launcher.</string>
@@ -4578,6 +4809,25 @@ Fix or delete the file to recover your options</string>
     <string name="player_buffering">buffering</string>
     <string name="player_cancel">CANCEL</string>
     <string name="player_cant_play">Could not play %1$s. Skipping it.</string>
+    <string name="player_channels_added">%1$d new of %2$d channels added.</string>
+    <string name="player_channels_clear">CLEAR</string>
+    <string name="player_channels_clear_ask">Remove every channel? Your playlists stay where they are; import them again any time.</string>
+    <string name="player_channels_empty">No channels yet. Import an M3U playlist from a file or a URL.</string>
+    <string name="player_channels_failed">Could not import: %1$s</string>
+    <string name="player_channels_from_file">FROM FILE</string>
+    <string name="player_channels_from_url">FROM URL</string>
+    <string name="player_channels_importing">Importing channels…</string>
+    <string name="player_channels_last">Last watched: %1$s</string>
+    <string name="player_channels_none_found">No channels in that playlist.</string>
+    <string name="player_channels_plain_accept">ACCEPT</string>
+    <plurals name="player_channels_plain_message">
+        <item quantity="one">This uses http://, not https://. Nothing it sends is encrypted: anyone on your network, your provider or the stream's host can see what you watch, and can change or replace the picture and sound. Accept only if you trust this playlist and the network you are on. Accepting allows unencrypted channels from now on.</item>
+        <item quantity="other">%1$d of these channels use http://, not https://. Nothing they send is encrypted: anyone on your network, your provider or the stream's host can see what you watch, and can change or replace the picture and sound. Accept only if you trust this playlist and the network you are on. Skip leaves them out. Accepting allows unencrypted channels from now on.</item>
+    </plurals>
+    <string name="player_channels_plain_skip">SKIP</string>
+    <string name="player_channels_plain_title">Unencrypted channels</string>
+    <string name="player_channels_playlist_url">Playlist URL (M3U)</string>
+    <string name="player_channels_web_only">Use an https:// or http:// address.</string>
     <string name="player_chapter_n">Chapter %1$d</string>
     <string name="player_chapters">CHAPTERS</string>
     <string name="player_chapters_none">This episode has no chapters.</string>
@@ -4648,6 +4898,7 @@ Fix or delete the file to recover your options</string>
     <string name="player_sleep_minutes">%1$d minutes</string>
     <string name="player_sleep_off">Off</string>
     <string name="player_songs">SONGS</string>
+    <string name="player_tab_channels">TV</string>
     <string name="player_tab_music">MUSIC</string>
     <string name="player_tab_podcasts">PODCASTS</string>
     <string name="player_tab_video">VIDEO</string>
@@ -4754,6 +5005,105 @@ To apply later: preset -apply %1$s</string>
 Disabling this option hides Re:TUI access; it does not lock Private Space. Save Settings to apply your choice.</string>
     <string name="private_space_compatibility_title">Private Space compatibility</string>
     <string name="private_space_enable_command">Enable command</string>
+    <string name="reader_add_folder">ADD FOLDER</string>
+    <string name="reader_bookmark">Pin this page</string>
+    <string name="reader_cannot_open">Could not open %1$s. The file may be damaged or protected.</string>
+    <string name="reader_chapter_n">Chapter %1$d</string>
+    <string name="reader_continue">CONTINUE READING</string>
+    <string name="reader_copied">Copied</string>
+    <string name="reader_count">%1$d books</string>
+    <string name="reader_dir_ltr">L → R</string>
+    <string name="reader_dir_rtl">R → L</string>
+    <string name="reader_dir_scroll">SCROLL</string>
+    <string name="reader_direction">DIRECTION</string>
+    <string name="reader_direction_note">Text books, and PDFs with comics, each keep their own direction: R → L suits manga. Scrolling reads as one long column; taps at the edges and the volume keys move it a screen at a time.</string>
+    <string name="reader_done">done</string>
+    <string name="reader_double_tap_zoom">double-tap to zoom</string>
+    <string name="reader_empty">No books yet. ADD FOLDER picks a folder of EPUB, PDF, TXT, Markdown or CBZ files; OPEN FILE opens a single book.</string>
+    <string name="reader_empty_scanned">No books found in your folders. Add another folder, or press SCAN after adding files.</string>
+    <string name="reader_faint">FAINT</string>
+    <string name="reader_find">FIND</string>
+    <string name="reader_font">FONT</string>
+    <string name="reader_font_mono">Mono</string>
+    <string name="reader_font_sans">Sans</string>
+    <string name="reader_ghost_note">Each turn leaves the last page faintly behind the new one, fading over the next few turns, like an e-ink screen. A refresh washes the screen grey and clears what was left behind.</string>
+    <string name="reader_ghosting">GHOSTING</string>
+    <string name="reader_grain">GRAIN</string>
+    <string name="reader_justify">JUSTIFY</string>
+    <string name="reader_larger">Larger text</string>
+    <string name="reader_left_book">%1$s left in book</string>
+    <string name="reader_left_chapter">%1$s left in chapter</string>
+    <string name="reader_library">&lt; LIBRARY</string>
+    <string name="reader_look">LOOK</string>
+    <string name="reader_look_eink">E-INK</string>
+    <string name="reader_look_theme">THEME</string>
+    <string name="reader_margins">MARGINS</string>
+    <string name="reader_module_continue">continue</string>
+    <string name="reader_module_library">library</string>
+    <string name="reader_module_none">No book open yet. Open the library to add a folder of books.</string>
+    <string name="reader_new">new</string>
+    <string name="reader_no_pages">This book has no pages.</string>
+    <string name="reader_none_match">No books match.</string>
+    <string name="reader_not_a_book">That file is not a book the reader opens. It reads EPUB, PDF, TXT, Markdown and CBZ.</string>
+    <string name="reader_not_found">No more matches for “%1$s”.</string>
+    <string name="reader_off">OFF</string>
+    <string name="reader_on">ON</string>
+    <string name="reader_open_file">OPEN FILE</string>
+    <string name="reader_opening">Opening %1$s…</string>
+    <string name="reader_page_n">Page %1$d</string>
+    <string name="reader_pages_empty">Tap the pin at the top to pin the page you are on.</string>
+    <plurals name="reader_pages_left">
+        <item quantity="one">%1$d page left in chapter</item>
+        <item quantity="other">%1$d pages left in chapter</item>
+    </plurals>
+    <string name="reader_paper">PAPER</string>
+    <string name="reader_paper_cool">Cool paper</string>
+    <string name="reader_paper_grey">Grey paper</string>
+    <string name="reader_paper_night">Night: light ink on dark</string>
+    <string name="reader_paper_warm">Warm paper</string>
+    <string name="reader_percent_read">%1$d%% read</string>
+    <string name="reader_pin">Pin</string>
+    <string name="reader_pinned_lines">PINNED LINES · %1$d</string>
+    <string name="reader_pinned_pages">PINNED PAGES · %1$d</string>
+    <string name="reader_pins_empty">Hold a word, stretch the selection over the lines you want, then tap Pin.</string>
+    <string name="reader_pins_note">Tap to go there. Hold to copy or remove.</string>
+    <string name="reader_position">Place in the book</string>
+    <string name="reader_real">REAL</string>
+    <string name="reader_refresh">REFRESH</string>
+    <string name="reader_refresh_every">EVERY</string>
+    <string name="reader_refresh_six">EVERY 6</string>
+    <string name="reader_remove">REMOVE</string>
+    <string name="reader_remove_body">Remove %1$s from the library and forget your place in it? The file itself stays where it is.</string>
+    <string name="reader_remove_pin">Remove</string>
+    <string name="reader_remove_title">Remove from library</string>
+    <string name="reader_rescan">SCAN</string>
+    <string name="reader_scanning">Scanning…</string>
+    <string name="reader_search">Search in book</string>
+    <string name="reader_search_books">Search books</string>
+    <string name="reader_search_hint">Words to find</string>
+    <string name="reader_share">Share</string>
+    <string name="reader_share_all">SHARE ALL</string>
+    <string name="reader_shelf_all">ALL</string>
+    <string name="reader_shelf_comic">COMIC</string>
+    <string name="reader_shelf_epub">EPUB</string>
+    <string name="reader_shelf_pdf">PDF</string>
+    <string name="reader_shelf_text">TEXT</string>
+    <string name="reader_size">SIZE</string>
+    <string name="reader_smaller">Smaller text</string>
+    <string name="reader_spacing">LINE SPACING</string>
+    <string name="reader_strong">STRONG</string>
+    <string name="reader_swipe">SWIPE TO TURN</string>
+    <string name="reader_tab_contents">CONTENTS</string>
+    <string name="reader_tab_eink">E-INK</string>
+    <string name="reader_tab_pages">PAGES</string>
+    <string name="reader_tab_pins">PINS</string>
+    <string name="reader_tab_text">TEXT</string>
+    <string name="reader_time_hours">%1$d h %2$02d min</string>
+    <string name="reader_time_min">%1$d min</string>
+    <string name="reader_title">BOOKS</string>
+    <string name="reader_unpin">Unpin</string>
+    <string name="reader_unpin_page">Unpin this page</string>
+    <string name="reader_volume_keys">VOLUME KEYS TURN</string>
     <string name="reminder_add_reminder">ADD REMINDER</string>
     <string name="reminder_add_title">Add reminder</string>
     <string name="reminder_cancel">CANCEL</string>
@@ -4903,7 +5253,10 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_max_lines_description">Set maximum number of lines that will be shown in the terminal (if -1, this feature is be disabled)</string>
     <string name="setting_behavior_max_optional_depth_description">A value which is used to tell how deep Re:T-UI can go in a nested optional value</string>
     <string name="setting_behavior_mono_ink_color_description">In Mono mode, the colour everything is drawn in: text, lines and selections.</string>
+    <string name="setting_behavior_mono_layout_description">In Mono mode, the home panels in order on a four-column grid, separated by commas: scene, clock, apps, media, quick, tasks, next, alerts, read, term. A | starts a new page. A size can follow a name, such as read:2x4 or term:4x2; each panel takes the first free spot its size fits. Hold a panel on the home to resize, move, swap or remove it, and use the add panel slot to add one.</string>
+    <string name="setting_behavior_mono_layout_style_description">In Mono mode, how the home holds more panels than fit: pages, swiped left and right, or scroll, everything on one page that scrolls down.</string>
     <string name="setting_behavior_mono_paper_color_description">In Mono mode, the background colour.</string>
+    <string name="setting_behavior_mono_preset_description">In Mono mode, the pair of colours: e-ink lite (dark ink on grey paper), e-ink dark (light ink on dark paper), or custom, your own ink and paper.</string>
     <string name="setting_behavior_multiple_cmd_separator_description">The separator between two or more commands in a single input</string>
     <string name="setting_behavior_network_info_format_description">Define the network format</string>
     <string name="setting_behavior_not_available_text_description">The text shown when a value is not available</string>
@@ -6692,6 +7045,8 @@ Ready for the next command</string>
     <string name="wallpaper_topo_noise">Topo noise</string>
     <string name="wallpaper_topo_pick_color">Pick Topo Color</string>
     <string name="wallpaper_topo_relief">RELIEF</string>
+    <string name="wallpaper_touch_grass">touch grass</string>
+    <string name="wallpaper_touch_grass_credit">Touch grass · inspired by Dylearn's 3D Pixel Art Grass demo (github.com/DylearnDev)</string>
     <string name="weather_condition_clearsky">Clear</string>
     <string name="weather_condition_cloudy">Cloudy</string>
     <string name="weather_condition_fair">Fair</string>

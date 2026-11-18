@@ -56,6 +56,13 @@ class TerminalGridView @JvmOverloads constructor(
      * Where pasted text goes; set by the pane that owns the terminal. Without it the selection menu only copies.
      */
     var onPasteText: ((String) -> Unit)? = null
+
+    /** One ink on one paper: colours drop to the foreground, and any background inverts the cell. */
+    var monochrome = false
+        set(value) { field = value; streamEmulator?.let { setEmulatorFrame(it) } ?: invalidate() }
+
+    /** Whether a long press selects text; off where the long press belongs to the parent. */
+    var selectable = true
     private val selection = TextSelection()
 
     init {
@@ -219,7 +226,7 @@ class TerminalGridView @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean =
-        selection.touch(event) || super.dispatchTouchEvent(event)
+        (selectable && selection.touch(event)) || super.dispatchTouchEvent(event)
 
     /**
      * Long-press text selection, as in Termux: a long press selects the word under the finger and dragging
@@ -539,6 +546,10 @@ class TerminalGridView @JvmOverloads constructor(
     }
 
     private fun resolveStyle(style: Style): ResolvedStyle {
+        if (monochrome) {
+            val inverted = style.reverse xor (style.background != null)
+            return if (inverted) ResolvedStyle(terminalBackground, terminalForeground) else ResolvedStyle(terminalForeground, null)
+        }
         var foreground = style.foreground ?: terminalForeground
         var background = style.background
         if (style.reverse) {

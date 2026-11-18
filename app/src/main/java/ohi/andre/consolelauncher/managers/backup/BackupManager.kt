@@ -51,10 +51,21 @@ object BackupManager {
     private const val MANIFEST_FILE = "manifest.txt"
     private const val SHARED_PREFS_DIR = "shared_prefs/"
     private const val PRIVATE_FILES_DIR = "app_files/"
-    internal val personalPrivateFileNames = listOf(
+    /** The private files a schema 2 backup holds; restoring one leaves every other private file alone. */
+    internal val schemaTwoPrivateFileNames = listOf(
         "remember-notes.xml", "remember-notes.xml.bak", "notes-library", "images",
         "launcher-language-packs", "launcher_frames", "fonts"
     )
+    /**
+     * Everything a personal backup keeps from the app's private files: notes, the journal, quick notes, TV channels,
+     * the book list, and the images behind the wallpapers.
+     */
+    internal val personalPrivateFileNames = schemaTwoPrivateFileNames + listOf(
+        "journal", "quick-notes.json", "channels.json", "book-index.json",
+        "dither-photo.jpg", "nagomi-background.jpg", "wallpaper-packs"
+    )
+    /** The personal backup's schema: 3 added the private files after [schemaTwoPrivateFileNames]. */
+    private const val PERSONAL_SCHEMA = "3"
     private val MAX_BACKUP_BYTES = 32L * 1024L * 1024L
     private val ENCRYPTED_MAGIC = kotlin.byteArrayOf(
         'R'.code.toByte(),
@@ -118,7 +129,34 @@ object BackupManager {
         TermuxWorkspaceLauncherManager.PREFS,
         "changelogPrefs",
         "launcher-language",
-        "remember-theme"
+        "remember-theme",
+        "reader",
+        "book_library",
+        "book_places",
+        "media_library",
+        "media_channels",
+        "video_resume",
+        "retui_keyboard_shortcuts",
+        "irc_pane",
+        "terminal_home",
+        "terminal_windows",
+        "retui_workspace_surface",
+        "retui_focus_friction",
+        "apps_last_launch",
+        "retui_preset_wallpaper",
+        "retui_weather",
+        "retui_files",
+        "notes-split",
+        "offline_help_reader"
+    )
+
+    /**
+     * Stores a personal backup leaves out on purpose: Android widget ids and running timers belong to this phone and
+     * this moment, and the rest are caches or one-off states that are fetched or made again.
+     */
+    internal val excludedSharedPreferenceNames = setOf(
+        "android_widget_drawer", "clock_timer", "preset_marketplace", "retui_module_library",
+        "retui_startup_preview", "busybox_prefs", "retui_wallpaper_pending"
     )
 
     internal fun personalSharedPreferenceNames(): List<kotlin.String> = PERSONAL_PREFS.filterNotNull()
@@ -368,7 +406,7 @@ object BackupManager {
             val personal = validatePackage(manifest, entries)
             if (personal) {
                 synchronized(ohi.andre.consolelauncher.notes.NoteStore.lock) {
-                    restorePersonalBackup(context, tempDir, manifestValue(manifest, "schema") == "2")
+                    restorePersonalBackup(context, tempDir, privateFileNamesFor(manifestValue(manifest, "schema")))
                 }
                 context.applicationContext.sendBroadcast(
                     Intent(RetuiWallpaperService.ACTION_REFRESH).setPackage(context.packageName)
@@ -501,11 +539,11 @@ object BackupManager {
 
         return when (type) {
             TYPE_BACKUP -> {
-                kotlin.require(schema == "1" || schema == "2") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_backup_schema_94afd) }
+                kotlin.require(schema == "1" || schema == "2" || schema == PERSONAL_SCHEMA) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_unsupported_backup_schema_94afd) }
                 kotlin.require(profile == "personal") { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_invalid_personal_backup_profile_e275d) }
                 kotlin.require(entries.containsAll(REQUIRED_PERSONAL_ENTRIES)) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_personal_backup_is_incomplete_838a0) }
                 require(entries.filter { it.startsWith(PRIVATE_FILES_DIR) }.all { entry ->
-                    schema == "2" && personalPrivateFileNames.any { name ->
+                    privateFileNamesFor(schema).any { name ->
                         entry == PRIVATE_FILES_DIR + name || entry.startsWith(PRIVATE_FILES_DIR + name + "/")
                     }
                 }) { "Unsupported private backup file" }
@@ -606,7 +644,7 @@ object BackupManager {
             ohi.andre.consolelauncher.managers.backup.BackupManager.addTextEntry(
                 zip, ohi.andre.consolelauncher.managers.backup.BackupManager.MANIFEST_FILE,
                 ("type=" + ohi.andre.consolelauncher.managers.backup.BackupManager.TYPE_BACKUP + "\n"
-                        + "schema=2\n"
+                        + "schema=" + PERSONAL_SCHEMA + "\n"
                         + "profile=personal\n"
                         + "appVersion=" + BuildConfig.VERSION_NAME + "\n")
             )
@@ -802,7 +840,14 @@ object BackupManager {
         }
     }
 
-    private fun restorePersonalBackup(context: Context, staging: File, includesPrivateFiles: Boolean) {
+    /** The private files a backup of [schema] speaks for: a restore replaces or removes only these. */
+    internal fun privateFileNamesFor(schema: String?): List<String> = when (schema) {
+        "2" -> schemaTwoPrivateFileNames
+        PERSONAL_SCHEMA -> personalPrivateFileNames
+        else -> emptyList()
+    }
+
+    private fun restorePersonalBackup(context: Context, staging: File, privateFiles: List<String>) {
         val root = Tuils.getFolder()
         val replacements = linkedMapOf<File, File?>()
         val incoming = requireNotNull(staging.listFiles()).filter {
@@ -814,8 +859,8 @@ object BackupManager {
             !it.name.startsWith(".restore-") && !it.name.endsWith(BACKUP_SUFFIX)
         }.forEach { replacements[it] = null }
         incoming.forEach { replacements[File(root, it.name)] = it }
-        if (includesPrivateFiles) {
-            personalPrivateFileNames.forEach { name ->
+        run {
+            privateFiles.forEach { name ->
                 replacements[File(context.filesDir, name)] = File(staging, PRIVATE_FILES_DIR + name).takeIf { it.exists() }
             }
         }

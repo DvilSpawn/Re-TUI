@@ -29,6 +29,7 @@ import ohi.andre.consolelauncher.wallpaper.pixel.DoomFireView
 import ohi.andre.consolelauncher.wallpaper.pixel.PhotoDitherView
 import ohi.andre.consolelauncher.wallpaper.pixel.PixelWallpaperView
 import ohi.andre.consolelauncher.wallpaper.pixel.RipplesView
+import ohi.andre.consolelauncher.wallpaper.pixel.TouchGrassView
 import ohi.andre.consolelauncher.wallpaper.pixel.ShorelineView
 
 internal fun shouldScheduleWallpaperFrame(
@@ -434,6 +435,7 @@ class RetuiWallpaperService : WallpaperService() {
             MatrixRainView.SCENE -> MatrixRainView(settingsContext)
             PhotoDitherView.SCENE -> PhotoDitherView(settingsContext)
             RipplesView.SCENE -> RipplesView(settingsContext)
+            TouchGrassView.SCENE -> TouchGrassView(settingsContext)
             DoomFireView.SCENE -> DoomFireView(settingsContext)
             ShorelineView.SCENE -> ShorelineView(settingsContext)
             TopoNoiseView.SCENE -> TopoNoiseView(settingsContext).apply { loadPosition() }
@@ -452,6 +454,7 @@ class RetuiWallpaperService : WallpaperService() {
             MatrixRainView.SCENE -> view is MatrixRainView
             PhotoDitherView.SCENE -> view is PhotoDitherView
             RipplesView.SCENE -> view is RipplesView
+            TouchGrassView.SCENE -> view is TouchGrassView
             DoomFireView.SCENE -> view is DoomFireView
             ShorelineView.SCENE -> view is ShorelineView
             TopoNoiseView.SCENE -> view is TopoNoiseView

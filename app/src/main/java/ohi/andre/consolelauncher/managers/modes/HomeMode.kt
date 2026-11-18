@@ -83,6 +83,8 @@ internal interface HomeModeHost {
     val keyboardUp: Boolean
     fun applyDisplayMargins()
     fun launchSettings()
+    fun appDrawer()
+    fun widgetDrawer()
     fun configureSearchLayout(closeDrawers: Boolean)
     fun activateInput()
     fun refreshSuggestions()

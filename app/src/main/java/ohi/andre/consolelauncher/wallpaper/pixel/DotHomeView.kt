@@ -221,9 +221,14 @@ class DotHomeView(context: Context) : PixelWallpaperView(context, GRID) {
         if (x in 0 until gw && y in 0 until gh) px[y * gw + x] = color
     }
 
+    private val hint = context.getString(ohi.andre.consolelauncher.R.string.dot_home_search_hint)
+
     /** App names sit where each ring crosses the top, cut into the ring like a pane title. */
     override fun drawOverlay(canvas: Canvas) {
-        if (!holding) return
+        if (!holding) {
+            drawHint(canvas)
+            return
+        }
         val now = SystemClock.uptimeMillis()
         val pad = labelPaint.textSize * 0.35f
         shown.forEachIndexed { i, ring ->
@@ -238,6 +243,14 @@ class DotHomeView(context: Context) : PixelWallpaperView(context, GRID) {
             labelPaint.color = if (active) palette[0] else palette[2]
             canvas.drawText(ring.label, centerX, y - (metrics.ascent + metrics.descent) / 2f, labelPaint)
         }
+    }
+
+    /** How to search, small and half see-through at the bottom middle, above the navigation bar. */
+    private fun drawHint(canvas: Canvas) {
+        val bar = rootWindowInsets?.let { androidx.core.view.WindowInsetsCompat.toWindowInsetsCompat(it, this)
+            .getInsets(androidx.core.view.WindowInsetsCompat.Type.navigationBars()).bottom } ?: 0
+        labelPaint.color = palette[2] and 0x00FFFFFF or 0x80000000.toInt()
+        canvas.drawText(hint, centerX, height - bar - resources.displayMetrics.density * 24f, labelPaint)
     }
 
     private fun startHold() {

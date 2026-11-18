@@ -89,6 +89,10 @@ class VideoPlayerActivity : VideoActivity() {
     private var trackedUri: String? = null
     private var trackedPos = 0L
     private var trackedDur = 0L
+    /** Opened from the mono media panel, which takes the channel back when this closes. */
+    private var fromHome = false
+    /** Home was pressed while opened from the mono panel: closing then hands the channel back. */
+    private var leftForHome = false
 
     private lateinit var root: FrameLayout
     private lateinit var pane: FrameLayout
@@ -188,9 +192,10 @@ class VideoPlayerActivity : VideoActivity() {
 
     private fun handleIntent(intent: Intent) {
         val uri = intent.getStringExtra(EXTRA_URI) ?: return
-        val item = videos().firstOrNull { it.uri == uri } ?: return
+        val item = videos().firstOrNull { it.uri == uri } ?: Channels.find(this, uri)?.let(Channels::item) ?: return
         // After start over the library has cleared these positions; the old video must not write its own back.
         if (intent.getBooleanExtra(EXTRA_FORGET, false)) trackedUri = null
+        fromHome = intent.getBooleanExtra(EXTRA_FROM_HOME, false)
         open(item, intent.getLongExtra(EXTRA_START_AT, 0))
     }
 
@@ -326,12 +331,15 @@ class VideoPlayerActivity : VideoActivity() {
         if (parkedOnWatched) { if (player.isPlaying) parkedOnWatched = false else return }
         val uri = currentUri() ?: return
         if (uri != trackedUri) return
-        trackedPos = player.currentPosition
+        if (Channels.isStream(uri)) { Channels.keepSpot(uri, player); trackedPos = Channels.spot(uri) }
+        else trackedPos = player.currentPosition
         trackedDur = knownDuration().takeIf { it > 0 } ?: trackedDur
     }
 
     private fun saveTracked() {
         val uri = trackedUri ?: return
+        // Channels are not kept in the resume list; track() hands where it was to the home panel, this keeps which one.
+        if (Channels.isStream(uri)) { Channels.remember(this, uri); return }
         resume.edit().putString(uri, "$trackedPos|$trackedDur").putString(KEY_LAST, uri).apply()
     }
 
@@ -341,16 +349,19 @@ class VideoPlayerActivity : VideoActivity() {
     private fun open(item: MediaLibrary.Item, startAt: Long) {
         track()
         saveTracked()
-        playlist = videos().filter { it.folder == item.folder }
+        // A channel's playlist is the channel list, so next and previous zap.
+        playlist = if (item.folder == Channels.FOLDER) Channels.items(this) else videos().filter { it.folder == item.folder }
         playlistRows.rows = playlist.mapIndexed { i, v -> Row(null, v, i + 1) }
         val dur = saved(item.uri).second
         player.setMediaItems(playlist.map(::mediaItem),
             playlist.indexOf(item).coerceAtLeast(0), startAt)
         trackedUri = item.uri
         nowPlaying = item.uri
+        if (item.folder == Channels.FOLDER) Channels.remember(this, item.uri)
         trackedPos = startAt
         trackedDur = dur
-        listTitle.text = getString(R.string.media_video_playlist, item.folder.substringAfterLast('/'))
+        listTitle.text = if (item.folder == Channels.FOLDER) getString(R.string.player_tab_channels)
+            else getString(R.string.media_video_playlist, item.folder.substringAfterLast('/'))
         title.text = item.name
         player.setPlaybackParameters(PlaybackParameters(speed))
         player.prepare()
@@ -669,9 +680,19 @@ class VideoPlayerActivity : VideoActivity() {
     private fun goBack() {
         when {
             playlistOpen -> togglePlaylist()
+            fromHome -> handBack()
             player.isPlaying && enterPip() -> showLibrary()
             else -> { showLibrary(); finish() }
         }
+    }
+
+    /** Back to the home panel: save where this was before the home resumes, so it picks up from here. */
+    private fun handBack() {
+        track()
+        saveTracked()
+        player.pause()
+        nowPlaying = null
+        finish()
     }
 
     private fun showLibrary() = startActivity(Intent(this, MediaPlayerActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -703,7 +724,8 @@ class VideoPlayerActivity : VideoActivity() {
                 pipAction(androidx.media3.session.R.drawable.media3_icon_skip_forward_10, R.string.media_video_forward10_desc, PIP_FORWARD)
             ))
         // Going home mid-video slides straight into the window on Android 12 and up.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setAutoEnterEnabled(playing)
+        // From the home panel it goes back to the panel instead.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) builder.setAutoEnterEnabled(playing && !fromHome)
         return builder.build()
     }
 
@@ -716,7 +738,8 @@ class VideoPlayerActivity : VideoActivity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && player.isPlaying) enterPip()
+        if (fromHome) leftForHome = true
+        else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && player.isPlaying) enterPip()
     }
 
     override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean, newConfig: Configuration) {
@@ -743,6 +766,8 @@ class VideoPlayerActivity : VideoActivity() {
         saveTracked()
         if (isFinishing) nowPlaying = null // The library redraws on resume, before this screen's onDestroy.
         if (!isPipNow()) player.pause()
+        // Pressing Home from a channel opened on the mono home hands it back to the panel there.
+        if (leftForHome && !isFinishing) { nowPlaying = null; finish() }
     }
 
     private fun isPipNow() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && isInPictureInPictureMode

@@ -287,6 +287,10 @@ object XMLPrefsManager {
         "rss_download_message_color" to "rss_download_message_text_color"
     )
 
+    /** Mono's colours before they matched the PDA look. */
+    private const val OLD_MONO_INK = "#FFF2F0E6"
+    private const val OLD_MONO_PAPER = "#FF0A0A0A"
+
     private val BEHAVIOR_RENAMES = arrayOf(
         "tui_notification_time_color" to "tui_notification_time_text_color",
         "tui_notification_input_color" to "tui_notification_input_text_color"
@@ -335,6 +339,16 @@ object XMLPrefsManager {
                     }
                 }
                 root.removeChild(legacy)
+                changed = true
+            }
+            // Saving any setting writes every default out, so the old cream-on-black mono pair sits in most files.
+            // Left exactly as it was, it moves to the current default: blue ink on navy, like a PDA's screen.
+            val ink = findDirectChild(root, "mono_ink_color")
+            val paper = findDirectChild(root, "mono_paper_color")
+            if (ink != null && paper != null &&
+                ink.getAttribute(VALUE_ATTRIBUTE).equals(OLD_MONO_INK, true) && paper.getAttribute(VALUE_ATTRIBUTE).equals(OLD_MONO_PAPER, true)) {
+                ink.setAttribute(VALUE_ATTRIBUTE, ohi.andre.consolelauncher.managers.xml.options.Behavior.mono_ink_color.defaultValue())
+                paper.setAttribute(VALUE_ATTRIBUTE, ohi.andre.consolelauncher.managers.xml.options.Behavior.mono_paper_color.defaultValue())
                 changed = true
             }
         }

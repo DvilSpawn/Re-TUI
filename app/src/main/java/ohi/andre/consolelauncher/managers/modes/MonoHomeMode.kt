@@ -5,6 +5,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import ohi.andre.consolelauncher.R
+import ohi.andre.consolelauncher.commands.tuixt.TuixtActivity
 import ohi.andre.consolelauncher.managers.terminal.TerminalManager
 import ohi.andre.consolelauncher.managers.apps.AppsManager
 import ohi.andre.consolelauncher.managers.modules.ReminderManager
@@ -17,8 +18,12 @@ import ohi.andre.consolelauncher.tuils.interfaces.OnTextChanged
 
 /** Mono mode: its own two-colour home over the (themed) classic layout, which stays underneath for drawers. */
 internal class MonoHomeMode(private val host: HomeModeHost) : HomeMode {
+    private companion object { const val TOP_APPS = 15 }
+
     private var mono: MonoHomeView? = null
     private var suggestions: SuggestionsManager? = null
+    /** Set while a panel runs a command, so it does not open the output panel. */
+    private var quiet = false
 
     override val managesOwnKeyboard get() = true
 
@@ -27,14 +32,20 @@ internal class MonoHomeMode(private val host: HomeModeHost) : HomeMode {
         val view = mono ?: MonoHomeView(host.context, source()).also { mono = it; wireSearch(it) }
         if (view.parent == null) root.addView(view, FrameLayout.LayoutParams(-1, -1))
         view.bringToFront()
+        view.start()
         host.hideKeyboard()
     }
 
     override fun onStart() {
         mono?.closeInput()
-        mono?.refresh()
+        mono?.start()
         host.hideKeyboard()
     }
+
+    // The home owns its panels' lives: they run only while it is in front.
+    override fun onResume() { mono?.start() }
+    override fun onPause() { mono?.stop() }
+    override fun dispose() { mono?.stop() }
 
     override fun handleBack(): Boolean {
         val view = mono ?: return false
@@ -42,9 +53,9 @@ internal class MonoHomeMode(private val host: HomeModeHost) : HomeMode {
         return true
     }
 
-    // Mono answers in its own session pane; nothing underneath needs to show.
+    // Mono answers in its own output panel; nothing underneath needs to show.
     override fun beforeSearchCommand(command: String) {
-        mono?.echo(command)
+        if (!quiet) mono?.echo(command)
     }
 
     override fun afterSearchCommand() {
@@ -64,7 +75,7 @@ internal class MonoHomeMode(private val host: HomeModeHost) : HomeMode {
     private fun source(): MonoHomeView.Source {
         val apps = host.pack.appsManager
         val launch = { app: AppsManager.LaunchInfo ->
-            MonoHomeView.Action(app.publicLabel?.lowercase(java.util.Locale.getDefault()).orEmpty()) {
+            MonoHomeView.Action(app.publicLabel.orEmpty()) {
                 apps.launch(host.context, app)
             }
         }
@@ -117,7 +128,26 @@ internal class MonoHomeMode(private val host: HomeModeHost) : HomeMode {
                     }
                 )
             },
-            chips = { HomeApps.picks(host.pack.appsManager).map(launch) }
+            appTabs = {
+                val tabs = ArrayList<MonoHomeView.Tab>()
+                val top = runCatching {
+                    (HomeApps.picks(apps) + apps.rankedApps(AppsManager.Ranking.MOST_USED, TOP_APPS).map { it.first } +
+                        apps.shownApps().sortedBy { it.publicLabel?.lowercase(java.util.Locale.getDefault()) })
+                        .distinctBy { it.write() }.take(TOP_APPS)
+                }.getOrDefault(emptyList())
+                tabs += MonoHomeView.Tab(host.context.getString(R.string.mono_apps_top), top.map(launch))
+                runCatching { apps.groups.toList() }.getOrDefault(emptyList()).filter { it.apps.isNotEmpty() }.forEach { group ->
+                    tabs += MonoHomeView.Tab(group.name, group.apps.map(launch))
+                }
+                tabs
+            },
+            run = { command ->
+                quiet = true
+                try { host.executeSearchCommand(command) } finally { quiet = false }
+            },
+            openApps = { host.appDrawer() },
+            openWidgets = { host.widgetDrawer() },
+            openSettings = { host.context.startActivity(TuixtActivity.monoSettingsIntent(host.context)) }
         )
     }
 

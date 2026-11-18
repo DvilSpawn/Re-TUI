@@ -48,7 +48,8 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.tuixt.TuixtDialog
 import ohi.andre.consolelauncher.commands.tuixt.TuixtLayout
 import ohi.andre.consolelauncher.help.PanelBackdrop
-import ohi.andre.consolelauncher.managers.media.VideoActivity
+import ohi.andre.consolelauncher.managers.media.WorkspaceActivity
+import ohi.andre.consolelauncher.managers.media.Channels
 import ohi.andre.consolelauncher.managers.media.MediaLibrary
 import ohi.andre.consolelauncher.managers.media.VideoMath
 import ohi.andre.consolelauncher.managers.media.VideoPlayerActivity
@@ -73,28 +74,11 @@ import java.util.Locale
  * The media player: music, video and podcast libraries, what is playing, and the queue. It steers the playback the
  * launcher already runs. Videos play in [VideoPlayerActivity], which needs a task of its own for picture-in-picture.
  */
-class MediaPlayerActivity : VideoActivity() {
+class MediaPlayerActivity : WorkspaceActivity() {
     private enum class Screen { LIBRARY, PLAYER, QUEUE }
-    enum class Tab { MUSIC, VIDEO, PODCASTS }
+    enum class Tab { MUSIC, VIDEO, CHANNELS, PODCASTS }
     private enum class Shelf { NEW, SHOWS, RECENT, OFFLINE, EPISODES }
     private enum class Panel { UP_NEXT, LYRICS, EQ, SLEEP, NOTES, CHAPTERS }
-
-    private class Line(val title: String, val sub: String = "", val meta: String = "", val on: Boolean = false,
-        val tap: (() -> Unit)? = null, val hold: (() -> Unit)? = null, val header: Boolean = false, val wrap: Boolean = false)
-
-    override val font: Typeface by lazy { Tuils.getTypeface(this) ?: Typeface.DEFAULT }
-    override val border by lazy { ThemeColorResolver.color(Theme.workspace_panel_border_color) }
-    override val ink by lazy { ThemeColorResolver.color(Theme.workspace_panel_text_color) }
-    override val sel by lazy { ThemeColorResolver.color(Theme.selection_background_color) }
-    override val head by lazy { ThemeColorResolver.color(Theme.workspace_panel_text_color) }
-    override val dim by lazy { ThemeColorResolver.color(Theme.muted_text_color) }
-    override val ground by lazy { ThemeColorResolver.color(Theme.workspace_panel_background_color) }
-    override val onSelected by lazy { ThemeColorResolver.color(Theme.selection_text_color) }
-    override val control by lazy { ThemeColorResolver.color(Theme.workspace_control_text_color) }
-
-    /** Controls follow the launcher's dashed-border and corner settings, but a custom frame image is for whole panels. */
-    override fun outline(color: Int, fill: Int, radius: Int): Drawable = TerminalBorderRuntime.panelDrawable(this, fill, color, 1f,
-        AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), cyberdeckNotch = false, frameEnabled = false)
 
     private val handler = Handler(Looper.getMainLooper())
     private val pack get() = LauncherActivity.instance?.uiManager?.pack
@@ -142,6 +126,9 @@ class MediaPlayerActivity : VideoActivity() {
     private lateinit var filterBox: EditText
     private lateinit var browseRow: View
     private lateinit var podcastRow: View
+    private lateinit var channelRow: View
+    /** The last import's outcome, shown above the channel list. */
+    private var channelNote: String? = null
     private lateinit var tagScroll: HorizontalScrollView
     private lateinit var tagRow: LinearLayout
     private lateinit var addOrSort: TextView
@@ -182,46 +169,6 @@ class MediaPlayerActivity : VideoActivity() {
         }
     }
 
-    /** The same window as help and the Termux console: one framed panel with a title tab, the launcher dimmed behind. */
-    private fun buildWindow(content: View): View {
-        val panel = FrameLayout(this).apply {
-            clipChildren = false
-            background = TerminalBorderRuntime.panelDrawable(context, ground, border, 1.5f,
-                AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
-            setPadding(dp(8), dp(22), dp(8), dp(8))
-            addView(content, FrameLayout.LayoutParams(-1, -1))
-        }
-        val header = label(getString(R.string.player_title), ThemeColorResolver.color(Theme.workspace_header_text_color), LauncherFontScale.terminalTextSizeSp()).apply {
-            gravity = Gravity.CENTER_VERTICAL
-            isSingleLine = true
-            setPadding(dp(10), 0, dp(10), 0)
-            background = TerminalBorderRuntime.tabDrawable(context, ThemeColorResolver.color(Theme.workspace_header_background_color), FrameTarget.OVERLAYS)
-        }
-        val root = FrameLayout(this).apply {
-            clipChildren = false
-            setPadding(dp(8), 0, dp(8), dp(4))
-            addView(panel, FrameLayout.LayoutParams(-1, -1).apply { topMargin = dp(18); bottomMargin = dp(2) })
-            addView(header, FrameLayout.LayoutParams(-2, dp(20)).apply { leftMargin = dp(48); topMargin = dp(8) })
-        }
-        val screen = FrameLayout(this).apply {
-            isFocusableInTouchMode = true
-            // It only holds focus to keep the keyboard away from the search box, so it must not look focused.
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) defaultFocusHighlightEnabled = false
-        }
-        val viewport = FrameLayout(this)
-        TuixtLayout.addFoldAwareHost(this, screen, ViewGroup.LayoutParams.MATCH_PARENT).addView(viewport, ViewGroup.LayoutParams(-1, -1))
-        PanelBackdrop.install(viewport)
-        viewport.addView(root, FrameLayout.LayoutParams(-1, -1))
-        TerminalBorderRuntime.bind(panel, header)
-        ViewCompat.setOnApplyWindowInsetsListener(screen) { view, insets ->
-            val safe = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout() or WindowInsetsCompat.Type.ime())
-            view.setPadding(safe.left, safe.top, safe.right, safe.bottom)
-            WindowInsetsCompat.CONSUMED
-        }
-        screen.post { screen.requestFocus() }
-        return screen
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         LauncherSystemUi.requestNoTitleIfFullscreen(this)
         super.onCreate(savedInstanceState)
@@ -242,7 +189,7 @@ class MediaPlayerActivity : VideoActivity() {
         player = buildPlayer()
         queue = buildQueue()
         val content = FrameLayout(this).apply { clipChildren = false; listOf(library, player, queue).forEach { addView(it, FrameLayout.LayoutParams(-1, -1)) } }
-        setContentView(buildWindow(content))
+        setContentView(buildWindow(getString(R.string.player_title), content))
         onBackPressedDispatcher.addCallback(this) { goBack() }
         if (savedInstanceState == null) follow(intent)
         show(screen)
@@ -324,38 +271,10 @@ class MediaPlayerActivity : VideoActivity() {
     /** Highlighted when [on]; otherwise an ordinary control. */
     private fun mark(b: TextView, on: Boolean) = paint(b, on, if (on) sel else control)
 
-    private fun row(vararg views: View) = LinearLayout(this).apply {
-        gravity = Gravity.CENTER_VERTICAL
-        views.forEach { addView(it) }
-    }
-
-    /** Equal-width buttons with the player's 6dp gaps. */
-    private fun evenRow(buttons: List<TextView>) = LinearLayout(this).apply {
-        gravity = Gravity.CENTER_VERTICAL
-        buttons.forEachIndexed { i, b ->
-            addView(b, LinearLayout.LayoutParams(0, dp(TOUCH), 1f).apply { if (i > 0) leftMargin = dp(GAP) })
-        }
-    }
-
     /** Landscape on a phone: rows move up beside the top controls so the list keeps some room. */
     private fun isShort() = resources.displayMetrics.run { heightPixels / density } < SHORT_HEIGHT_DP
 
     private fun spring() = Space(this).apply { layoutParams = LinearLayout.LayoutParams(0, 1, 1f) }
-
-    private fun section(heading: TextView, list: View) = FrameLayout(this).apply {
-        background = outline(border, ThemeColorResolver.color(Theme.workspace_output_background_color))
-        clipChildren = false
-        addView(FrameLayout(context).apply { addView(list, FrameLayout.LayoutParams(-1, -1)) }, FrameLayout.LayoutParams(-1, -1))
-        addView(heading, FrameLayout.LayoutParams(-2, -2).apply { leftMargin = dp(14) })
-    }
-
-    private fun lineList(adapter: Lines) = RecyclerView(this).apply {
-        layoutManager = LinearLayoutManager(context)
-        this.adapter = adapter
-        setPadding(0, dp(12), 0, dp(4))
-        clipToPadding = false
-        itemAnimator = null
-    }
 
     private fun clock(ms: Int) = VideoMath.clock(ms.toLong())
 
@@ -377,7 +296,8 @@ class MediaPlayerActivity : VideoActivity() {
             doAfterTextChanged { query = it?.toString().orEmpty(); refresh() }
         }
         val close = button("X", getString(R.string.player_close), 44, BAR) { finish() }
-        val tabNames = mapOf(Tab.MUSIC to R.string.player_tab_music, Tab.VIDEO to R.string.player_tab_video, Tab.PODCASTS to R.string.player_tab_podcasts)
+        val tabNames = mapOf(Tab.MUSIC to R.string.player_tab_music, Tab.VIDEO to R.string.player_tab_video,
+            Tab.CHANNELS to R.string.player_tab_channels, Tab.PODCASTS to R.string.player_tab_podcasts)
         val tabs = evenRow(Tab.entries.map { option ->
             button(getString(tabNames.getValue(option)), getString(tabNames.getValue(option)), 52, BAR) { pickTab(option); hideAskQuietly(); refresh() }
                 .also { tabButtons[option] = it }
@@ -402,6 +322,13 @@ class MediaPlayerActivity : VideoActivity() {
         videoRow = evenRow(listOf(false to R.string.player_all, true to R.string.player_unwatched).map { (only, name) ->
             button(getString(name), getString(name), 52, BAR) { unwatchedOnly = only; refresh() }.also { videoButtons[only] = it }
         })
+        channelRow = evenRow(listOf(
+            button(getString(R.string.player_channels_from_file), getString(R.string.player_channels_from_file), 52, BAR) {
+                runCatching { pickPlaylist.launch(arrayOf("*/*")) }
+            },
+            button(getString(R.string.player_channels_from_url), getString(R.string.player_channels_from_url), 52, BAR) { askPlaylistUrl() },
+            button(getString(R.string.player_channels_clear), getString(R.string.player_channels_clear), 52, BAR) { confirmClearChannels() },
+        ))
         addOrSort = button(getString(R.string.player_add), getString(R.string.surface_add_podcast_24ba4), 52, BAR) {}
         refreshButton = button("", getString(R.string.surface_refresh_selected_podcast_4b302), 52, BAR) { refreshPodcast() }
         val shelfNames = listOf(Shelf.NEW to R.string.player_new, Shelf.SHOWS to R.string.player_shows, Shelf.RECENT to R.string.player_recent, Shelf.OFFLINE to R.string.player_offline)
@@ -443,6 +370,7 @@ class MediaPlayerActivity : VideoActivity() {
             if (!isShort()) addView(tabs)
             addView(browseRow)
             addView(videoRow)
+            addView(channelRow)
             addView(podcastRow)
             addView(tagScroll)
             addView(Space(context), LinearLayout.LayoutParams(1, dp(10)))
@@ -470,12 +398,14 @@ class MediaPlayerActivity : VideoActivity() {
         val searching = query.isNotBlank() && !(tab == Tab.PODCASTS && shelf == Shelf.EPISODES) && !(tab == Tab.MUSIC && group != null)
         browseRow.visibility = if (tab == Tab.MUSIC && !searching) View.VISIBLE else View.GONE
         videoRow.visibility = if (tab == Tab.VIDEO && !searching) View.VISIBLE else View.GONE
+        channelRow.visibility = if (tab == Tab.CHANNELS && !searching) View.VISIBLE else View.GONE
         podcastRow.visibility = if (tab == Tab.PODCASTS && !searching) View.VISIBLE else View.GONE
         tagScroll.visibility = View.GONE
         showNowPlayingStrip()
         if (searching) refreshSearch() else when (tab) {
             Tab.MUSIC -> refreshMusic()
             Tab.VIDEO -> refreshVideo()
+            Tab.CHANNELS -> refreshChannels()
             Tab.PODCASTS -> refreshPodcasts()
         }
         if (askBlock.visibility == View.VISIBLE) strip.visibility = View.GONE
@@ -501,6 +431,10 @@ class MediaPlayerActivity : VideoActivity() {
         videos().filter { it.name.contains(query, ignoreCase = true) }.take(SEARCH_ROWS).takeIf { it.isNotEmpty() }?.let { found ->
             lines += Line(getString(R.string.player_tab_video), header = true)
             found.forEachIndexed { i, item -> lines += videoLine(i + 1, item) }
+        }
+        Channels.list(this).filter { it.name.contains(query, ignoreCase = true) }.take(SEARCH_ROWS).takeIf { it.isNotEmpty() }?.let { found ->
+            lines += Line(getString(R.string.player_tab_channels), header = true)
+            found.mapTo(lines) { channelLine(it) }
         }
         podcasts?.let { p ->
             val shows = p.shows().filter { it.title.contains(query, ignoreCase = true) }
@@ -587,6 +521,87 @@ class MediaPlayerActivity : VideoActivity() {
         stripText.text = getString(R.string.player_continue, last.name, VideoMath.clock(pos), VideoMath.clock(dur))
         strip.visibility = View.VISIBLE
         strip.setOnClickListener { if (last.uri == nowPlaying) expandVideo() else openVideo(last, VideoMath.resumeAt(pos, dur)) }
+    }
+
+    // ---- channels ----
+
+    private val pickPlaylist = registerForActivityResult(androidx.activity.result.contract.ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) importChannels { Channels.readDocument(this, uri) }
+    }
+
+    private fun askPlaylistUrl() = TuixtDialog.showValidatedForm(this, getString(R.string.player_channels_from_url),
+        listOf(TuixtDialog.FormField("url", getString(R.string.player_channels_playlist_url), "https://example.com/channels.m3u",
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI)),
+        getString(R.string.surface_add_f9460), getString(R.string.surface_cancel_1507c),
+        { values -> values["url"].orEmpty().trim().let { if (it.startsWith("https://") || Channels.isPlain(it)) null else getString(R.string.player_channels_web_only) } },
+    ) { values ->
+        val url = values["url"]?.trim() ?: return@showValidatedForm
+        // An http:// playlist is unencrypted too: ask before fetching it.
+        if (Channels.isPlain(url) && !Channels.plainAccepted(this)) askPlain(1, onAccept = { importChannels { Channels.download(url) } }, onSkip = {})
+        else importChannels { Channels.download(url) }
+    }
+
+    /** Reads a playlist off the main thread, then adds its channels; unencrypted ones only after the user accepts. */
+    private fun importChannels(read: () -> String) {
+        channelNote = getString(R.string.player_channels_importing)
+        refresh()
+        Thread {
+            val found = runCatching { Channels.parse(read()) }
+            runOnUiThread {
+                found.onFailure { channelNote = getString(R.string.player_channels_failed, it.message ?: it.javaClass.simpleName); refresh() }
+                found.onSuccess { channels ->
+                    val plain = channels.count { Channels.isPlain(it.url) }
+                    if (plain == 0 || Channels.plainAccepted(this)) addChannels(channels)
+                    else askPlain(plain, onAccept = { addChannels(channels) }, onSkip = { addChannels(channels.filterNot { Channels.isPlain(it.url) }) })
+                }
+            }
+        }.start()
+    }
+
+    private fun addChannels(channels: List<Channels.Channel>) {
+        channelNote = if (channels.isEmpty()) getString(R.string.player_channels_none_found)
+            else runCatching { getString(R.string.player_channels_added, Channels.add(this, channels), channels.size) }
+                .getOrElse { getString(R.string.player_channels_failed, it.message ?: it.javaClass.simpleName) }
+        refresh()
+    }
+
+    /** Unencrypted channels are a real risk; the user accepts it once, knowingly, or they are left out. */
+    private fun askPlain(count: Int, onAccept: () -> Unit, onSkip: () -> Unit) {
+        TuixtDialog.showConfirm(this, getString(R.string.player_channels_plain_title),
+            resources.getQuantityString(R.plurals.player_channels_plain_message, count, count),
+            getString(R.string.player_channels_plain_accept), getString(R.string.player_channels_plain_skip),
+            TuixtDialog.ConfirmAction { Channels.acceptPlain(this); onAccept() }, declined = onSkip)
+    }
+
+    private fun confirmClearChannels() {
+        if (Channels.list(this).isEmpty()) return
+        TuixtDialog.showConfirm(this, getString(R.string.player_channels_clear), getString(R.string.player_channels_clear_ask),
+            getString(R.string.surface_remove_f9662), getString(R.string.surface_cancel_1507c),
+            TuixtDialog.ConfirmAction { Channels.clear(this); channelNote = null; refresh() })
+    }
+
+    private fun refreshChannels() {
+        libraryTitle.text = getString(R.string.player_tab_channels)
+        val lines = ArrayList<Line>()
+        channelNote?.let { lines += Line(it) }
+        val all = Channels.list(this)
+        all.groupBy { it.group }.forEach { (group, channels) ->
+            if (group.isNotBlank()) lines += Line(group, meta = channels.size.toString(), header = true)
+            channels.mapTo(lines) { channelLine(it) }
+        }
+        if (all.isEmpty()) lines += Line(getString(R.string.player_channels_empty))
+        libraryLines.set(lines)
+        val last = Channels.last(this) ?: return
+        stripText.text = getString(R.string.player_channels_last, last.name)
+        strip.visibility = View.VISIBLE
+        strip.setOnClickListener { openChannel(last) }
+    }
+
+    private fun channelLine(channel: Channels.Channel) = Line(channel.name, on = channel.url == nowPlaying, tap = { openChannel(channel) })
+
+    private fun openChannel(channel: Channels.Channel) {
+        if (channel.url == nowPlaying) { expandVideo(); return }
+        startActivity(Intent(this, VideoPlayerActivity::class.java).putExtra(EXTRA_URI, channel.url))
     }
 
     private fun videoLine(n: Int, item: MediaLibrary.Item): Line {
@@ -1304,87 +1319,6 @@ class MediaPlayerActivity : VideoActivity() {
 
     // ---- rows ----
 
-    private inner class Lines(private val editable: Boolean = false) : RecyclerView.Adapter<Lines.Holder>() {
-        private var lines: List<Line> = emptyList()
-        var startDrag: (RecyclerView.ViewHolder) -> Unit = {}
-        var remove: (Int) -> Unit = {}
-
-        @SuppressLint("NotifyDataSetChanged")
-        fun set(next: List<Line>) {
-            lines = next
-            notifyDataSetChanged()
-        }
-
-        fun swap(a: Int, b: Int) {
-            lines = ArrayList(lines).also { Collections.swap(it, a, b) }
-            notifyItemMoved(a, b)
-        }
-
-        inner class Holder(val root: LinearLayout, val handle: TextView, val title: TextView, val sub: TextView, val meta: TextView, val x: TextView) : RecyclerView.ViewHolder(root)
-
-        @SuppressLint("ClickableViewAccessibility")
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-            val handle = label("=").apply {
-                gravity = Gravity.CENTER
-                contentDescription = getString(R.string.player_reorder)
-                visibility = if (editable) View.VISIBLE else View.GONE
-            }
-            val title = label().apply { isSingleLine = true; ellipsize = TextUtils.TruncateAt.END }
-            val sub = label(size = 11f).apply { isSingleLine = true; ellipsize = TextUtils.TruncateAt.END }
-            val meta = label().apply { setPadding(dp(10), 0, 0, 0) }
-            val x = label("x").apply {
-                gravity = Gravity.CENTER
-                contentDescription = getString(R.string.player_remove)
-                visibility = if (editable) View.VISIBLE else View.GONE
-            }
-            val texts = LinearLayout(parent.context).apply {
-                orientation = LinearLayout.VERTICAL
-                addView(title)
-                addView(sub, LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(2) })
-            }
-            val root = LinearLayout(parent.context).apply {
-                gravity = Gravity.CENTER_VERTICAL
-                layoutParams = RecyclerView.LayoutParams(-1, dp(ROW))
-                setPadding(dp(8), 0, if (editable) 0 else dp(8), 0)
-                addView(handle, LinearLayout.LayoutParams(dp(32), -1))
-                addView(texts, LinearLayout.LayoutParams(0, -2, 1f))
-                addView(meta)
-                addView(x, LinearLayout.LayoutParams(dp(TOUCH), -1))
-            }
-            return Holder(root, handle, title, sub, meta, x).also { holder ->
-                handle.setOnTouchListener { _, event ->
-                    if (event.actionMasked == MotionEvent.ACTION_DOWN) startDrag(holder)
-                    false
-                }
-                x.setOnClickListener { holder.bindingAdapterPosition.takeIf { it != RecyclerView.NO_POSITION }?.let(remove) }
-            }
-        }
-
-        override fun getItemCount() = lines.size
-
-        override fun onBindViewHolder(holder: Holder, position: Int) {
-            val line = lines[position]
-            val fg = if (line.on) onSelected else if (line.header) head else ink
-            holder.root.setBackgroundColor(if (line.on) sel else Color.TRANSPARENT)
-            holder.root.layoutParams = holder.root.layoutParams.apply { height = if (line.wrap) -2 else dp(ROW) }
-            holder.root.setPadding(holder.root.paddingLeft, if (line.wrap) dp(WRAP_PADDING) else 0, holder.root.paddingRight, if (line.wrap) dp(WRAP_PADDING) else 0)
-            holder.title.isSingleLine = !line.wrap
-            holder.title.ellipsize = if (line.wrap) null else TextUtils.TruncateAt.END
-            holder.title.text = line.title
-            holder.sub.text = line.sub
-            holder.sub.visibility = if (line.sub.isEmpty()) View.GONE else View.VISIBLE
-            holder.meta.text = line.meta
-            holder.title.setTextColor(fg)
-            holder.handle.setTextColor(fg)
-            holder.x.setTextColor(fg)
-            holder.meta.setTextColor(fg)
-            holder.sub.setTextColor(if (line.on) onSelected else dim)
-            holder.root.setOnClickListener(line.tap?.let { tap -> View.OnClickListener { tap() } })
-            holder.root.isClickable = line.tap != null
-            holder.root.setOnLongClickListener(line.hold?.let { hold -> View.OnLongClickListener { hold(); true } })
-        }
-    }
-
     /** The seek bar's hairline, with a tick at each chapter. */
     private inner class MarkedLine : Drawable() {
         var marks: List<Float> = emptyList()
@@ -1423,7 +1357,6 @@ class MediaPlayerActivity : VideoActivity() {
         private const val SEARCH_ROWS = 40
         private const val ACROSS_ROWS = 60
         private const val NARROW = 0.65f
-        private const val WRAP_PADDING = 6
         private val SLEEP_MINUTES = listOf(15, 30, 45, 60)
         private val MUSIC_PANELS = setOf(Panel.EQ, Panel.LYRICS)
         private val PODCAST_PANELS = setOf(Panel.NOTES, Panel.CHAPTERS)
@@ -1434,8 +1367,6 @@ class MediaPlayerActivity : VideoActivity() {
         private const val KEY_BY = "by"
         private const val KEY_QUERY = "query"
         private const val TICK = 500L
-        private const val GAP = 6
-        private const val ROW = 44
         private const val UP_NEXT_ROWS = 20
         private const val ART_DOTS = 96
         private const val MIN_HEIGHT_FOR_ART = 560f

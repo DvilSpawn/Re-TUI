@@ -1154,14 +1154,9 @@ class SuggestionsManager(
         }
         if (fullInput == "mode") {
             comparator.noInput = false
-            suggestionList.add(
-                Suggestion(
-                    "mode",
-                    modeTarget(LauncherMode.current()),
-                    true,
-                    Suggestion.TYPE_COMMAND
-                )
-            )
+            otherModes(LauncherMode.current()).forEach { target ->
+                suggestionList.add(Suggestion("mode", target, true, Suggestion.TYPE_COMMAND))
+            }
             return suggestionList
         }
         if (fullInput == "files") {
@@ -4027,6 +4022,8 @@ class SuggestionsManager(
         internal fun searchModeCommandSuggestionExecutes(commandName: String?, argTypes: IntArray?): Boolean = SuggestionStatics.searchModeCommandSuggestionExecutes(commandName, argTypes)
 
         internal fun modeTarget(currentMode: String): String = SuggestionStatics.modeTarget(currentMode)
+
+        internal fun otherModes(currentMode: String): List<String> = SuggestionStatics.otherModes(currentMode)
 
         internal fun modeTargets(filter: String?): List<String> = SuggestionStatics.modeTargets(filter)
 

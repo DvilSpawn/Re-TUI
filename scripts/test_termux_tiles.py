@@ -10,6 +10,7 @@ import queue
 import threading
 import time
 import unittest
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -17,7 +18,7 @@ class TilesTest(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(dir=os.environ.get('TMPDIR'))
         self.home = Path(self.tmp.name)
-        self.socket = 'retui-test-' + str(os.getpid())
+        self.socket = f'retui-test-{os.getpid()}-{uuid.uuid4().hex[:8]}'
         self.tmux_bin = shutil.which('tmux')
         assert self.tmux_bin is not None, 'real tmux is required'
         bin_dir = self.home / 'bin'
@@ -31,7 +32,9 @@ class TilesTest(unittest.TestCase):
         self.ids = self.tmux('list-windows', '-t', 'retui_workspace', '-F', '#{window_id}').splitlines()
 
     def tmux(self, *args):
-        return subprocess.check_output([self.tmux_bin, '-L', self.socket, *args], text=True).strip()
+        result = subprocess.run([self.tmux_bin, '-L', self.socket, *args], capture_output=True, text=True)
+        self.assertEqual(0, result.returncode, f'tmux {" ".join(args)}: {result.stderr.strip()}')
+        return result.stdout.strip()
 
     def tearDown(self):
         subprocess.run([self.tmux_bin, '-L', self.socket, 'kill-server'], capture_output=True)

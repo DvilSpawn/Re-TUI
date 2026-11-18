@@ -81,6 +81,7 @@ object PresetManager {
         Behavior.tui_notification,
         Behavior.auto_show_keyboard,
         Behavior.launcher_mode,
+        Behavior.mono_preset,
         Behavior.mono_ink_color,
         Behavior.mono_paper_color,
         Behavior.search_only_mode,
@@ -294,31 +295,64 @@ object PresetManager {
         }
     }
 
-    /** Saves the current setup as preset [name], wallpaper included when the launcher can tell what it is. */
+    /**
+     * What a saved preset can hold. COLOURS: every theme and suggestion colour. LOOK: fonts, borders, status rows,
+     * frames and effects such as cyberdeck and the CRT filter. MODE: the launcher mode and layout. MONO: Mono's colours
+     * and panels. BEHAVIOUR: everything else in behavior.xml. WALLPAPER: the wallpaper.
+     */
+    enum class Part { COLOURS, LOOK, MODE, MONO, BEHAVIOUR, WALLPAPER }
+
+    private val MODE_SETTINGS: Set<XMLPrefsSave> = setOf(Behavior.launcher_mode, Behavior.search_only_mode, Behavior.orientation,
+        Behavior.duo_mode, Behavior.duo_swap_top_panes)
+    private val MONO_SETTINGS: Set<XMLPrefsSave> = setOf(Behavior.mono_preset, Behavior.mono_ink_color, Behavior.mono_paper_color,
+        Behavior.mono_layout, Behavior.mono_layout_style)
+    private val LOOK_BEHAVIOR: Set<XMLPrefsSave> = setOf(Behavior.enable_cyberdeck_mode, Behavior.enable_crt_filter,
+        Behavior.ascii_animation, Behavior.ascii_animation_frame_delay_ms, Behavior.ascii_animation_max_file_kb,
+        Behavior.ascii_effect, Behavior.ascii_effect_speed, Behavior.ascii_effect_loop_seconds)
+
+    /**
+     * The user's own value for [setting], or its default. Mono mode stands in its own colours, font and borders for
+     * the user's while it is on; a preset keeps the user's, so it does not come back two-coloured in another mode.
+     */
+    private fun own(setting: XMLPrefsSave): String? =
+        LauncherSettings.raw(setting)?.takeIf { it.isNotEmpty() } ?: setting.defaultValue()
+
+    /** Saves the current setup as preset [name], with only the [parts] chosen; the rest is left out of it. */
     @Throws(Exception::class)
-    fun save(context: Context, name: kotlin.String): PresetWallpaper.Saved {
+    fun save(context: Context, name: kotlin.String, parts: Set<Part> = Part.entries.toSet()): PresetWallpaper.Saved {
         val cleanName = cleanName(name)
         val presetFolder: File = File(presetsDir, cleanName)
         check(!(!presetFolder.exists() && !presetFolder.mkdirs())) { context.getString(R.string.manager_presetmanager_unable_to_create_preset_folder_4e6c1) }
 
-        writeXml(
-            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.THEME.path),
-            XMLPrefsManager.XMLPrefsRoot.THEME, SHAREABLE_THEME
-        )
-        writeXml(
-            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS.path),
-            XMLPrefsManager.XMLPrefsRoot.SUGGESTIONS, SHAREABLE_SUGGESTIONS
-        )
-        writeXml(
-            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.UI.path),
-            XMLPrefsManager.XMLPrefsRoot.UI, SHAREABLE_UI
-        )
-        copyLocalBehavior(
-            File(Tuils.getFolder(), XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path),
-            File(presetFolder, XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.path)
-        )
-        FrameManager.copyCurrentTo(context, presetFolder)
+        // Theme and suggestions files are what make a folder a preset, so they stay, empty when colours are left out.
+        val colours = Part.COLOURS in parts
+        writeXml(File(presetFolder, XMLPrefsRoot.THEME.path), XMLPrefsRoot.THEME, if (colours) SHAREABLE_THEME else emptyArray())
+        writeXml(File(presetFolder, XMLPrefsRoot.SUGGESTIONS.path), XMLPrefsRoot.SUGGESTIONS, if (colours) SHAREABLE_SUGGESTIONS else emptyArray())
+        val ui = File(presetFolder, XMLPrefsRoot.UI.path)
+        if (Part.LOOK in parts) writeXml(ui, XMLPrefsRoot.UI, SHAREABLE_UI) else ui.delete()
+        saveBehavior(File(Tuils.getFolder(), XMLPrefsRoot.BEHAVIOR.path), File(presetFolder, XMLPrefsRoot.BEHAVIOR.path), parts)
+        val frames = File(presetFolder, "frames")
+        if (Part.LOOK in parts) FrameManager.copyCurrentTo(context, presetFolder) else if (frames.exists()) Tuils.delete(frames)
+        if (Part.WALLPAPER !in parts) {
+            PresetWallpaper.remove(cleanName)
+            return PresetWallpaper.Saved.NONE
+        }
         return runCatching { PresetWallpaper.capture(context, cleanName) }.getOrDefault(PresetWallpaper.Saved.UNKNOWN)
+    }
+
+    /**
+     * The behaviour settings for the chosen [parts]. With every part the active file is copied whole, as a local
+     * preset always has; otherwise only the settings of the chosen parts are written, and none at all removes the file.
+     */
+    internal fun saveBehavior(source: File, destination: File, parts: Set<Part>) {
+        val grouped = listOf(Part.MODE to MODE_SETTINGS, Part.MONO to MONO_SETTINGS, Part.LOOK to LOOK_BEHAVIOR)
+        if (grouped.all { it.first in parts } && Part.BEHAVIOUR in parts) return copyLocalBehavior(source, destination)
+        val left = grouped.filter { it.first !in parts }.flatMap { it.second }.toSet()
+        val kept = grouped.filter { it.first in parts }.flatMap { it.second }.toSet()
+        val wanted = Behavior.entries.filter { if (Part.BEHAVIOUR in parts) it !in left else it in kept }
+        if (wanted.isEmpty() || !source.isFile) { destination.delete(); return }
+        val values = readAllowed(source, XMLPrefsRoot.BEHAVIOR, wanted.toTypedArray()) { _, _ -> true }
+        writeText(destination, xml(XMLPrefsRoot.BEHAVIOR, wanted.toTypedArray(), { values[it] }, { _, _ -> true }, useCurrentMode = false))
     }
 
     internal fun copyLocalBehavior(source: File, destination: File) {
@@ -612,7 +646,7 @@ object PresetManager {
     }
 
     internal fun shareableXml(root: XMLPrefsRoot): String =
-        xml(root, shareableValues(root), { LauncherSettings.getEffective(it) })
+        xml(root, shareableValues(root), ::own)
 
     internal fun shareableUiXml(): String = shareableXml(XMLPrefsRoot.UI)
 
@@ -623,7 +657,7 @@ object PresetManager {
 
     internal fun shareableBehaviorValues(presetName: String?): Map<Behavior, String> {
         if (presetName.isNullOrBlank()) {
-            return Behavior.entries.associateWith { LauncherSettings.getEffective(it).orEmpty() }
+            return Behavior.entries.associateWith { own(it).orEmpty() }
         }
         val file = File(getSavedPresetFolder(presetName), XMLPrefsRoot.BEHAVIOR.path)
         if (!file.isFile) return emptyMap()
@@ -645,7 +679,7 @@ object PresetManager {
 
     internal fun shareableBehaviorXml(selectedLabels: Set<String>): String {
         val settings = selectedBehaviorSettings(selectedLabels)
-        return xml(XMLPrefsRoot.BEHAVIOR, settings, { LauncherSettings.getEffective(it) }, ::isSelectedBehaviorValue)
+        return xml(XMLPrefsRoot.BEHAVIOR, settings, ::own, ::isSelectedBehaviorValue)
     }
 
     internal fun sanitizeSelectedBehaviorXml(file: File, selectedLabels: Set<String>): String {
@@ -1092,7 +1126,7 @@ object PresetManager {
         values: Array<out XMLPrefsSave>,
         validator: (XMLPrefsSave, String) -> Boolean = ::isShareableValue
     ) {
-        writeText(requireNotNull(file), xml(root, values, { LauncherSettings.getEffective(it) }, validator))
+        writeText(requireNotNull(file), xml(root, values, ::own, validator))
     }
 
     private fun writeText(file: File, text: String) {

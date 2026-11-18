@@ -22,7 +22,9 @@ class TerminalBorderDrawable(
     private val dashGapPx: Float,
     private val cyberdeck: Boolean = false,
     private val cyberdeckNotch: Boolean = true,
-    private val flipVertically: Boolean = false
+    private val flipVertically: Boolean = false,
+    /** Cyberdeck only: drawn over a view, filling outside the shape so the view's own content is cut to it. */
+    private val overlay: Boolean = false
 ) : Drawable() {
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -64,11 +66,11 @@ class TerminalBorderDrawable(
         val bottom = bottomCutouts.map(::RectF)
         // A saved presentation must not retain this drawable's View callback through the outer instance.
         val fill=fillColor;val border=borderColor;val stroke=strokeWidthPx;val radius=radiusPx
-        val dashedLine=dashed;val dash=dashLengthPx;val gap=dashGapPx;val cyber=cyberdeck;val notch=cyberdeckNotch;val flipped=flipVertically
+        val dashedLine=dashed;val dash=dashLengthPx;val gap=dashGapPx;val cyber=cyberdeck;val notch=cyberdeckNotch;val flipped=flipVertically;val over=overlay
         return object : ConstantState() {
             override fun getChangingConfigurations() = 0
             override fun newDrawable(): Drawable = TerminalBorderDrawable(fill, border, stroke,
-                radius, dashedLine, dash, gap, cyber, notch, flipped).apply { setCutouts(top, bottom) }
+                radius, dashedLine, dash, gap, cyber, notch, flipped, over).apply { setCutouts(top, bottom) }
         }
     }
 
@@ -158,7 +160,16 @@ class TerminalBorderDrawable(
         }
         path.close()
 
-        canvas.drawPath(path, fillPaint)
+        if (overlay) {
+            val saved = canvas.save()
+            canvas.clipRect(b)
+            path.fillType = Path.FillType.INVERSE_WINDING
+            canvas.drawPath(path, fillPaint)
+            path.fillType = Path.FillType.WINDING
+            canvas.restoreToCount(saved)
+        } else {
+            canvas.drawPath(path, fillPaint)
+        }
         if (strokeWidthPx > 0) {
             canvas.drawPath(path, strokePaint)
             drawCyberpunkDetails(canvas, left, top, right, bottom, width, height, cornerCut, if (cyberdeckNotch) notchDepth else 0f)

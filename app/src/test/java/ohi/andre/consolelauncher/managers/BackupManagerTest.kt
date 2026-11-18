@@ -177,6 +177,39 @@ class BackupManagerTest {
         ))
     }
 
+    @Test
+    fun olderBackupsOnlySpeakForTheirOwnPrivateFiles() {
+        assertFalse("journal" in BackupManager.privateFileNamesFor("2"))
+        assertTrue("journal" in BackupManager.privateFileNamesFor("3"))
+        assertTrue(BackupManager.privateFileNamesFor("1").isEmpty())
+        assertTrue(BackupManager.validatePackage(
+            "type=retui-backup\nschema=3\nprofile=personal\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "shared_prefs/ui.properties",
+                "app_files/channels.json", "app_files/journal/2026-11-16.md", "app_files/wallpaper-packs/pack/a.png")
+        ))
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun schemaTwoBackupCannotCarryNewerPrivateFiles() {
+        BackupManager.validatePackage(
+            "type=retui-backup\nschema=2\nprofile=personal\n",
+            setOf("manifest.txt", "theme.xml", "ui.xml", "suggestions.xml", "shared_prefs/ui.properties", "app_files/channels.json")
+        )
+    }
+
+    /** A new settings store has to be backed up or left out on purpose, so a backup stays a full snapshot. */
+    @Test
+    fun everySettingsStoreIsBackedUpOrDeliberatelyLeftOut() {
+        val source = ohi.andre.consolelauncher.SourceFiles.repo("app/src/main/java")
+        val pattern = Regex("""getSharedPreferences\(\s*"([A-Za-z0-9_.-]+)"|(?:const val|val) (?:PREFS|PREFS_NAME|PREF_NAME|PREFS_LIST|PREFS_PLACE|PLACES)(?:\s*:\s*String)?\s*=\s*"([A-Za-z0-9_.-]+)"""")
+        val names = source.walk().filter { it.isFile && (it.name.endsWith(".kt") || it.name.endsWith(".java")) }
+            .flatMap { file -> pattern.findAll(file.readText()).map { it.groupValues[1].ifEmpty { it.groupValues[2] } } }
+            .filter { it.isNotEmpty() && it != "shared_prefs" }
+            .toSortedSet()
+        val covered = BackupManager.personalSharedPreferenceNames().toSet() + BackupManager.excludedSharedPreferenceNames
+        assertEquals("Settings stores neither backed up nor excluded", emptySet<String>(), names - covered)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun rejectsUnknownPrivateFileStore() {
         BackupManager.validatePackage(

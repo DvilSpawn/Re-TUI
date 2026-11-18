@@ -37,6 +37,8 @@ import kotlin.math.abs
  */
 class EdgeSidebarService : Service() {
     companion object {
+        /** Below this the sidebar text is hard to read on its bezel. */
+        private const val MIN_CONTRAST = 3.0
         private const val CHANNEL = "edge_sidebar"
         private const val NOTIFICATION_ID = 7501
         private const val ACTION_TURN_OFF = "ohi.andre.consolelauncher.sidebar.TURN_OFF"
@@ -132,7 +134,9 @@ class EdgeSidebarService : Service() {
 
     private fun dockView() = EdgeDockView(this, EdgeSidebar.onRightEdge(this)).apply {
         val appearance = HomeAppearance.saved()
-        iconColor = appearance.color(Theme.output_text_color)
+        val (bezel, ink) = sidebarColors(appearance)
+        bezelColor = bezel
+        iconColor = ink
         accentColor = appearance.color(Theme.terminal_border_color)
         items = dockItems(iconColor)
         contentDescription = getString(R.string.edge_sidebar_handle)
@@ -147,9 +151,24 @@ class EdgeSidebarService : Service() {
         y = if (below != null) ((tabParams?.y ?: 0) + below - height + view.bottomInset).toInt().coerceAtLeast(0) else centerY - height / 2
     }
 
+    /**
+     * The bezel and the text on it. The sidebar is a black bezel with the theme's text, unless that text would not
+     * show on black (dark ink, as in Mono on light paper): then it inverts, an ink bezel with the background's colour
+     * on it, so the pill still stands out against a light home.
+     */
+    private fun sidebarColors(appearance: HomeAppearance): Pair<Int, Int> {
+        val text = appearance.color(Theme.output_text_color) or 0xFF000000.toInt()
+        if (androidx.core.graphics.ColorUtils.calculateContrast(text, android.graphics.Color.BLACK) >= MIN_CONTRAST) return android.graphics.Color.BLACK to text
+        val paper = appearance.color(Theme.terminal_window_background_color) or 0xFF000000.toInt()
+        return if (androidx.core.graphics.ColorUtils.calculateContrast(paper, text) >= MIN_CONTRAST) text to paper
+            else android.graphics.Color.BLACK to android.graphics.Color.WHITE
+    }
+
     private fun stackView() = EdgeStackView(this, EdgeSidebar.onRightEdge(this)).apply {
         val appearance = HomeAppearance.saved()
-        textColor = appearance.color(Theme.output_text_color)
+        val (bezel, ink) = sidebarColors(appearance)
+        bezelColor = bezel
+        textColor = ink
         accentColor = appearance.color(Theme.terminal_border_color)
         typeface = ohi.andre.consolelauncher.tuils.Tuils.getTypeface(this@EdgeSidebarService)
         fun icon(res: Int) = ContextCompat.getDrawable(this@EdgeSidebarService, res)!!.mutate().apply { setTint(textColor) }

@@ -266,10 +266,36 @@ object TuixtDialog {
         positive: String,
         negative: String,
         action: ConfirmAction
+    ) = confirm(context, title, message, positive, negative, action, null)
+
+    /** As [showConfirm], and [declined] runs when the dialog closes any way other than the positive button. */
+    fun showConfirm(
+        context: Context,
+        title: String,
+        message: String?,
+        positive: String,
+        negative: String,
+        action: ConfirmAction,
+        declined: () -> Unit
+    ) = confirm(context, title, message, positive, negative, action, declined)
+
+    private fun confirm(
+        context: Context,
+        title: String,
+        message: String?,
+        positive: String,
+        negative: String,
+        action: ConfirmAction,
+        declined: (() -> Unit)?
     ) {
         Handler(Looper.getMainLooper()).post(Runnable {
             val dialog = createDialog(context)
             val content = createContent(context)
+            var confirmed = false
+            if (declined != null) dialog.setOnDismissListener {
+                // The positive button dismisses before it confirms; look once that click is done.
+                Handler(Looper.getMainLooper()).post { if (!confirmed) declined() }
+            }
 
             val messageView = TextView(context)
             messageView.setText(message)
@@ -289,7 +315,7 @@ object TuixtDialog {
                 )
             )
 
-            val buttons = buttons(context, dialog, positive, negative, action, true)
+            val buttons = buttons(context, dialog, positive, negative, ConfirmAction { confirmed = true; action.onConfirm() }, true)
             dialog.setContentView(wrap(context, title, content, buttons))
             show(dialog)
         })

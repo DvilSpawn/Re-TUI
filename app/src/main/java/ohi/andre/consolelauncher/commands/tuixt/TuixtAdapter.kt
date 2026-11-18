@@ -277,6 +277,18 @@ class TuixtAdapter(
             settingHolder.input.setVisibility(View.GONE)
             settingHolder.options.setVisibility(View.VISIBLE)
             bindOptionSwitch(settingHolder, item, ohi.andre.consolelauncher.tuils.asciifx.AsciiEffects.NAMES.toTypedArray())
+        } else if (item === Behavior.mono_preset) {
+            settingHolder.toggle.setVisibility(View.GONE)
+            settingHolder.colorPreview.setVisibility(View.GONE)
+            settingHolder.input.setVisibility(View.GONE)
+            settingHolder.options.setVisibility(View.VISIBLE)
+            bindOptionSwitch(settingHolder, item, ohi.andre.consolelauncher.managers.settings.MonoMode.PRESETS)
+        } else if (item === Behavior.mono_layout_style) {
+            settingHolder.toggle.setVisibility(View.GONE)
+            settingHolder.colorPreview.setVisibility(View.GONE)
+            settingHolder.input.setVisibility(View.GONE)
+            settingHolder.options.setVisibility(View.VISIBLE)
+            bindOptionSwitch(settingHolder, item, arrayOf("pages", "scroll"))
         } else if (item === Behavior.output_header_mode) {
             settingHolder.toggle.setVisibility(View.GONE)
             settingHolder.colorPreview.setVisibility(View.GONE)
@@ -484,11 +496,16 @@ class TuixtAdapter(
                 hidden = if (accordionSections) accordionState.collapsed(row.section ?: "")
                 else collapsedSections.contains(row.section)
                 visibleRows.add(row)
-            } else if (!hidden) {
+            } else if (!hidden && !hiddenByDraft(row.item)) {
                 visibleRows.add(row)
             }
         }
     }
+
+    /** Rows that only matter for another setting's choice: Mono's own ink and paper, under the custom preset. */
+    private fun hiddenByDraft(item: XMLPrefsSave?): Boolean =
+        (item === Behavior.mono_ink_color || item === Behavior.mono_paper_color) &&
+            getCurrentValue(Behavior.mono_preset)?.trim()?.lowercase() != ohi.andre.consolelauncher.managers.settings.MonoMode.CUSTOM
 
     private fun bindOptionSwitch(holder: ViewHolder, item: XMLPrefsSave, options: Array<String>) {
         var current = getCurrentValue(item)
@@ -530,6 +547,7 @@ class TuixtAdapter(
             styleChoice(holder.itemView.getContext(), button, option == current)
             button.setOnClickListener(View.OnClickListener { v: View? ->
                 changeDraft(item, option)
+                if (item === Behavior.mono_preset) rebuildVisibleRows()
                 notifyDataSetChanged()
             })
             row.addView(button)

@@ -242,12 +242,18 @@
     <!-- Behavior.kt: launcher_mode -->
     <string name="setting_behavior_launcher_mode_description" formatted="false">"Launcher layout mode: classic, search, terminal, dot, or mono"</string>
     <string name="setting_behavior_search_category_tabs_description">In Search mode, show one result category at a time with tabs. Turn off to show all category rows together in a single pane.</string>
-    <!-- Behavior.kt: mono_ink_color, mono_paper_color -->
+    <!-- Behavior.kt: mono_preset, mono_ink_color, mono_paper_color -->
+    <string name="setting_behavior_mono_preset_description">In Mono mode, the pair of colours: e-ink lite (dark ink on grey paper), e-ink dark (light ink on dark paper), or custom, your own ink and paper.</string>
     <string name="setting_behavior_mono_ink_color_description">In Mono mode, the colour everything is drawn in: text, lines and selections.</string>
     <string name="setting_behavior_mono_paper_color_description">In Mono mode, the background colour.</string>
+    <!-- Behavior.kt: mono_layout -->
+    <string name="setting_behavior_mono_layout_description">In Mono mode, the home panels in order on a four-column grid, separated by commas: scene, clock, apps, media, quick, tasks, next, alerts, read, term. A | starts a new page. A size can follow a name, such as read:2x4 or term:4x2; each panel takes the first free spot its size fits. Hold a panel on the home to resize, move, swap or remove it, and use the add panel slot to add one.</string>
+    <!-- Behavior.kt: mono_layout_style -->
+    <string name="setting_behavior_mono_layout_style_description">In Mono mode, how the home holds more panels than fit: pages, swiped left and right, or scroll, everything on one page that scrolls down.</string>
     <!-- Behavior.kt: dot_apps -->
     <string name="setting_behavior_dot_apps_description">In Dot mode, the apps on the rings around the dot, innermost first, separated by commas (up to 5). Leave empty to use your most-used apps.</string>
     <string name="dot_home_description">Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app.</string>
+    <string name="dot_home_search_hint">double-tap the dot to search</string>
     <string name="dot_home_toggle_modules">Show or hide the time, battery and temperature</string>
     <!-- Behavior.kt: search_only_mode -->
     <string name="setting_behavior_search_only_mode_description" formatted="false">"Legacy search mode toggle used only when launcher_mode is empty"</string>

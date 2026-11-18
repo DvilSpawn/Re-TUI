@@ -1305,7 +1305,7 @@
   "changelog_release_highlights": {
     "formatted": false,
     "forms": {
-      "other": "Re:TUI 6 adds a full media player for music, podcasts and video, a new two-colour Mono home, community presets you can download and share from inside the launcher, and one tabbed edge stack in place of the sidebar and its pills.\n\n## One media player\n\n- Music, podcasts and video now live in one player with Library, Now playing, Queue, Podcasts and Video tabs. Open it with `music -open` or by tapping the title in the music panel.\n- Music and podcasts share one queue that survives restarts and is included in backups. Add, remove, reorder, shuffle and repeat.\n- Play your own files: `media -add` picks a folder through Android's folder picker, with no storage permission. `media` lists your folders, `media -rm` removes one and `media -scan` looks again.\n- Sleep timer, equaliser with presets, gapless playback, saved lists and search across the whole library.\n- Lyrics from a `.lrc` or `.txt` file beside the song, including `[offset:]`.\n- Podcasts gain chapters, playback speed, skip silence, notes, downloads, and NEW and OFFLINE shelves.\n- Streams are cached ahead (30 minutes, or 10 on metered networks) and recover from dropped connections by themselves.\n- The system media controls, lock screen, headset and Bluetooth buttons control playback. Playback pauses when headphones are unplugged.\n- Video keeps its own full-screen player with picture-in-picture, next-up, an unwatched filter and autoplay that skips watched episodes.\n- Music keeps playing when the launcher restarts.\n\n## Mono mode\n\n- `mode mono` draws Home in two colours, ink and paper, with the VT323 pixel font. Your other settings are left alone, so switching back restores them exactly.\n- A status strip, a dithered weather banner that animates with the weather and time of day, and one session pane with notes, events, reminders, notifications, music, timers and your commands with their answers.\n- An input line under the session runs commands and searches apps, modules and the web.\n\n## Community presets\n\n- `preset -market` now has a COMMUNITY tab next to the terminal themes. Browse presets made by other Re:TUI users, sorted by newest or most popular.\n- Open one to see its screenshot, what it changes (colours, suggestions, layout, behaviour) and whether it comes with a wallpaper or a font link.\n- Download & import checks the file first and saves it beside your presets. Your look stays the same until you run `preset -apply`.\n- A preset's wallpaper can come with it and is set when you apply the preset.\n- + SHARE MINE sends your own setup for review: pick what to share, add a screenshot and an optional wallpaper. It appears for everyone once approved.\n\n## Edge stack\n\n- The edge sidebar and its timer, stopwatch and podcast pills are now one tabbed stack on the screen edge.\n- Tap a small tab to bring it forward, tap the home tab to return to the sidebar, hold to open the sidebar, and drag to move the whole stack.\n\n## Toolbar\n\n- The app drawer button has its own setting, `show_apps_drawer_button` under Toolbar, separate from swipe-up. If you had swipe-up turned off, the button stays hidden after the update, as before.\n\n## Wallpapers and looks\n\n- Doom fire has a custom look. Pick your own background, ember, flame and tip colours.\n- Settings › System & Support uses the official GitHub, Discord and Reddit logos.\n\n## Modules\n\n- Lua modules can make text tappable. Bookmarks 1.0.2 opens a link when you tap it.\n- With a module open, the output shrinks to its tab before notification rows push anything off screen.\n\n## Fixes\n\n- Dot mode: a command's answer shows over the dot. Home or Back brings the dot back. Output nobody asked for no longer covers it.\n- A running or paused timer comes back after Android closes the launcher. A timer that ran out meanwhile is not rung late.\n- Tapping an ended or disconnected terminal tile reconnects it.\n- Adding a podcast selects the new show.\n- Mono's music line stays correct after switching modes.\n- The video library highlight clears when the player closes.\n- Fixed a crash in suggestions, kept the keyboard state across rotation, kept focus on search after a mode switch, and stopped showing unfilled notification formats.\n- Bare parameter commands, such as `apps`, show their help. `breach`, `credits`, `lockdown` and `pomodoro` now have help too.\n- Dot mode: closing the changelog or another screen no longer brings the keyboard up over the dot.\n- Android no longer tints the dot and mono homes grey.\n- The Hack overlay closes when you tap it."
+      "other": "Re:TUI 6 adds a full media player for music, podcasts and video, a new two-colour Mono home, community presets you can download and share from inside the launcher, and one tabbed edge stack in place of the sidebar and its pills.\n\n## One media player\n\n- Music, podcasts and video now live in one player with Library, Now playing, Queue, Podcasts and Video tabs. Open it with `music -open` or by tapping the title in the music panel.\n- Music and podcasts share one queue that survives restarts and is included in backups. Add, remove, reorder, shuffle and repeat.\n- Play your own files: `media -add` picks a folder through Android's folder picker, with no storage permission. `media` lists your folders, `media -rm` removes one and `media -scan` looks again.\n- Sleep timer, equaliser with presets, gapless playback, saved lists and search across the whole library.\n- Lyrics from a `.lrc` or `.txt` file beside the song, including `[offset:]`.\n- Podcasts gain chapters, playback speed, skip silence, notes, downloads, and NEW and OFFLINE shelves.\n- Streams are cached ahead (30 minutes, or 10 on metered networks) and recover from dropped connections by themselves.\n- The system media controls, lock screen, headset and Bluetooth buttons control playback. Playback pauses when headphones are unplugged.\n- Video keeps its own full-screen player with picture-in-picture, next-up, an unwatched filter and autoplay that skips watched episodes.\n- Music keeps playing when the launcher restarts.\n\n## Mono mode\n\n- `mode mono` draws Home in two colours, ink and paper, with the VT323 pixel font. Your other settings are left alone, so switching back restores them exactly.\n- A status strip, a dithered weather banner that animates with the weather and time of day, and one session pane with notes, events, reminders, notifications, music, timers and your commands with their answers.\n- An input line under the session runs commands and searches apps, modules and the web.\n\n## Community presets\n\n- `preset -market` now has a COMMUNITY tab next to the terminal themes. Browse presets made by other Re:TUI users, sorted by newest or most popular.\n- Open one to see its screenshot, what it changes (colours, suggestions, layout, behaviour) and whether it comes with a wallpaper or a font link.\n- Download & import checks the file first and saves it beside your presets. Your look stays the same until you run `preset -apply`.\n- A preset's wallpaper can come with it and is set when you apply the preset.\n- + SHARE MINE sends your own setup for review: pick what to share, add a screenshot and an optional wallpaper. It appears for everyone once approved.\n\n## Edge stack\n\n- The edge sidebar and its timer, stopwatch and podcast pills are now one tabbed stack on the screen edge.\n- Tap a small tab to bring it forward, tap the home tab to return to the sidebar, hold to open the sidebar, and drag to move the whole stack.\n\n## Toolbar\n\n- The app drawer button has its own setting, `show_apps_drawer_button` under Toolbar, separate from swipe-up. If you had swipe-up turned off, the button stays hidden after the update, as before.\n\n## Wallpapers and looks\n\n- Doom fire has a custom look. Pick your own background, ember, flame and tip colours.\n- Settings › System & Support uses the official GitHub, Discord and Reddit logos.\n\n## Modules\n\n- Lua modules can make text tappable. Bookmarks 1.0.2 opens a link when you tap it.\n- With a module open, the output shrinks to its tab before notification rows push anything off screen.\n\n## Fixes\n\n- Dot mode: a command's answer shows over the dot. Home or Back brings the dot back. Output nobody asked for no longer covers it.\n- A running or paused timer comes back after Android closes the launcher. A timer that ran out meanwhile is not rung late.\n- Tapping an ended or disconnected terminal tile reconnects it.\n- Adding a podcast selects the new show.\n- Mono's music line stays correct after switching modes.\n- The video library highlight clears when the player closes.\n- Fixed a crash in suggestions, kept the keyboard state across rotation, kept focus on search after a mode switch, and stopped showing unfilled notification formats.\n- Bare parameter commands, such as `apps`, show their help. `breach`, `credits`, `lockdown` and `pomodoro` now have help too.\n- Dot mode: closing the changelog or another screen no longer brings the keyboard up over the dot.\n- Android no longer tints the dot and mono homes grey.\n- The Hack overlay closes when you tap it.\n\n## V.6 · Build 801\n\n- Mono home: a handheld PDA frame with panels on a four-column grid: a pixel-art weather scene, a clock with battery, storage and memory meters, apps as name chips grouped into scrolling sections, media, quick commands, tasks, what's next and alerts. Hold a panel to swap it for another.\n- Mono now defaults to blue ink on navy. If you never changed the old cream on black, you get the new pair; colours you picked are kept.\n- Mono keeps the CRT filter and vignette when they are on, and its Settings soft key opens just the settings that change the Mono home.\n- Live TV: the media player has a TV tab. Import channels from an M3U playlist, from a file or an https link. Channels on plain http:// are explained and left out unless you accept the risk.\n- In Mono, the media panel plays your last channel dithered in ink, with a library of channels, videos to carry on with, shows and music. Full screen plays it in colour from where the panel was, and Back or Home returns it to the panel. A live broadcast always rejoins live; a video at a link keeps its place.\n- eReader: `books` opens a library of EPUB, PDF, text, Markdown and CBZ books from folders you pick. Pages look like e-ink paper, with ghosting and an optional refresh. Turn by tap, swipe or volume keys, left to right, right to left or scrolling.\n- Hold a word to select text: copy, share, pin, or send it to your own apps such as a translator. Pinned lines and pages are listed in the PINS tab. The footer cycles between time and pages left, learning how fast you read.\n- Mono gets a READ panel with the last book of each kind and a read row in Quick; the other modes get a READ module.\n- Mono panels sit on pages you swipe between, with the command line fixed below them, or on one page that scrolls (`mono_layout_style`). Add panels from the add slot, resize, move or remove them on hold, and add terminal panels: a tmux window each, in three sizes. Tap one and it fills the screen above the keyboard with the terminal keys; hold text to copy or paste.\n- Mono colour presets: e-ink lite, e-ink dark or your own ink and paper. Cyberdeck frames work in Mono, and the clock panel shows a running timer, your next alarm, a day meter and AM/PM.\n- The edge sidebar stays visible on a light Mono home.\n- `preset -save` asks what the preset keeps, and presets saved in Mono keep your own colours and fonts.\n- Personal backups are a full snapshot: the journal, quick notes, channels, reader places and pins, wallpaper images and more.\n- Touch Grass: a downloadable wallpaper. Drag through the lawn to part it; tilt to lean it.\n- `mode` on its own suggests every other mode, and dot mode shows a faint hint on how to search.\n- Mono search results stay readable after presets with transparent suggestions or coloured app groups, and no longer push the input line under the keyboard."
     },
     "type": "string"
   },
@@ -2660,6 +2660,13 @@
     },
     "type": "string"
   },
+  "command_preset_choose_parts": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose what preset %1$s keeps."
+    },
+    "type": "string"
+  },
   "command_preset_duplicate_972d5": {
     "formatted": false,
     "forms": {
@@ -2702,6 +2709,62 @@
     },
     "type": "string"
   },
+  "command_preset_part_behaviour": {
+    "formatted": true,
+    "forms": {
+      "other": "Behaviour: sounds, output, gestures and everything else"
+    },
+    "type": "string"
+  },
+  "command_preset_part_colours": {
+    "formatted": true,
+    "forms": {
+      "other": "Colours: theme and suggestion colours"
+    },
+    "type": "string"
+  },
+  "command_preset_part_look": {
+    "formatted": true,
+    "forms": {
+      "other": "Look: fonts, borders, status rows, frames, cyberdeck, CRT and ASCII effects"
+    },
+    "type": "string"
+  },
+  "command_preset_part_mode": {
+    "formatted": true,
+    "forms": {
+      "other": "Mode: launcher mode, orientation and Duo layout"
+    },
+    "type": "string"
+  },
+  "command_preset_part_mono": {
+    "formatted": true,
+    "forms": {
+      "other": "Mono: preset, ink and paper, and panel layout"
+    },
+    "type": "string"
+  },
+  "command_preset_part_wallpaper": {
+    "formatted": true,
+    "forms": {
+      "other": "Wallpaper"
+    },
+    "type": "string"
+  },
+  "command_preset_parts_note": {
+    "formatted": true,
+    "forms": {
+      "other": "Choose what this preset keeps. Anything left out stays as it is when the preset is applied."
+    },
+    "type": "string"
+  },
+  "command_preset_parts_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Save preset %1$s"
+    },
+    "type": "string"
+  },
   "command_preset_preset_applied_0611f": {
     "formatted": true,
     "forms": {
@@ -2720,6 +2783,13 @@
     "formatted": true,
     "forms": {
       "other": "Preset '%1$s' saved."
+    },
+    "type": "string"
+  },
+  "command_preset_save": {
+    "formatted": true,
+    "forms": {
+      "other": "Save"
     },
     "type": "string"
   },
@@ -3611,6 +3681,13 @@
     "formatted": true,
     "forms": {
       "other": "Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app."
+    },
+    "type": "string"
+  },
+  "dot_home_search_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "double-tap the dot to search"
     },
     "type": "string"
   },
@@ -6225,6 +6302,13 @@
     },
     "type": "string"
   },
+  "help_books": {
+    "formatted": true,
+    "forms": {
+      "other": "books: your eReader. books opens the library · books -last carries on with the book you read last · books -last epub, pdf, text or comic carries on with the last of that kind. Reads EPUB, PDF, TXT, Markdown and CBZ comics from folders you pick, with no storage permission. In a book, tap the edges to turn and the middle for the menu; hold a word to copy, share, translate or pin it. help -topic ereader has the full guide."
+    },
+    "type": "string"
+  },
   "help_breach": {
     "formatted": true,
     "forms": {
@@ -6466,7 +6550,7 @@
   "help_mode": {
     "formatted": true,
     "forms": {
-      "other": "Switch launcher layout.\nUsage:\n$ mode classic\n$ mode search\n$ mode terminal"
+      "other": "Switch launcher layout. mode on its own shows the current one.\nUsage:\n$ mode classic\n$ mode search\n$ mode terminal\n$ mode dot\n$ mode mono"
     },
     "type": "string"
   },
@@ -6543,7 +6627,7 @@
   "help_preset": {
     "formatted": true,
     "forms": {
-      "other": "-save [name] -> save theme.xml and suggestions.xml colors, shareable ui.xml values, local behavior.xml settings, and frame state as a local preset \n-apply [name] -> apply a saved or built-in preset; saved presets can restore UI, selected behavior settings, and frames as well as colors; disable auto_color_pick \n-duplicate [saved name] -> copy a saved preset and prompt for its new name \n-ls -> list saved and built-in presets \n-market -> open the external Re:T-UI preset marketplace (network) \n-rm [name] -> remove a saved or imported preset \nLocal saved presets are not sanitized portable exports or personal backups. Save your current setup before applying a different preset. \nTo share a look, use Settings > System & Support > Create Shareable Configuration."
+      "other": "-save [name] -> save the current setup as a local preset; a checklist asks what it keeps: colours, look (ui.xml, frames, effects), mode, Mono, the rest of behavior.xml, and the wallpaper. What is left out stays as it is when the preset is applied. Saved in Mono, a preset keeps your own colours and fonts, not Mono's \n-apply [name] -> apply a saved or built-in preset; saved presets can restore UI, selected behavior settings, and frames as well as colors; disable auto_color_pick \n-duplicate [saved name] -> copy a saved preset and prompt for its new name \n-ls -> list saved and built-in presets \n-market -> open the external Re:T-UI preset marketplace (network) \n-rm [name] -> remove a saved or imported preset \nLocal saved presets are not sanitized portable exports or personal backups. Save your current setup before applying a different preset. \nTo share a look, use Settings > System & Support > Create Shareable Configuration."
     },
     "type": "string"
   },
@@ -11199,6 +11283,13 @@
     },
     "type": "string"
   },
+  "module_label_read": {
+    "formatted": true,
+    "forms": {
+      "other": "READ"
+    },
+    "type": "string"
+  },
   "module_label_reminder": {
     "formatted": true,
     "forms": {
@@ -11290,10 +11381,339 @@
     },
     "type": "string"
   },
+  "mono_add_panel": {
+    "formatted": true,
+    "forms": {
+      "other": "add panel"
+    },
+    "type": "string"
+  },
+  "mono_add_terminal": {
+    "formatted": true,
+    "forms": {
+      "other": "terminal"
+    },
+    "type": "string"
+  },
+  "mono_add_title": {
+    "formatted": true,
+    "forms": {
+      "other": "add to this page"
+    },
+    "type": "string"
+  },
+  "mono_alarm": {
+    "formatted": true,
+    "forms": {
+      "other": "ALARM %1$s"
+    },
+    "type": "string"
+  },
+  "mono_alerts_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Alerts"
+    },
+    "type": "string"
+  },
+  "mono_apps_top": {
+    "formatted": true,
+    "forms": {
+      "other": "top"
+    },
+    "type": "string"
+  },
   "mono_banner_description": {
     "formatted": true,
     "forms": {
       "other": "Weather scene. Tap to step through the scenes."
+    },
+    "type": "string"
+  },
+  "mono_bar_apps": {
+    "formatted": true,
+    "forms": {
+      "other": "Apps"
+    },
+    "type": "string"
+  },
+  "mono_bar_search": {
+    "formatted": true,
+    "forms": {
+      "other": "Search"
+    },
+    "type": "string"
+  },
+  "mono_bar_settings": {
+    "formatted": true,
+    "forms": {
+      "other": "Settings"
+    },
+    "type": "string"
+  },
+  "mono_bar_widgets": {
+    "formatted": true,
+    "forms": {
+      "other": "Widgets"
+    },
+    "type": "string"
+  },
+  "mono_library_add_channels": {
+    "formatted": true,
+    "forms": {
+      "other": "add channels"
+    },
+    "type": "string"
+  },
+  "mono_library_close": {
+    "formatted": true,
+    "forms": {
+      "other": "Close the library"
+    },
+    "type": "string"
+  },
+  "mono_library_continue": {
+    "formatted": true,
+    "forms": {
+      "other": "continue"
+    },
+    "type": "string"
+  },
+  "mono_library_more_channels": {
+    "formatted": true,
+    "forms": {
+      "other": "import more channels"
+    },
+    "type": "string"
+  },
+  "mono_library_music": {
+    "formatted": true,
+    "forms": {
+      "other": "music"
+    },
+    "type": "string"
+  },
+  "mono_library_open_music": {
+    "formatted": true,
+    "forms": {
+      "other": "open the music library"
+    },
+    "type": "string"
+  },
+  "mono_library_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Library"
+    },
+    "type": "string"
+  },
+  "mono_library_tv": {
+    "formatted": true,
+    "forms": {
+      "other": "tv"
+    },
+    "type": "string"
+  },
+  "mono_library_video": {
+    "formatted": true,
+    "forms": {
+      "other": "video"
+    },
+    "type": "string"
+  },
+  "mono_media_full": {
+    "formatted": true,
+    "forms": {
+      "other": "full"
+    },
+    "type": "string"
+  },
+  "mono_media_idle": {
+    "formatted": true,
+    "forms": {
+      "other": "idle"
+    },
+    "type": "string"
+  },
+  "mono_media_last_watched": {
+    "formatted": true,
+    "forms": {
+      "other": "last watched"
+    },
+    "type": "string"
+  },
+  "mono_media_library": {
+    "formatted": true,
+    "forms": {
+      "other": "library"
+    },
+    "type": "string"
+  },
+  "mono_media_live": {
+    "formatted": true,
+    "forms": {
+      "other": "● LIVE"
+    },
+    "type": "string"
+  },
+  "mono_media_music": {
+    "formatted": true,
+    "forms": {
+      "other": "music"
+    },
+    "type": "string"
+  },
+  "mono_media_paused": {
+    "formatted": true,
+    "forms": {
+      "other": "paused"
+    },
+    "type": "string"
+  },
+  "mono_media_play": {
+    "formatted": true,
+    "forms": {
+      "other": "play"
+    },
+    "type": "string"
+  },
+  "mono_media_playing": {
+    "formatted": true,
+    "forms": {
+      "other": "♪ playing"
+    },
+    "type": "string"
+  },
+  "mono_media_resume": {
+    "formatted": true,
+    "forms": {
+      "other": "resume"
+    },
+    "type": "string"
+  },
+  "mono_media_resume_live": {
+    "formatted": true,
+    "forms": {
+      "other": "resume live"
+    },
+    "type": "string"
+  },
+  "mono_media_stopped": {
+    "formatted": true,
+    "forms": {
+      "other": "stopped"
+    },
+    "type": "string"
+  },
+  "mono_media_stopped_by_you": {
+    "formatted": true,
+    "forms": {
+      "other": "Stopped"
+    },
+    "type": "string"
+  },
+  "mono_media_stopped_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Stopped when you left"
+    },
+    "type": "string"
+  },
+  "mono_media_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Media"
+    },
+    "type": "string"
+  },
+  "mono_media_tuning": {
+    "formatted": true,
+    "forms": {
+      "other": "tuning"
+    },
+    "type": "string"
+  },
+  "mono_media_tv": {
+    "formatted": true,
+    "forms": {
+      "other": "live tv"
+    },
+    "type": "string"
+  },
+  "mono_media_video_playing": {
+    "formatted": true,
+    "forms": {
+      "other": "▶ playing"
+    },
+    "type": "string"
+  },
+  "mono_media_watch": {
+    "formatted": true,
+    "forms": {
+      "other": "watch"
+    },
+    "type": "string"
+  },
+  "mono_menu_move": {
+    "formatted": true,
+    "forms": {
+      "other": "move"
+    },
+    "type": "string"
+  },
+  "mono_menu_on_page": {
+    "formatted": true,
+    "forms": {
+      "other": "page %1$d"
+    },
+    "type": "string"
+  },
+  "mono_menu_shown": {
+    "formatted": true,
+    "forms": {
+      "other": "on home"
+    },
+    "type": "string"
+  },
+  "mono_menu_size": {
+    "formatted": true,
+    "forms": {
+      "other": "size"
+    },
+    "type": "string"
+  },
+  "mono_menu_swap": {
+    "formatted": true,
+    "forms": {
+      "other": "swap for"
+    },
+    "type": "string"
+  },
+  "mono_move_down": {
+    "formatted": true,
+    "forms": {
+      "other": "down"
+    },
+    "type": "string"
+  },
+  "mono_move_up": {
+    "formatted": true,
+    "forms": {
+      "other": "up"
+    },
+    "type": "string"
+  },
+  "mono_next_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Next"
+    },
+    "type": "string"
+  },
+  "mono_no_apps": {
+    "formatted": true,
+    "forms": {
+      "other": "no apps here"
     },
     "type": "string"
   },
@@ -11325,17 +11745,31 @@
     },
     "type": "string"
   },
-  "mono_no_reminders": {
+  "mono_output_close": {
     "formatted": true,
     "forms": {
-      "other": "none set · reminder 18:00 call"
+      "other": "Close the output"
     },
     "type": "string"
   },
-  "mono_no_timer": {
+  "mono_page_add": {
     "formatted": true,
     "forms": {
-      "other": "not running · timer 5m"
+      "other": "add a page"
+    },
+    "type": "string"
+  },
+  "mono_page_remove": {
+    "formatted": true,
+    "forms": {
+      "other": "remove this page and its panels"
+    },
+    "type": "string"
+  },
+  "mono_pages_title": {
+    "formatted": true,
+    "forms": {
+      "other": "pages"
     },
     "type": "string"
   },
@@ -11346,10 +11780,136 @@
     },
     "type": "string"
   },
-  "mono_session_title": {
+  "mono_quick_calc": {
     "formatted": true,
     "forms": {
-      "other": "── session ──"
+      "other": "calc"
+    },
+    "type": "string"
+  },
+  "mono_quick_clipboard": {
+    "formatted": true,
+    "forms": {
+      "other": "clipboard"
+    },
+    "type": "string"
+  },
+  "mono_quick_note": {
+    "formatted": true,
+    "forms": {
+      "other": "note"
+    },
+    "type": "string"
+  },
+  "mono_quick_read": {
+    "formatted": true,
+    "forms": {
+      "other": "read"
+    },
+    "type": "string"
+  },
+  "mono_quick_reminder": {
+    "formatted": true,
+    "forms": {
+      "other": "reminder"
+    },
+    "type": "string"
+  },
+  "mono_quick_timer": {
+    "formatted": true,
+    "forms": {
+      "other": "timer"
+    },
+    "type": "string"
+  },
+  "mono_quick_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Quick"
+    },
+    "type": "string"
+  },
+  "mono_read_continue": {
+    "formatted": true,
+    "forms": {
+      "other": "> continue"
+    },
+    "type": "string"
+  },
+  "mono_read_library": {
+    "formatted": true,
+    "forms": {
+      "other": "> open library"
+    },
+    "type": "string"
+  },
+  "mono_read_none": {
+    "formatted": true,
+    "forms": {
+      "other": "No book yet"
+    },
+    "type": "string"
+  },
+  "mono_read_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Read"
+    },
+    "type": "string"
+  },
+  "mono_remove_panel": {
+    "formatted": true,
+    "forms": {
+      "other": "remove"
+    },
+    "type": "string"
+  },
+  "mono_settings_all": {
+    "formatted": true,
+    "forms": {
+      "other": "All settings"
+    },
+    "type": "string"
+  },
+  "mono_settings_home": {
+    "formatted": true,
+    "forms": {
+      "other": "Home"
+    },
+    "type": "string"
+  },
+  "mono_settings_mode": {
+    "formatted": true,
+    "forms": {
+      "other": "Mode"
+    },
+    "type": "string"
+  },
+  "mono_settings_preset": {
+    "formatted": true,
+    "forms": {
+      "other": "Preset"
+    },
+    "type": "string"
+  },
+  "mono_settings_screen": {
+    "formatted": true,
+    "forms": {
+      "other": "Screen"
+    },
+    "type": "string"
+  },
+  "mono_settings_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Mono settings"
+    },
+    "type": "string"
+  },
+  "mono_settings_weather": {
+    "formatted": true,
+    "forms": {
+      "other": "Weather"
     },
     "type": "string"
   },
@@ -11367,6 +11927,55 @@
     },
     "type": "string"
   },
+  "mono_tasks_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Tasks"
+    },
+    "type": "string"
+  },
+  "mono_term_done": {
+    "formatted": true,
+    "forms": {
+      "other": "done ×"
+    },
+    "type": "string"
+  },
+  "mono_term_pick": {
+    "formatted": true,
+    "forms": {
+      "other": "pick a window"
+    },
+    "type": "string"
+  },
+  "mono_term_tap": {
+    "formatted": true,
+    "forms": {
+      "other": "tap to type"
+    },
+    "type": "string"
+  },
+  "mono_term_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Term"
+    },
+    "type": "string"
+  },
+  "mono_term_typing": {
+    "formatted": true,
+    "forms": {
+      "other": "typing"
+    },
+    "type": "string"
+  },
+  "mono_term_window": {
+    "formatted": true,
+    "forms": {
+      "other": "window"
+    },
+    "type": "string"
+  },
   "mono_timer_paused": {
     "formatted": true,
     "forms": {
@@ -11378,6 +11987,13 @@
     "formatted": true,
     "forms": {
       "other": "timer %1$s left"
+    },
+    "type": "string"
+  },
+  "mono_week": {
+    "formatted": true,
+    "forms": {
+      "other": "WK %1$d"
     },
     "type": "string"
   },
@@ -12406,7 +13022,7 @@
   "offline_help_appearance_body": {
     "formatted": true,
     "forms": {
-      "other": "Fonts, colors, floating tools and optional idle fade. Choose a numbered topic. Use 0 to return to the launcher."
+      "other": "Fonts, colors, the Mono home, floating tools and optional idle fade. Choose a numbered topic. Use 0 to return to the launcher."
     },
     "type": "string"
   },
@@ -12823,6 +13439,20 @@
     },
     "type": "string"
   },
+  "offline_help_article_ereader_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Open the library\n\nEnter `books` at Launcher Home. ADD FOLDER picks a folder of books through Android's folder picker, so Launcher needs no storage permission; OPEN FILE opens one book. SCAN looks through your folders again. The shelves ALL, EPUB, PDF, TEXT and COMIC filter by kind, and the search box filters by name or folder. The book you were reading stays at the top. Hold a book to remove it from the library; the file itself stays where it is.\n\nThe eReader opens EPUB, PDF, plain text, Markdown and CBZ comics.\n\n## Turn pages\n\n- Tap the left or right quarter of the page to turn back or forward. Tap the wide middle to open the menu.\n- Swipe sideways to turn, when SWIPE TO TURN is on.\n- The volume keys turn pages when VOLUME KEYS TURN is on. Arrow keys, Page Up, Page Down and Space work on a keyboard.\n- In SCROLL direction the book is one long column. Drag or fling it; edge taps and keys move it by most of a screen.\n\n## The footer\n\nThe bottom left shows the page. Tap the footer to cycle what the right side shows: time left in the chapter, time left in the book, pages left in the chapter, or how much you have read. Your choice is kept.\n\nTime estimates learn how fast you read. Each forward stretch of at least a few seconds at a believable pace nudges the estimate; quick flips, jumps and time with the book closed are left out. Until it has learned, it assumes about 220 words a minute.\n\n## Select, copy and translate\n\nHold a word to select it, then drag either handle to stretch the selection; it settles on whole words when you let go. The toolbar offers Copy, Share, Pin and every app on your phone that works on selected text, such as a translator or dictionary. Tap anywhere else to clear the selection. A translator only sees the words you send it.\n\n## Pins\n\nPin keeps the selected lines. A pinned passage is dotted underneath, with a pin beside it in the margin when the margin has room. Select over a pinned passage and the toolbar offers Unpin instead.\n\nThe pin at the top of the menu pins the whole page you are on; it fills in when the page is pinned. PDFs and comics have no text to select, so pinned pages are how you mark them.\n\nThe PINS tab lists PINNED LINES as quotes, with their chapter and page, then PINNED PAGES. Tap one to go there; hold it to copy or remove it. SHARE ALL sends every pinned line, with where it is, to any app as plain text. Pins stay on this phone with your place in the book.\n\n## The menu\n\n- The top bar: LIBRARY, search in the book (text books), and the page pin.\n- The slider jumps through the book.\n- CONTENTS: the book's chapters and their pages; the current one is marked.\n- TEXT: font (Literata, Mono or Sans), size, margins, line spacing and justification.\n- PAGES: DIRECTION, either L → R, R → L or SCROLL, kept separately for text books and for PDFs and comics, so R → L can suit manga alone. Also SWIPE TO TURN and VOLUME KEYS TURN.\n- E-INK: LOOK, either E-INK paper or THEME (your launcher colours, with cyberdeck frames when that is on); grey, warm, cool or night PAPER; GRAIN; REFRESH; GHOSTING.\n\n## E-ink\n\nGHOSTING leaves the last page faintly behind the new one, fading over the next few turns, as an e-ink screen does. REFRESH washes the screen grey and back every 6 turns or every turn, and clears the ghosts, like an e-ink panel's full refresh. Either can be off.\n\nPDFs and comics are shown in greys on the E-INK look. Double-tap a page to zoom in, drag to look around, and double-tap again to fit. In SCROLL, comic pages run on without a gap, for webtoons.\n\n## Carry on from Home\n\n```\nbooks -last\nbooks -last comic\n```\n\n`books -last` opens the book you read last; add epub, pdf, text or comic for the last book of that kind. In Mono, the READ panel shows your book and the last one of each other kind, and Quick has a read row. In the other modes, the READ module does the same."
+    },
+    "type": "string"
+  },
+  "offline_help_article_ereader_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Read books with the eReader"
+    },
+    "type": "string"
+  },
   "offline_help_article_feed_and_text_automation_body": {
     "formatted": false,
     "forms": {
@@ -13022,14 +13652,28 @@
   "offline_help_article_launcher_modes_body": {
     "formatted": false,
     "forms": {
-      "other": "Classic shows the command terminal; Search presents categorized results and inline output around the search field. Search is a different layout, not a sandbox or an assurance that text cannot execute commands: both layouts keep the launcher command path. Use mode to inspect the current mode, mode search to switch, or mode classic to return. A mode change refreshes the existing launcher UI. An active command guide can control the normal suggestion row, so use guide -off when you want normal suggestions again.\n\n## Examples\n\n```\nmode\n```\n\nShow the selected launcher mode.\n\n```\nmode classic\n```\n\nChange layout to Classic.\n\n```\nmode search\n```\n\nChange layout to Search."
+      "other": "Launcher has five modes. `mode` on its own shows the current one and suggests the others.\n\n- classic: the command terminal.\n- search: categorized results and inline output around the search field. It still runs commands; it is a layout, not a sandbox.\n- terminal: a scrolling grid of Termux panes. It needs the Termux setup.\n- dot: a black screen with one dot. Hold the dot for a ring of apps, slide to one and lift to open it. Tap the dot for a clock, battery and temperature; double-tap it to search.\n- mono: the classic layout in one ink on one paper, with a panel home. Read Arrange the Mono home in Appearance.\n\nA mode change refreshes the launcher and keeps your settings; Mono's colours apply only while it is on. An active command guide can take over the suggestion row; use guide -off to get normal suggestions back.\n\n## Examples\n\n```\nmode\n```\n\nShow the current mode and suggest the others.\n\n```\nmode mono\n```\n\nSwitch to Mono.\n\n```\nmode classic\n```\n\nBack to Classic."
     },
     "type": "string"
   },
   "offline_help_article_launcher_modes_title": {
     "formatted": false,
     "forms": {
-      "other": "Classic terminal and Search layout"
+      "other": "Classic, Search, Terminal, Dot and Mono"
+    },
+    "type": "string"
+  },
+  "offline_help_article_live_tv_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Add channels\n\n`media -v` opens the media player at Videos; the TV tab is beside it. Import an M3U playlist from a file or an https link. Channels are kept on this phone; the last one you watched is remembered.\n\nStreams on plain http:// are not encrypted, so others on the network can see or change them. Launcher explains this before adding them: accept to keep them, or skip to leave them out.\n\n## Watch\n\nTap a channel to play it in the video player. In Mono, the media panel plays your last channel on Home, drawn in ink. Tap it once to show its name and controls; they hide again after a few seconds. The library button opens channels, videos to carry on with, shows and music without leaving Home.\n\nFull screen plays the channel in colour from where the panel was. Back or Home hands it back to the panel. A live channel always rejoins live; a video at a link keeps its place.\n\nLeaving Home stops a live channel and frees the player, so nothing streams in the background; the panel offers to resume it when you come back. Streaming uses your connection and can use mobile data."
+    },
+    "type": "string"
+  },
+  "offline_help_article_live_tv_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Watch live TV channels"
     },
     "type": "string"
   },
@@ -13117,6 +13761,20 @@
     },
     "type": "string"
   },
+  "offline_help_article_mono_home_body": {
+    "formatted": false,
+    "forms": {
+      "other": "## Mono\n\n`mode mono` turns Launcher into two colours: one ink on one paper, with a pixel font and square frames. Pick the pair under Preset in Mono's settings: e-ink lite (dark ink on grey paper), e-ink dark (light ink on dark paper) or custom, which shows mono_ink_color and mono_paper_color for your own pair. Everything else follows them. Your own colours, font and borders come back when you switch to another mode, because Mono changes nothing in your settings. The CRT filter, vignette and cyberdeck frames still apply when you turn them on.\n\n## The panels\n\nHome is a handheld frame: a status strip with signal, time and battery, panels on a four-column grid, an output panel over the command line, and soft keys for Apps, Search, Widgets and Settings.\n\n- scene: pixel-art weather over a skyline.\n- clock: time, date, week, battery, storage and memory.\n- apps: your apps as name chips, the most used first, then each app group.\n- media: music, or a video or TV channel drawn in ink.\n- quick: note, timer, clipboard, reminder, calc and read.\n- tasks, next and alerts: notes, what is coming up, and notifications.\n- read: the book you are reading and the last book of each other kind.\n- term: one window of the tmux workspace. Tap it and it fills the screen above the keyboard, with the terminal keys under it; hold text there to copy it, or hold empty space to paste. Back puts the keyboard away, Back again or done puts the panel back. Add as many as you like, in three sizes.\n\nPanels sit on pages: swipe left and right between them, away from the screen's edges. The squares above the command line show the page; hold them to add or remove a page. The command line stays put on every page. Set mono_layout_style to scroll to put every panel on one page that scrolls down instead.\n\nHold a panel to change its size, move it up or down the page, swap it for another or remove it; hold a terminal to change its size or window. Each panel takes the first free spot its size fits, so a tall read:2x4 can have two small panels stacked beside it. The add panel slot at the end of a page adds one. The order is kept in mono_layout, comma separated, with a | between pages; panels fill rows left to right.\n\n```\nconfig -set mono_layout scene,clock,apps,media,quick,tasks|term:4x4,read,term:2x2\n```\n\nPanels only run while Home is in front. The Settings soft key opens the settings that shape this home: mode, colour preset, layout, CRT filter, vignette and weather. All settings opens the full hub."
+    },
+    "type": "string"
+  },
+  "offline_help_article_mono_home_title": {
+    "formatted": false,
+    "forms": {
+      "other": "Arrange the Mono home"
+    },
+    "type": "string"
+  },
   "offline_help_article_music_and_podcasts_body": {
     "formatted": false,
     "forms": {
@@ -13134,7 +13792,7 @@
   "offline_help_article_new_features_body": {
     "formatted": false,
     "forms": {
-      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- Pixel wallpapers: shoreline (time, date or your own words with waves washing over them), dither photo, ripples and doom fire, in Settings, Personalization, Re:TUI Wallpaper.\n- ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.\n- Settings search: find any setting by name or description from the Settings hub, or with settings <words>. Read Settings search in Appearance.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: choose monochrome in the World list for a black sky and a planet dithered to black and white.\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
+      "other": "## Start here\n\nThis manual is bundled with Launcher and can be read offline. IRC and network services still need a connection. Read examples here; entering them at a live prompt can perform their described actions.\n\n- IRC: open `irc`, connect to Libera.Chat or another network, join a channel, then talk. Several networks can be connected at once. Find IRC guides in Tools.\n- Calculator: use 123, ABC and FUNC, check the interpretation/result hint, and use `to` for conversions. Read Calculator help in Tools.\n- Floating tools: Calculator, Help and IRC start expanded, remember their window choice and retain their floating size. Find Floating tools in Appearance.\n- Termux: the separate workspace has pages and up to two independent tiles. It offers a prompted update for the APK-bundled helper. Read Termux workspace and Helper updates in Automation.\n- Presets: a shared .retui package is inspected and saved first, not immediately applied. Personal .retui-backup archives are separate. Read Portable preset import in Presets.\n- Startup: new installs complete the introduction, configuration and build animation before entering Launcher. Existing completed setups are kept. Read Startup setup in Getting started.\n- Appearance: app-drawer category/alphabet rails have independent normal and selected colors. The default font is JetBrains Mono Nerd Font Regular; custom/system font controls remain available.\n- Idle fade: optionally fade Home and the Termux workspace to the wallpaper. It is off by default. Read Idle fade in Appearance.\n\n## Recent updates\n\n- eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.\n- Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.\n- Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.\n- Modes: `mode` on its own suggests the other modes, and Dot mode shows how to search.\n- Presets and backups: `preset -save` asks what a preset keeps, and personal backups are a full snapshot of the launcher. Read Keep personal backup separate in Presets.\n- Touch Grass: a downloadable wallpaper you can part with a finger. Find it under Get more wallpapers in the wallpaper picker.\n- Pixel wallpapers: shoreline (time, date or your own words with waves washing over them), dither photo, ripples and doom fire, in Settings, Personalization, Re:TUI Wallpaper.\n- ASCII art: type text as ASCII art in a choice of fonts, and animate any ASCII art with effects such as decrypt, rain or glitch. Read ASCII art and effects in Appearance.\n- Settings search: find any setting by name or description from the Settings hub, or with settings <words>. Read Settings search in Appearance.\n- App drawer: REC, NEW and TOP tabs under the groups order the drawer by recently opened, newest installed or most used.\n- Astro Chart: choose monochrome in the World list for a black sky and a planet dithered to black and white.\n- Help home: use 10 from any article or topic list to return directly to the main directory.\n- Notes: the library and editor share the terminal pane styling and background blur. Read Notes in Tools.\n- Settings: swipe through Status, Terminal, Music, Help and Calculator previews before saving appearance changes. Read Configuration workflow in Appearance.\n- Private Space: enable the private command in Behaviour on supported devices, unlock, then use `private -open <app name>`. Read Private Space in Apps.\n- Calculator: basic arithmetic is ready immediately; advanced Qalculate is downloaded and installed after confirmation.\n\n## Find an article directly\n\n```\nhelp -topic irc-community\n```\n\nAt Launcher Home, open the offline IRC guide. `help irc` prints the shorter command reference instead. Use numbered choices or tap a topic in this reader; Android Back closes Help and keeps your place."
     },
     "type": "string"
   },
@@ -13218,7 +13876,7 @@
   "offline_help_article_personal_backup_body": {
     "formatted": false,
     "forms": {
-      "other": "## Protect the archive\n\nSettings Export Backup creates a .retui-backup personal archive. Choose encryption with a password if the archive may leave trusted storage; export without password is still available. Password protection uses authenticated AES-GCM with a derived key. Forgotten passwords are not recoverable by the importer. Keep the password outside the archive.\nPersonal backup includes launcher configuration folder contents and an explicit preferences allowlist, including bindings, callback auth and Space state. It can contain secrets, commands, local data and personal identifiers: do not publish it like a theme. Restore Backup validates the archive and, for a personal manifest, deletes/replaces current launcher-root files and restores included preferences. This is a destructive local restore, unlike preset-only import.\nThe label full/personal does not mean every app-private asset or device setting. The current Remember note database and Markdown/assets are stored outside the archived configuration folder. Android-widget drawer and companion-keyboard shortcut preferences are also omitted. These are not protected by this backup. Termux files/apps and other Android apps are not a device-wide backup.\n\n## Restore is destructive\n\n## Examples\n\n## Coverage limits\n\n```\nsettings\n```\n\nUse Export Backup/Restore Backup actions; verify file kind before restoring."
+      "other": "## What a backup holds\n\nSettings, Export Backup creates a .retui-backup personal archive: a snapshot of the whole launcher, to restore on this phone or a new one. It holds:\n\n- every file in the launcher's configuration folder: settings, presets and their wallpapers, frames, fonts, Spaces, Lua modules, RSS and webhooks;\n- your launcher settings stores: apps and groups, modules and their dock, the edge sidebar, Terminal-mode tiles, keyboard shortcuts, reminders, podcasts, playlists, the reader's settings, places and pins, media folders, TV channels and video positions;\n- private files: notes, the journal, quick notes, language packs, the book list, and the images behind Re:TUI wallpapers (dither photo, Nagomi background, wallpaper packs).\n\n## What it cannot hold\n\n- Android widgets on the widgets pane, because their ids belong to this phone. Add them again.\n- Folder permissions. Android grants book and media folders to this install only: after restoring on a new phone, add the same folders again in books and media, and your places and pins come back with them.\n- A wallpaper set by another app, which Android does not let launchers read.\n- Running timers, downloaded wallpapers, calculator engines and other caches, which come back on their own or download again.\n- Termux files and other apps' data. This is not a device backup.\n\n## Protect the archive\n\nA backup can contain secrets, commands, webhooks, callback keys and personal notes: never publish it like a theme. Choose encryption with a password if the archive may leave trusted storage. It uses authenticated AES-GCM with a derived key, and a forgotten password cannot be recovered.\n\n## Restore replaces\n\nRestore Backup checks the archive, then replaces the launcher's configuration folder, the private files the backup holds and the settings stores it includes. An older backup only replaces what it knew about, so newer data such as the journal or TV channels stays. This is a destructive restore, unlike importing a preset.\n\n```\nsettings\n```\n\nOpen Settings, then use Export Backup or Restore Backup."
     },
     "type": "string"
   },
@@ -13750,7 +14408,7 @@
   "offline_help_tools_body": {
     "formatted": true,
     "forms": {
-      "other": "IRC, Calculator, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher."
+      "other": "IRC, Calculator, the eReader, live TV, notes and other built-in tools. Choose a numbered topic. Use 0 to return to the launcher."
     },
     "type": "string"
   },
@@ -14510,6 +15168,119 @@
     },
     "type": "string"
   },
+  "player_channels_added": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d new of %2$d channels added."
+    },
+    "type": "string"
+  },
+  "player_channels_clear": {
+    "formatted": true,
+    "forms": {
+      "other": "CLEAR"
+    },
+    "type": "string"
+  },
+  "player_channels_clear_ask": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove every channel? Your playlists stay where they are; import them again any time."
+    },
+    "type": "string"
+  },
+  "player_channels_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No channels yet. Import an M3U playlist from a file or a URL."
+    },
+    "type": "string"
+  },
+  "player_channels_failed": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not import: %1$s"
+    },
+    "type": "string"
+  },
+  "player_channels_from_file": {
+    "formatted": true,
+    "forms": {
+      "other": "FROM FILE"
+    },
+    "type": "string"
+  },
+  "player_channels_from_url": {
+    "formatted": true,
+    "forms": {
+      "other": "FROM URL"
+    },
+    "type": "string"
+  },
+  "player_channels_importing": {
+    "formatted": true,
+    "forms": {
+      "other": "Importing channels…"
+    },
+    "type": "string"
+  },
+  "player_channels_last": {
+    "formatted": true,
+    "forms": {
+      "other": "Last watched: %1$s"
+    },
+    "type": "string"
+  },
+  "player_channels_none_found": {
+    "formatted": true,
+    "forms": {
+      "other": "No channels in that playlist."
+    },
+    "type": "string"
+  },
+  "player_channels_plain_accept": {
+    "formatted": true,
+    "forms": {
+      "other": "ACCEPT"
+    },
+    "type": "string"
+  },
+  "player_channels_plain_message": {
+    "formatted": true,
+    "forms": {
+      "one": "This uses http://, not https://. Nothing it sends is encrypted: anyone on your network, your provider or the stream's host can see what you watch, and can change or replace the picture and sound. Accept only if you trust this playlist and the network you are on. Accepting allows unencrypted channels from now on.",
+      "other": "%1$d of these channels use http://, not https://. Nothing they send is encrypted: anyone on your network, your provider or the stream's host can see what you watch, and can change or replace the picture and sound. Accept only if you trust this playlist and the network you are on. Skip leaves them out. Accepting allows unencrypted channels from now on."
+    },
+    "type": "plurals"
+  },
+  "player_channels_plain_skip": {
+    "formatted": true,
+    "forms": {
+      "other": "SKIP"
+    },
+    "type": "string"
+  },
+  "player_channels_plain_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Unencrypted channels"
+    },
+    "type": "string"
+  },
+  "player_channels_playlist_url": {
+    "formatted": true,
+    "forms": {
+      "other": "Playlist URL (M3U)"
+    },
+    "type": "string"
+  },
+  "player_channels_web_only": {
+    "formatted": true,
+    "forms": {
+      "other": "Use an https:// or http:// address."
+    },
+    "type": "string"
+  },
   "player_chapter_n": {
     "formatted": true,
     "forms": {
@@ -14997,6 +15768,13 @@
     "formatted": true,
     "forms": {
       "other": "SONGS"
+    },
+    "type": "string"
+  },
+  "player_tab_channels": {
+    "formatted": true,
+    "forms": {
+      "other": "TV"
     },
     "type": "string"
   },
@@ -15634,6 +16412,679 @@
     "formatted": true,
     "forms": {
       "other": "Enable command"
+    },
+    "type": "string"
+  },
+  "reader_add_folder": {
+    "formatted": true,
+    "forms": {
+      "other": "ADD FOLDER"
+    },
+    "type": "string"
+  },
+  "reader_bookmark": {
+    "formatted": true,
+    "forms": {
+      "other": "Pin this page"
+    },
+    "type": "string"
+  },
+  "reader_cannot_open": {
+    "formatted": true,
+    "forms": {
+      "other": "Could not open %1$s. The file may be damaged or protected."
+    },
+    "type": "string"
+  },
+  "reader_chapter_n": {
+    "formatted": true,
+    "forms": {
+      "other": "Chapter %1$d"
+    },
+    "type": "string"
+  },
+  "reader_continue": {
+    "formatted": true,
+    "forms": {
+      "other": "CONTINUE READING"
+    },
+    "type": "string"
+  },
+  "reader_copied": {
+    "formatted": true,
+    "forms": {
+      "other": "Copied"
+    },
+    "type": "string"
+  },
+  "reader_count": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d books"
+    },
+    "type": "string"
+  },
+  "reader_dir_ltr": {
+    "formatted": true,
+    "forms": {
+      "other": "L → R"
+    },
+    "type": "string"
+  },
+  "reader_dir_rtl": {
+    "formatted": true,
+    "forms": {
+      "other": "R → L"
+    },
+    "type": "string"
+  },
+  "reader_dir_scroll": {
+    "formatted": true,
+    "forms": {
+      "other": "SCROLL"
+    },
+    "type": "string"
+  },
+  "reader_direction": {
+    "formatted": true,
+    "forms": {
+      "other": "DIRECTION"
+    },
+    "type": "string"
+  },
+  "reader_direction_note": {
+    "formatted": true,
+    "forms": {
+      "other": "Text books, and PDFs with comics, each keep their own direction: R → L suits manga. Scrolling reads as one long column; taps at the edges and the volume keys move it a screen at a time."
+    },
+    "type": "string"
+  },
+  "reader_done": {
+    "formatted": true,
+    "forms": {
+      "other": "done"
+    },
+    "type": "string"
+  },
+  "reader_double_tap_zoom": {
+    "formatted": true,
+    "forms": {
+      "other": "double-tap to zoom"
+    },
+    "type": "string"
+  },
+  "reader_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "No books yet. ADD FOLDER picks a folder of EPUB, PDF, TXT, Markdown or CBZ files; OPEN FILE opens a single book."
+    },
+    "type": "string"
+  },
+  "reader_empty_scanned": {
+    "formatted": true,
+    "forms": {
+      "other": "No books found in your folders. Add another folder, or press SCAN after adding files."
+    },
+    "type": "string"
+  },
+  "reader_faint": {
+    "formatted": true,
+    "forms": {
+      "other": "FAINT"
+    },
+    "type": "string"
+  },
+  "reader_find": {
+    "formatted": true,
+    "forms": {
+      "other": "FIND"
+    },
+    "type": "string"
+  },
+  "reader_font": {
+    "formatted": true,
+    "forms": {
+      "other": "FONT"
+    },
+    "type": "string"
+  },
+  "reader_font_mono": {
+    "formatted": true,
+    "forms": {
+      "other": "Mono"
+    },
+    "type": "string"
+  },
+  "reader_font_sans": {
+    "formatted": true,
+    "forms": {
+      "other": "Sans"
+    },
+    "type": "string"
+  },
+  "reader_ghost_note": {
+    "formatted": true,
+    "forms": {
+      "other": "Each turn leaves the last page faintly behind the new one, fading over the next few turns, like an e-ink screen. A refresh washes the screen grey and clears what was left behind."
+    },
+    "type": "string"
+  },
+  "reader_ghosting": {
+    "formatted": true,
+    "forms": {
+      "other": "GHOSTING"
+    },
+    "type": "string"
+  },
+  "reader_grain": {
+    "formatted": true,
+    "forms": {
+      "other": "GRAIN"
+    },
+    "type": "string"
+  },
+  "reader_justify": {
+    "formatted": true,
+    "forms": {
+      "other": "JUSTIFY"
+    },
+    "type": "string"
+  },
+  "reader_larger": {
+    "formatted": true,
+    "forms": {
+      "other": "Larger text"
+    },
+    "type": "string"
+  },
+  "reader_left_book": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s left in book"
+    },
+    "type": "string"
+  },
+  "reader_left_chapter": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$s left in chapter"
+    },
+    "type": "string"
+  },
+  "reader_library": {
+    "formatted": true,
+    "forms": {
+      "other": "< LIBRARY"
+    },
+    "type": "string"
+  },
+  "reader_look": {
+    "formatted": true,
+    "forms": {
+      "other": "LOOK"
+    },
+    "type": "string"
+  },
+  "reader_look_eink": {
+    "formatted": true,
+    "forms": {
+      "other": "E-INK"
+    },
+    "type": "string"
+  },
+  "reader_look_theme": {
+    "formatted": true,
+    "forms": {
+      "other": "THEME"
+    },
+    "type": "string"
+  },
+  "reader_margins": {
+    "formatted": true,
+    "forms": {
+      "other": "MARGINS"
+    },
+    "type": "string"
+  },
+  "reader_module_continue": {
+    "formatted": true,
+    "forms": {
+      "other": "continue"
+    },
+    "type": "string"
+  },
+  "reader_module_library": {
+    "formatted": true,
+    "forms": {
+      "other": "library"
+    },
+    "type": "string"
+  },
+  "reader_module_none": {
+    "formatted": true,
+    "forms": {
+      "other": "No book open yet. Open the library to add a folder of books."
+    },
+    "type": "string"
+  },
+  "reader_new": {
+    "formatted": true,
+    "forms": {
+      "other": "new"
+    },
+    "type": "string"
+  },
+  "reader_no_pages": {
+    "formatted": true,
+    "forms": {
+      "other": "This book has no pages."
+    },
+    "type": "string"
+  },
+  "reader_none_match": {
+    "formatted": true,
+    "forms": {
+      "other": "No books match."
+    },
+    "type": "string"
+  },
+  "reader_not_a_book": {
+    "formatted": true,
+    "forms": {
+      "other": "That file is not a book the reader opens. It reads EPUB, PDF, TXT, Markdown and CBZ."
+    },
+    "type": "string"
+  },
+  "reader_not_found": {
+    "formatted": true,
+    "forms": {
+      "other": "No more matches for “%1$s”."
+    },
+    "type": "string"
+  },
+  "reader_off": {
+    "formatted": true,
+    "forms": {
+      "other": "OFF"
+    },
+    "type": "string"
+  },
+  "reader_on": {
+    "formatted": true,
+    "forms": {
+      "other": "ON"
+    },
+    "type": "string"
+  },
+  "reader_open_file": {
+    "formatted": true,
+    "forms": {
+      "other": "OPEN FILE"
+    },
+    "type": "string"
+  },
+  "reader_opening": {
+    "formatted": true,
+    "forms": {
+      "other": "Opening %1$s…"
+    },
+    "type": "string"
+  },
+  "reader_page_n": {
+    "formatted": true,
+    "forms": {
+      "other": "Page %1$d"
+    },
+    "type": "string"
+  },
+  "reader_pages_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "Tap the pin at the top to pin the page you are on."
+    },
+    "type": "string"
+  },
+  "reader_pages_left": {
+    "formatted": true,
+    "forms": {
+      "one": "%1$d page left in chapter",
+      "other": "%1$d pages left in chapter"
+    },
+    "type": "plurals"
+  },
+  "reader_paper": {
+    "formatted": true,
+    "forms": {
+      "other": "PAPER"
+    },
+    "type": "string"
+  },
+  "reader_paper_cool": {
+    "formatted": true,
+    "forms": {
+      "other": "Cool paper"
+    },
+    "type": "string"
+  },
+  "reader_paper_grey": {
+    "formatted": true,
+    "forms": {
+      "other": "Grey paper"
+    },
+    "type": "string"
+  },
+  "reader_paper_night": {
+    "formatted": true,
+    "forms": {
+      "other": "Night: light ink on dark"
+    },
+    "type": "string"
+  },
+  "reader_paper_warm": {
+    "formatted": true,
+    "forms": {
+      "other": "Warm paper"
+    },
+    "type": "string"
+  },
+  "reader_percent_read": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d%% read"
+    },
+    "type": "string"
+  },
+  "reader_pin": {
+    "formatted": true,
+    "forms": {
+      "other": "Pin"
+    },
+    "type": "string"
+  },
+  "reader_pinned_lines": {
+    "formatted": true,
+    "forms": {
+      "other": "PINNED LINES · %1$d"
+    },
+    "type": "string"
+  },
+  "reader_pinned_pages": {
+    "formatted": true,
+    "forms": {
+      "other": "PINNED PAGES · %1$d"
+    },
+    "type": "string"
+  },
+  "reader_pins_empty": {
+    "formatted": true,
+    "forms": {
+      "other": "Hold a word, stretch the selection over the lines you want, then tap Pin."
+    },
+    "type": "string"
+  },
+  "reader_pins_note": {
+    "formatted": true,
+    "forms": {
+      "other": "Tap to go there. Hold to copy or remove."
+    },
+    "type": "string"
+  },
+  "reader_position": {
+    "formatted": true,
+    "forms": {
+      "other": "Place in the book"
+    },
+    "type": "string"
+  },
+  "reader_real": {
+    "formatted": true,
+    "forms": {
+      "other": "REAL"
+    },
+    "type": "string"
+  },
+  "reader_refresh": {
+    "formatted": true,
+    "forms": {
+      "other": "REFRESH"
+    },
+    "type": "string"
+  },
+  "reader_refresh_every": {
+    "formatted": true,
+    "forms": {
+      "other": "EVERY"
+    },
+    "type": "string"
+  },
+  "reader_refresh_six": {
+    "formatted": true,
+    "forms": {
+      "other": "EVERY 6"
+    },
+    "type": "string"
+  },
+  "reader_remove": {
+    "formatted": true,
+    "forms": {
+      "other": "REMOVE"
+    },
+    "type": "string"
+  },
+  "reader_remove_body": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove %1$s from the library and forget your place in it? The file itself stays where it is."
+    },
+    "type": "string"
+  },
+  "reader_remove_pin": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove"
+    },
+    "type": "string"
+  },
+  "reader_remove_title": {
+    "formatted": true,
+    "forms": {
+      "other": "Remove from library"
+    },
+    "type": "string"
+  },
+  "reader_rescan": {
+    "formatted": true,
+    "forms": {
+      "other": "SCAN"
+    },
+    "type": "string"
+  },
+  "reader_scanning": {
+    "formatted": true,
+    "forms": {
+      "other": "Scanning…"
+    },
+    "type": "string"
+  },
+  "reader_search": {
+    "formatted": true,
+    "forms": {
+      "other": "Search in book"
+    },
+    "type": "string"
+  },
+  "reader_search_books": {
+    "formatted": true,
+    "forms": {
+      "other": "Search books"
+    },
+    "type": "string"
+  },
+  "reader_search_hint": {
+    "formatted": true,
+    "forms": {
+      "other": "Words to find"
+    },
+    "type": "string"
+  },
+  "reader_share": {
+    "formatted": true,
+    "forms": {
+      "other": "Share"
+    },
+    "type": "string"
+  },
+  "reader_share_all": {
+    "formatted": true,
+    "forms": {
+      "other": "SHARE ALL"
+    },
+    "type": "string"
+  },
+  "reader_shelf_all": {
+    "formatted": true,
+    "forms": {
+      "other": "ALL"
+    },
+    "type": "string"
+  },
+  "reader_shelf_comic": {
+    "formatted": true,
+    "forms": {
+      "other": "COMIC"
+    },
+    "type": "string"
+  },
+  "reader_shelf_epub": {
+    "formatted": true,
+    "forms": {
+      "other": "EPUB"
+    },
+    "type": "string"
+  },
+  "reader_shelf_pdf": {
+    "formatted": true,
+    "forms": {
+      "other": "PDF"
+    },
+    "type": "string"
+  },
+  "reader_shelf_text": {
+    "formatted": true,
+    "forms": {
+      "other": "TEXT"
+    },
+    "type": "string"
+  },
+  "reader_size": {
+    "formatted": true,
+    "forms": {
+      "other": "SIZE"
+    },
+    "type": "string"
+  },
+  "reader_smaller": {
+    "formatted": true,
+    "forms": {
+      "other": "Smaller text"
+    },
+    "type": "string"
+  },
+  "reader_spacing": {
+    "formatted": true,
+    "forms": {
+      "other": "LINE SPACING"
+    },
+    "type": "string"
+  },
+  "reader_strong": {
+    "formatted": true,
+    "forms": {
+      "other": "STRONG"
+    },
+    "type": "string"
+  },
+  "reader_swipe": {
+    "formatted": true,
+    "forms": {
+      "other": "SWIPE TO TURN"
+    },
+    "type": "string"
+  },
+  "reader_tab_contents": {
+    "formatted": true,
+    "forms": {
+      "other": "CONTENTS"
+    },
+    "type": "string"
+  },
+  "reader_tab_eink": {
+    "formatted": true,
+    "forms": {
+      "other": "E-INK"
+    },
+    "type": "string"
+  },
+  "reader_tab_pages": {
+    "formatted": true,
+    "forms": {
+      "other": "PAGES"
+    },
+    "type": "string"
+  },
+  "reader_tab_pins": {
+    "formatted": true,
+    "forms": {
+      "other": "PINS"
+    },
+    "type": "string"
+  },
+  "reader_tab_text": {
+    "formatted": true,
+    "forms": {
+      "other": "TEXT"
+    },
+    "type": "string"
+  },
+  "reader_time_hours": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d h %2$02d min"
+    },
+    "type": "string"
+  },
+  "reader_time_min": {
+    "formatted": true,
+    "forms": {
+      "other": "%1$d min"
+    },
+    "type": "string"
+  },
+  "reader_title": {
+    "formatted": true,
+    "forms": {
+      "other": "BOOKS"
+    },
+    "type": "string"
+  },
+  "reader_unpin": {
+    "formatted": true,
+    "forms": {
+      "other": "Unpin"
+    },
+    "type": "string"
+  },
+  "reader_unpin_page": {
+    "formatted": true,
+    "forms": {
+      "other": "Unpin this page"
+    },
+    "type": "string"
+  },
+  "reader_volume_keys": {
+    "formatted": true,
+    "forms": {
+      "other": "VOLUME KEYS TURN"
     },
     "type": "string"
   },
@@ -16613,10 +18064,31 @@
     },
     "type": "string"
   },
+  "setting_behavior_mono_layout_description": {
+    "formatted": true,
+    "forms": {
+      "other": "In Mono mode, the home panels in order on a four-column grid, separated by commas: scene, clock, apps, media, quick, tasks, next, alerts, read, term. A | starts a new page. A size can follow a name, such as read:2x4 or term:4x2; each panel takes the first free spot its size fits. Hold a panel on the home to resize, move, swap or remove it, and use the add panel slot to add one."
+    },
+    "type": "string"
+  },
+  "setting_behavior_mono_layout_style_description": {
+    "formatted": true,
+    "forms": {
+      "other": "In Mono mode, how the home holds more panels than fit: pages, swiped left and right, or scroll, everything on one page that scrolls down."
+    },
+    "type": "string"
+  },
   "setting_behavior_mono_paper_color_description": {
     "formatted": true,
     "forms": {
       "other": "In Mono mode, the background colour."
+    },
+    "type": "string"
+  },
+  "setting_behavior_mono_preset_description": {
+    "formatted": true,
+    "forms": {
+      "other": "In Mono mode, the pair of colours: e-ink lite (dark ink on grey paper), e-ink dark (light ink on dark paper), or custom, your own ink and paper."
     },
     "type": "string"
   },
@@ -28568,6 +30040,20 @@
     "formatted": true,
     "forms": {
       "other": "RELIEF"
+    },
+    "type": "string"
+  },
+  "wallpaper_touch_grass": {
+    "formatted": true,
+    "forms": {
+      "other": "touch grass"
+    },
+    "type": "string"
+  },
+  "wallpaper_touch_grass_credit": {
+    "formatted": true,
+    "forms": {
+      "other": "Touch grass · inspired by Dylearn's 3D Pixel Art Grass demo (github.com/DylearnDev)"
     },
     "type": "string"
   },

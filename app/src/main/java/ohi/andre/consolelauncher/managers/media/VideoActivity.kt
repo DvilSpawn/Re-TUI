@@ -180,6 +180,8 @@ abstract class VideoActivity : LocalizedComponentActivity() {
         const val EXTRA_URI = "uri"
         const val EXTRA_START_AT = "start_at"
         const val EXTRA_FORGET = "forget"
+        /** Opened full screen from the mono media panel: leaving goes back to it, not to the library or a window. */
+        const val EXTRA_FROM_HOME = "from_home"
         const val KEY_LAST = "__last"
         /** Stored as both position and length when a never-opened video is marked watched. */
         const val MARKED_DONE = 1L

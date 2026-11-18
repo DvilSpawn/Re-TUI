@@ -197,15 +197,30 @@ enum class Behavior : XMLPrefsSave {
 
         override fun type(): String? = XMLPrefsSave.TEXT
     },
+    mono_preset {
+        override fun defaultValue(): String = ohi.andre.consolelauncher.managers.settings.MonoMode.CUSTOM
+        override fun infoRes(): Int = R.string.setting_behavior_mono_preset_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
     mono_ink_color {
-        override fun defaultValue(): String = "#FFF2F0E6"
+        override fun defaultValue(): String = "#FF8DB8F2"
         override fun infoRes(): Int = R.string.setting_behavior_mono_ink_color_description
         override fun type(): String = XMLPrefsSave.COLOR
     },
     mono_paper_color {
-        override fun defaultValue(): String = "#FF0A0A0A"
+        override fun defaultValue(): String = "#FF0B0D12"
         override fun infoRes(): Int = R.string.setting_behavior_mono_paper_color_description
         override fun type(): String = XMLPrefsSave.COLOR
+    },
+    mono_layout {
+        override fun defaultValue(): String = "scene,clock,apps,media,quick,tasks"
+        override fun infoRes(): Int = R.string.setting_behavior_mono_layout_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
+    mono_layout_style {
+        override fun defaultValue(): String = "pages"
+        override fun infoRes(): Int = R.string.setting_behavior_mono_layout_style_description
+        override fun type(): String = XMLPrefsSave.TEXT
     },
     dot_apps {
         override fun defaultValue(): String = ""

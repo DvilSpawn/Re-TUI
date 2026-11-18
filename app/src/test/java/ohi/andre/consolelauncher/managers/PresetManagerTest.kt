@@ -88,6 +88,37 @@ class PresetManagerTest {
         assertEquals(source.readText(), destination.readText())
     }
 
+    @Test fun presetPartsChooseWhichBehaviorIsSaved() {
+        val root = Files.createTempDirectory("preset-parts").toFile()
+        val source = File(root, "behavior.xml").apply {
+            writeText("<BEHAVIOR><launcher_mode value=\"mono\" /><mono_ink_color value=\"#FF000000\" />" +
+                "<enable_crt_filter value=\"true\" /><weather_location value=\"Home\" /></BEHAVIOR>")
+        }
+        val destination = File(root, "preset/behavior.xml").apply { parentFile?.mkdirs() }
+        val all = PresetManager.Part.entries.toSet()
+
+        PresetManager.saveBehavior(source, destination, all)
+        assertEquals(source.readText(), destination.readText())
+
+        PresetManager.saveBehavior(source, destination, all - PresetManager.Part.MODE)
+        destination.readText().let {
+            assertFalse(it.contains("<launcher_mode "))
+            assertTrue(it.contains("<mono_ink_color value=\"#FF000000\""))
+            assertTrue(it.contains("<weather_location value=\"Home\""))
+        }
+
+        PresetManager.saveBehavior(source, destination, setOf(PresetManager.Part.MONO, PresetManager.Part.LOOK))
+        destination.readText().let {
+            assertTrue(it.contains("<mono_ink_color "))
+            assertTrue(it.contains("<enable_crt_filter value=\"true\""))
+            assertFalse(it.contains("<launcher_mode "))
+            assertFalse(it.contains("<weather_location "))
+        }
+
+        PresetManager.saveBehavior(source, destination, setOf(PresetManager.Part.COLOURS))
+        assertFalse(destination.exists())
+    }
+
     @Test fun sanitizerRemovesPersonalTextUnknownFieldsAndInvalidValues() {
         val behavior = Files.createTempFile("preset-behavior", ".xml").toFile()
         behavior.writeText(

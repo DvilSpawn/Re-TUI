@@ -16,6 +16,7 @@ PACKS = [
     ('nagomi', 'nagomi', 'Nagomi Koi Pond', 'Koi, tiny fish and drifting plants. Pick a pond photo or use the original background.'),
     ('astro', 'astro chart', 'Astro Chart', 'A pixel-art planet and busy station. Small craft dock and land while freighters cross at different depths.'),
     ('matrix', 'matrix rain', 'Matrix Rain', 'Falling glyph streams in six colour styles. Touch parts the rain and sends a ripple.'),
+    ('grass', 'touch grass', 'Touch Grass', 'A lawn seen from just above. Drag a finger through it and the grass parts, then stands back up; tilt the phone and the tips shift. Leave it alone and it reminds you. Needs Re:TUI 6 Build 801 or later.'),
 ]
 # catalog.json is read by builds that reject the whole file on any id they do not know, so it stays at these four.
 # New wallpapers go only in catalog-v2.json, which every later build reads and which skips rows it cannot use.
@@ -44,6 +45,9 @@ def prepare(output: Path):
                 pack_notices += '\n\n' + (ROOT / 'docs/nagomi.md').read_text()
             if ident == 'clouds':
                 pack_notices += '\n\n' + (ROOT / 'docs/clouds-licensing.md').read_text()
+            if ident == 'grass':
+                pack_notices += ('\n\nTouch Grass is drawn by Re:TUI\'s own code, with no copied code or artwork. It is inspired by '
+                                 "Dylearn's Stylised 3D Pixel Grass demo (https://github.com/DylearnDev/Dylearn-3D-Pixel-Art-Grass-Demo).")
             archive.writestr('LICENSE.txt', pack_notices)
             for file in assets: archive.write(file, file.name)
         records.append(dict(id=ident, name=title, description=description, api=1,

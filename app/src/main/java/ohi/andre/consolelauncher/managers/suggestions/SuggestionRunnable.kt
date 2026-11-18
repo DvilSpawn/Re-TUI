@@ -286,7 +286,9 @@ internal class SuggestionChipStyler(private val context: Context, private val ap
         var bgColor=Int.MAX_VALUE
         var textColor=Int.MAX_VALUE
         var styledPayload=payload
-        if(type==SuggestionsManager.Suggestion.TYPE_APP || type==SuggestionsManager.Suggestion.TYPE_APPGP) {
+        // Mono draws every chip in its two colours, so group colours do not apply there.
+        if((type==SuggestionsManager.Suggestion.TYPE_APP || type==SuggestionsManager.Suggestion.TYPE_APPGP) &&
+            !ohi.andre.consolelauncher.managers.settings.MonoMode.active()) {
             if(styledPayload is LaunchInfo)
                 styledPayload=appsManager?.groups?.firstOrNull { it.contains(styledPayload) } ?: styledPayload
             if(styledPayload is AppsManager.Group) { bgColor=styledPayload.bgColor;textColor=styledPayload.foreColor }

@@ -48,6 +48,7 @@ import ohi.andre.consolelauncher.wallpaper.pixel.DoomFireView
 import ohi.andre.consolelauncher.wallpaper.pixel.PhotoDitherView
 import ohi.andre.consolelauncher.wallpaper.pixel.PixelLook
 import ohi.andre.consolelauncher.wallpaper.pixel.RipplesView
+import ohi.andre.consolelauncher.wallpaper.pixel.TouchGrassView
 import ohi.andre.consolelauncher.wallpaper.pixel.ShorelineView
 import ohi.andre.consolelauncher.wallpaper.astro.AstroWorld
 
@@ -83,6 +84,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
     private lateinit var panelParams: FrameLayout.LayoutParams
     private var scene = "csakura"
     private lateinit var nagomiControls: LinearLayout
+    private lateinit var grassCredit: TextView
     private var nagomiBackground: File? = null
     private var pickedPhoto: File? = null
     private var wasOursBeforeApply = false
@@ -247,6 +249,14 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             }.apply { layoutParams = LinearLayout.LayoutParams(-1, dp(46)) })
         }
         panel.addView(nagomiControls)
+        grassCredit = TextView(this).apply {
+            text = getString(R.string.wallpaper_touch_grass_credit)
+            setTextColor(Color.WHITE)
+            textSize = 12f
+            setPadding(dp(4), dp(6), dp(4), dp(6))
+            visibility = View.GONE
+        }
+        panel.addView(grassCredit)
 
         photoControls = row().apply {
             addView(compactControl(getString(R.string.wallpaper_photo_choose)) {
@@ -450,6 +460,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             is MatrixRainView -> RetuiWallpaperSettings.saveMatrix(target, current.styleName, current.charSet.name)
             is PhotoDitherView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.look.id, current.ripples, current.offset)
             is RipplesView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.style)
+            is TouchGrassView -> RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.look)
             is DoomFireView -> {
                 RetuiWallpaperSettings.savePixelWallpaper(target, scene, current.styleName)
                 RetuiWallpaperSettings.saveDoomFireColors(target, current.customColors())
@@ -499,6 +510,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
             MatrixRainView.SCENE -> MatrixRainView(this)
             PhotoDitherView.SCENE -> PhotoDitherView(this).apply { pickedPhoto?.let { photo = it } }
             RipplesView.SCENE -> RipplesView(this)
+            // The preview takes touches too, so the grass can be tried before applying it.
+            TouchGrassView.SCENE -> TouchGrassView(this).apply { setOnTouchListener { _, event -> handleTouch(event); true } }
             DoomFireView.SCENE -> DoomFireView(this)
             ShorelineView.SCENE -> ShorelineView(this)
             NagomiView.SCENE -> NagomiView(this).apply {
@@ -568,6 +581,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         is PhotoDitherView -> PixelLook.entries.map { it.id }.let { names -> spinner(names, names.indexOf(current.look.id)) { current.look = PixelLook.of(it) } }
         is ShorelineView -> PixelLook.entries.map { it.id }.let { names -> spinner(names, names.indexOf(current.look.id)) { current.look = PixelLook.of(it) } }
         is RipplesView -> spinner(RipplesView.STYLES, RipplesView.STYLES.indexOf(current.style).coerceAtLeast(0)) { current.style = it }
+        is TouchGrassView -> spinner(TouchGrassView.LOOKS, TouchGrassView.LOOKS.indexOf(current.look).coerceAtLeast(0)) { current.look = it }
         is MatrixRainView -> spinner(MatrixRainView.STYLE_NAMES, MatrixRainView.STYLE_NAMES.indexOf(current.styleName).coerceAtLeast(0), current::setStyle)
         is CloudsView -> CloudsView.sceneNames(this).let { names ->
             spinner(names, current.sceneNumber - 1) { current.setScene(names.indexOf(it) + 1) }
@@ -604,13 +618,14 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         val nagomi = scene == NagomiView.SCENE
         val astro = scene == AstroChartView.SCENE
         val matrix = scene == MatrixRainView.SCENE
-        val pixelScene = scene == PhotoDitherView.SCENE || scene == RipplesView.SCENE || scene == DoomFireView.SCENE || scene == ShorelineView.SCENE
+        val pixelScene = scene == PhotoDitherView.SCENE || scene == RipplesView.SCENE || scene == TouchGrassView.SCENE || scene == DoomFireView.SCENE || scene == ShorelineView.SCENE
         photoControls.visibility = if (scene == PhotoDitherView.SCENE) View.VISIBLE else View.GONE
         bindShoreControls(available)
         (preview as? PhotoDitherView)?.let {
             ripplesButton.text = getString(if (it.ripples) R.string.wallpaper_photo_ripples_on else R.string.wallpaper_photo_ripples_off)
         }
         nagomiControls.visibility = if (nagomi && available) View.VISIBLE else View.GONE
+        grassCredit.visibility = if (scene == TouchGrassView.SCENE) View.VISIBLE else View.GONE
         colorLabel.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
         colorSpinner.visibility = if (nagomi || !available) View.GONE else View.VISIBLE
         colorLabel.text = getString(if (clouds) R.string.wallpaper_clouds_scene_label else if (astro) R.string.wallpaper_astro_world_label else if (matrix) R.string.wallpaper_matrix_style_label else if (pixelScene) R.string.wallpaper_pixel_look_label else R.string.editor_retuiwallpaperactivity_color_34171)
@@ -634,7 +649,8 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
         zoomLabel.visibility = zoomVisibility
         zoomMinus.visibility = zoomVisibility
         zoomPlus.visibility = zoomVisibility
-        panelParams.height = if (!available) dp(116) else if (nagomi) ViewGroup.LayoutParams.WRAP_CONTENT
+        // Nagomi and touch grass carry a credit line, so their panel grows to fit it.
+        panelParams.height = if (!available) dp(116) else if (nagomi || scene == TouchGrassView.SCENE) ViewGroup.LayoutParams.WRAP_CONTENT
             else if (scene == PhotoDitherView.SCENE || scene == ShorelineView.SCENE || scene == DoomFireView.SCENE) dp(166) else dp(if (clouds || pixelScene) 116 else if (astro || matrix) 166 else if (scene == TopoNoiseView.SCENE) 318 else 268)
         settingsPanel.layoutParams = panelParams
         topoColorControls.forEachIndexed { index, button ->
@@ -926,6 +942,7 @@ class RetuiWallpaperActivity : ohi.andre.consolelauncher.localization.LocalizedA
                 MatrixRainView.SCENE -> getString(R.string.wallpaper_matrix_rain)
                 PhotoDitherView.SCENE -> getString(R.string.wallpaper_dither_photo)
                 RipplesView.SCENE -> getString(R.string.wallpaper_ripples)
+                TouchGrassView.SCENE -> getString(R.string.wallpaper_touch_grass)
                 DoomFireView.SCENE -> getString(R.string.wallpaper_doom_fire)
                 ShorelineView.SCENE -> getString(R.string.wallpaper_shoreline)
                 NagomiView.SCENE -> getString(R.string.nagomi_title)

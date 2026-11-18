@@ -300,7 +300,7 @@
         \n(no args) -> open the wallpaper picker
     </string>
     <string name="hint_wallpaper_auto_confirm">Yes/No</string>
-    <string name="help_preset">-save [name] -> save theme.xml and suggestions.xml colors, shareable ui.xml values, local behavior.xml settings, and frame state as a local preset
+    <string name="help_preset">-save [name] -> save the current setup as a local preset; a checklist asks what it keeps: colours, look (ui.xml, frames, effects), mode, Mono, the rest of behavior.xml, and the wallpaper. What is left out stays as it is when the preset is applied. Saved in Mono, a preset keeps your own colours and fonts, not Mono\'s
         \n-apply [name] -> apply a saved or built-in preset; saved presets can restore UI, selected behavior settings, and frames as well as colors; disable auto_color_pick
         \n-duplicate [saved name] -> copy a saved preset and prompt for its new name
         \n-ls -> list saved and built-in presets
@@ -808,7 +808,7 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     </string>
 
     <string name="help_username">Change the username and device name: username [new_user] [new_device]</string>
-    <string name="help_mode">Switch launcher layout.\nUsage:\n$ mode classic\n$ mode search\n$ mode terminal</string>
+    <string name="help_mode">Switch launcher layout. mode on its own shows the current one.\nUsage:\n$ mode classic\n$ mode search\n$ mode terminal\n$ mode dot\n$ mode mono</string>
     <string name="search_mode_hint">Search apps, contacts, notifications, or the web…</string>
     <string name="player_filter">search music, video, podcasts</string>
     <string name="player_title">Media player</string>
@@ -875,6 +875,26 @@ Enable qalculate in Settings → behavior.xml for units and symbolic maths, e.g.
     <string name="player_tab_music">MUSIC</string>
     <string name="player_tab_video">VIDEO</string>
     <string name="player_tab_podcasts">PODCASTS</string>
+    <string name="player_tab_channels">TV</string>
+    <string name="player_channels_from_file">FROM FILE</string>
+    <string name="player_channels_from_url">FROM URL</string>
+    <string name="player_channels_clear">CLEAR</string>
+    <string name="player_channels_clear_ask">Remove every channel? Your playlists stay where they are; import them again any time.</string>
+    <string name="player_channels_playlist_url">Playlist URL (M3U)</string>
+    <string name="player_channels_web_only">Use an https:// or http:// address.</string>
+    <string name="player_channels_plain_title">Unencrypted channels</string>
+    <plurals name="player_channels_plain_message">
+        <item quantity="one">This uses http://, not https://. Nothing it sends is encrypted: anyone on your network, your provider or the stream\'s host can see what you watch, and can change or replace the picture and sound. Accept only if you trust this playlist and the network you are on. Accepting allows unencrypted channels from now on.</item>
+        <item quantity="other">%1$d of these channels use http://, not https://. Nothing they send is encrypted: anyone on your network, your provider or the stream\'s host can see what you watch, and can change or replace the picture and sound. Accept only if you trust this playlist and the network you are on. Skip leaves them out. Accepting allows unencrypted channels from now on.</item>
+    </plurals>
+    <string name="player_channels_plain_accept">ACCEPT</string>
+    <string name="player_channels_plain_skip">SKIP</string>
+    <string name="player_channels_importing">Importing channels…</string>
+    <string name="player_channels_none_found">No channels in that playlist.</string>
+    <string name="player_channels_added">%1$d new of %2$d channels added.</string>
+    <string name="player_channels_failed">Could not import: %1$s</string>
+    <string name="player_channels_empty">No channels yet. Import an M3U playlist from a file or a URL.</string>
+    <string name="player_channels_last">Last watched: %1$s</string>
     <string name="player_albums">ALBUMS</string>
     <string name="player_artists">ARTISTS</string>
     <string name="player_songs">SONGS</string>

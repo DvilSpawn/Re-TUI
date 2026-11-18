@@ -34,6 +34,7 @@ object ModuleManager {
     const val RSS: String = "rss"
     const val WEATHER: String = "weather"
     const val WEATHER_NATIVE: String = "weather_native"
+    const val READ: String = "read"
     const val SOURCE_LAUNCHER_PREFIX: String = "launcher:"
     const val SOURCE_TERMUX_PREFIX: String = "termux:"
     const val SOURCE_LUA_PREFIX: String = "lua:"
@@ -50,7 +51,7 @@ object ModuleManager {
     private val DEFAULT_DOCK: MutableList<String?> =
         Arrays.asList<String?>(MUSIC, NOTIFICATIONS, TIMER, CALENDAR, REMINDER)
     private val BUILT_INS: MutableList<String?> =
-        Arrays.asList<String?>(MUSIC, NOTIFICATIONS, TIMER, CALENDAR, REMINDER, NOTES, RSS, WEATHER, WEATHER_NATIVE)
+        Arrays.asList<String?>(MUSIC, NOTIFICATIONS, TIMER, CALENDAR, REMINDER, NOTES, RSS, WEATHER, WEATHER_NATIVE, READ)
 
     val builtIns: MutableList<String?>
         get() = ArrayList<String?>(BUILT_INS)
@@ -368,6 +369,9 @@ object ModuleManager {
         if ("weath" == id || "wttr" == id) {
             return WEATHER
         }
+        if ("book" == id || "books" == id || "reader" == id || "ereader" == id || "reading" == id) {
+            return READ
+        }
         if ("nativeweather" == id || "weathernative" == id) {
             return WEATHER_NATIVE
         }
@@ -395,6 +399,7 @@ object ModuleManager {
             REMINDER -> context.getString(R.string.module_label_reminder)
             NOTES -> context.getString(R.string.module_label_notes)
             WEATHER -> context.getString(R.string.module_label_weather)
+            READ -> context.getString(R.string.module_label_read)
             else -> id.uppercase()
         }
     }

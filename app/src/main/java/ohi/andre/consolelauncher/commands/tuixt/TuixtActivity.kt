@@ -78,6 +78,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     private var plainTextEditor: EditText? = null
     private var originalRawText: String? = null
     private var asciiSettingsMode = false
+    private var monoSettingsMode = false
     private var appearancePreview: SettingsAppearancePreview? = null
     private var previewKeyboardVisible = false
     private var previewPanelViews: Pair<LinearLayout, TextView>? = null
@@ -91,14 +92,20 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
         val intent = getIntent()
         asciiSettingsMode = MODE_ASCII_SETTINGS == intent.getStringExtra(MODE)
+        monoSettingsMode = MODE_MONO_SETTINGS == intent.getStringExtra(MODE)
         val onlySection = intent.getStringExtra(ONLY_SECTION)
         val excludeSections = intent.getStringArrayListExtra(EXCLUDE_SECTION) ?: listOfNotNull(intent.getStringExtra(EXCLUDE_SECTION))
         val path = intent.getStringExtra(PATH)
-        if (path == null && !asciiSettingsMode) {
+        if (path == null && !asciiSettingsMode && !monoSettingsMode) {
             finish()
             return
         }
-        file = if (asciiSettingsMode) asciiFile else File(path!!)
+        file = when {
+            asciiSettingsMode -> asciiFile
+            // The mono list spans several files; it saves through the adapter, never through this file.
+            monoSettingsMode -> File(Tuils.getFolder(), "mono")
+            else -> File(path!!)
+        }
 
         val screen = FrameLayout(this)
         stylePaneScreen(this, screen)
@@ -112,7 +119,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             insets
         }
         val fileName = file!!.getName().lowercase(Locale.ROOT)
-        val previewRoot = if (asciiSettingsMode) null else XMLPrefsRoot.entries.firstOrNull { fileName == it.path() }
+        val previewRoot = if (asciiSettingsMode || monoSettingsMode) null else XMLPrefsRoot.entries.firstOrNull { fileName == it.path() }
             ?.takeIf { it == XMLPrefsRoot.UI || it == XMLPrefsRoot.THEME || it == XMLPrefsRoot.BEHAVIOR || it == XMLPrefsRoot.TOOLBAR || it == XMLPrefsRoot.SUGGESTIONS }
         // In landscape the preview gets its own pane beside the settings instead of a strip above them.
         val previewSplit = if (previewRoot != null && TuixtLayout.usesPreviewSplit(this)) TuixtLayout.addPreviewSplit(this, screen) else null
@@ -132,6 +139,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         header.setText(
             when {
                 asciiSettingsMode -> getString(R.string.editor_tuixtactivity_ascii_settings_4a299)
+                monoSettingsMode -> getString(R.string.mono_settings_title)
                 onlySection != null -> getString(R.string.editor_tuixtactivity_behavior_70e30, onlySection)
                 else -> getString(R.string.editor_tuixtactivity_themer_93fef, file!!.getName())
             }
@@ -153,6 +161,15 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         recyclerView!!.setLayoutManager(LinearLayoutManager(this))
         if (asciiSettingsMode) {
             root.addView(buildAsciiActions())
+        }
+        if (monoSettingsMode) {
+            root.addView(LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, 0, 0, dp(this@TuixtActivity, 10f))
+                addAsciiAction(this, getString(R.string.mono_settings_all)) {
+                    startActivity(ThemerActivity.launchIntent(this@TuixtActivity, null))
+                }
+            })
         }
         root.addView(recyclerView)
 
@@ -248,8 +265,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             }
         }
 
-        if (asciiSettingsMode) {
-            originalRows = buildAsciiSettingsRows()
+        if (asciiSettingsMode || monoSettingsMode) {
+            originalRows = if (monoSettingsMode) buildMonoSettingsRows() else buildAsciiSettingsRows()
             adapter = TuixtAdapter(originalRows!!.toMutableList(), null)
             recyclerView!!.setAdapter(adapter)
             adapter?.restoreDraftState(savedInstanceState?.getBundle("appearance_draft"))
@@ -464,6 +481,25 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_background_color, getString(R.string.editor_tuixtactivity_colors_88d5e)))
         rows.add(TuixtAdapter.SettingsRow.setting(Theme.ascii_status_text_shadow_color, getString(R.string.editor_tuixtactivity_colors_88d5e)))
 
+        return rows
+    }
+
+    /** Only what changes the mono home: everything else is overridden or hidden while mono is on. */
+    private fun buildMonoSettingsRows(): MutableList<TuixtAdapter.SettingsRow> {
+        val rows: MutableList<TuixtAdapter.SettingsRow> = ArrayList()
+        for ((title, settings) in listOf(
+            R.string.mono_settings_mode to listOf<XMLPrefsSave>(Behavior.launcher_mode),
+            // Ink and paper only show under the custom preset; see TuixtAdapter.hiddenByDraft.
+            R.string.mono_settings_preset to listOf(Behavior.mono_preset, Behavior.mono_ink_color, Behavior.mono_paper_color),
+            R.string.mono_settings_home to listOf(Behavior.mono_layout_style, Behavior.mono_layout),
+            R.string.mono_settings_screen to listOf(Behavior.enable_crt_filter, Ui.enable_crt_vignette),
+            R.string.mono_settings_weather to listOf(Ui.show_weather, Behavior.weather_location,
+                Behavior.weather_temperature_measure, Behavior.weather_update_time, Behavior.weather_key),
+        )) {
+            val section = getString(title)
+            addSection(rows, section)
+            settings.forEach { rows.add(TuixtAdapter.SettingsRow.setting(it, section)) }
+        }
         return rows
     }
 
@@ -951,6 +987,13 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         const val PATH: String = "path"
         const val MODE: String = "mode"
         const val MODE_ASCII_SETTINGS: String = "ascii_settings"
+        const val MODE_MONO_SETTINGS: String = "mono_settings"
+
+        /** The settings that matter in mono mode, opened from the mono home's soft keys. */
+        fun monoSettingsIntent(context: android.content.Context): android.content.Intent =
+            android.content.Intent(context, TuixtActivity::class.java)
+                .putExtra(MODE, MODE_MONO_SETTINGS)
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
         private const val PREVIEW_ROWS = 7
         const val ONLY_SECTION: String = "only_section"
         const val FOCUS: String = "focus"

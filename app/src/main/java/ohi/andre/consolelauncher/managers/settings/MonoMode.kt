@@ -31,16 +31,30 @@ object MonoMode {
         }
     }
 
-    fun ink(): Int = colorOf(Behavior.mono_ink_color, 0xFFF2F0E6.toInt())
-    fun paper(): Int = colorOf(Behavior.mono_paper_color, 0xFF0A0A0A.toInt())
+    /** The pair comes from a preset, or from the user's own ink and paper under [CUSTOM]. */
+    const val EINK_LITE = "e-ink lite"
+    const val EINK_DARK = "e-ink dark"
+    const val CUSTOM = "custom"
+    val PRESETS = arrayOf(EINK_LITE, EINK_DARK, CUSTOM)
+
+    /** E-ink paper and its ink, as the eReader's grey and night papers draw them. */
+    private val pairs = mapOf(EINK_LITE to (0xFF1E1E1C.toInt() to 0xFFE3E1DA.toInt()), EINK_DARK to (0xFFD8D5CC.toInt() to 0xFF2A2A28.toInt()))
+
+    private fun preset(): Pair<Int, Int>? = pairs[LauncherSettings.raw(Behavior.mono_preset)?.trim()?.lowercase()]
+
+    fun ink(): Int = preset()?.first ?: colorOf(Behavior.mono_ink_color, 0xFF8DB8F2.toInt())
+    fun paper(): Int = preset()?.second ?: colorOf(Behavior.mono_paper_color, 0xFF0B0D12.toInt())
 
     private fun colorOf(setting: Behavior, fallback: Int): Int =
         runCatching { Color.parseColor(LauncherSettings.raw(setting)) }.getOrDefault(fallback) or 0xFF000000.toInt()
 
     private fun hex(color: Int) = String.format("#%08X", color)
 
-    private val fixedFalse: Set<XMLPrefsSave> = setOf(Ui.system_wallpaper, Ui.system_font, Ui.enable_crt_vignette,
-        Ui.auto_color_pick, Behavior.enable_crt_filter, Behavior.enable_cyberdeck_mode)
+    // The CRT filter, vignette and cyberdeck frames are left to the user: they still read as mono in one ink.
+    private val fixedFalse: Set<XMLPrefsSave> = setOf(Ui.system_wallpaper, Ui.system_font,
+        Ui.auto_color_pick,
+        // Chips are inverted; a transparent chip would leave paper labels on paper.
+        Suggestions.transparent_suggestions)
     // Borders: the "dashed" style with no gap draws one solid square line around every surface.
     private val fixedTrue: Set<XMLPrefsSave> = setOf(Ui.enable_dashed_border)
     private val fixedZero: Set<XMLPrefsSave> = setOf(Ui.dashed_border_corner_radius, Ui.module_corner_radius,
@@ -48,7 +62,7 @@ object MonoMode {
 
     /** Whether mono mode takes [setting] over at all; cheap, so ordinary reads cost nothing extra. */
     private fun takesOver(setting: XMLPrefsSave): Boolean = when (setting) {
-        Behavior.launcher_mode, Behavior.search_only_mode, Behavior.mono_ink_color, Behavior.mono_paper_color -> false
+        Behavior.launcher_mode, Behavior.search_only_mode, Behavior.mono_ink_color, Behavior.mono_paper_color, Behavior.mono_preset -> false
         in fixedFalse, in fixedTrue, in fixedZero, Ui.font_file, Ui.font_size_offset, Ui.dashed_border_gap_length, Ui.dashed_border_stroke_width, Ui.shadow_params, Ui.text_redraw_times, Ui.statusbar_light_icons -> true
         is Theme -> true
         is Suggestions -> setting.type() == XMLPrefsSave.COLOR

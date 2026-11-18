@@ -350,6 +350,16 @@
     <!-- preset.kt: exec -->
     <string name="command_preset_preset_saved_c599d">"Preset \'%1$s\' saved."</string>
     <!-- preset.kt: exec -->
+    <string name="command_preset_parts_title">Save preset %1$s</string>
+    <string name="command_preset_parts_note">Choose what this preset keeps. Anything left out stays as it is when the preset is applied.</string>
+    <string name="command_preset_part_colours">Colours: theme and suggestion colours</string>
+    <string name="command_preset_part_look">Look: fonts, borders, status rows, frames, cyberdeck, CRT and ASCII effects</string>
+    <string name="command_preset_part_mode">Mode: launcher mode, orientation and Duo layout</string>
+    <string name="command_preset_part_mono">Mono: preset, ink and paper, and panel layout</string>
+    <string name="command_preset_part_behaviour">Behaviour: sounds, output, gestures and everything else</string>
+    <string name="command_preset_part_wallpaper">Wallpaper</string>
+    <string name="command_preset_save">Save</string>
+    <string name="command_preset_choose_parts">Choose what preset %1$s keeps.</string>
     <string name="command_preset_saved_preset_4a339">"Saved preset: %1$s"</string>
     <!-- reminder.kt: remove -->
     <string name="command_reminder_reminder_not_found_032c9">"Reminder not found.\n%1$s"</string>

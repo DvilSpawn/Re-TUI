@@ -121,6 +121,7 @@ import ohi.andre.consolelauncher.managers.modules.home.HomeModules
 import ohi.andre.consolelauncher.managers.modules.home.LuaModules
 import ohi.andre.consolelauncher.managers.modules.home.MusicModule
 import ohi.andre.consolelauncher.managers.modules.home.NotesModule
+import ohi.andre.consolelauncher.managers.modules.home.ReadModule
 import ohi.andre.consolelauncher.managers.modules.home.NotificationsModule
 import ohi.andre.consolelauncher.managers.modules.home.ReminderModule
 import ohi.andre.consolelauncher.managers.modules.home.RssModule
@@ -777,6 +778,8 @@ class UIManager(
         override val keyboardUp: Boolean get() = keyboardVisible
         override fun applyDisplayMargins() = applyDisplayMarginsForConfigurationOnMainThread()
         override fun launchSettings() = openSettingsSurface(null)
+        override fun appDrawer() = showAppsDrawer()
+        override fun widgetDrawer() = showAndroidWidgetDrawer()
         override fun configureSearchLayout(closeDrawers: Boolean) = configureSearchOnlyLayout(closeDrawers)
         override fun activateInput() = activateTerminalInput(true)
         override fun refreshSuggestions() = refreshStockSuggestions()
@@ -2839,7 +2842,7 @@ class UIManager(
     /** Built-in Home modules. A new one only needs its class and an entry here. */
     private val homeModules by lazy {
         HomeModules(listOf(
-            musicModule, notificationsModule, TimerModule(), CalendarModule(), ReminderModule(), NotesModule(), RssModule { mainPack.rssManager },
+            musicModule, notificationsModule, TimerModule(), CalendarModule(), ReminderModule(), NotesModule(), ReadModule(), RssModule { mainPack.rssManager },
             WeatherModule(
                 reading = {
                     WeatherModule.Reading(lastWeatherText.takeUnless { TextUtils.isEmpty(it) } ?: labelTexts[Label.weather.ordinal],

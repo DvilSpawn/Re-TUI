@@ -360,6 +360,14 @@
     "license_metadata": "The Apache Software License, Version 2.0"
   },
   {
+    "coordinate": "androidx.media3:media3-exoplayer-hls:1.11.1",
+    "license_files": [
+      "Material-Symbols-Apache-2.0.txt"
+    ],
+    "project_url": "https://developer.android.com/jetpack/androidx/releases/media3#1.11.1",
+    "license_metadata": "The Apache Software License, Version 2.0"
+  },
+  {
     "coordinate": "androidx.media3:media3-extractor:1.11.1",
     "license_files": [
       "Material-Symbols-Apache-2.0.txt"

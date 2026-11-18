@@ -452,6 +452,8 @@
     <string name="wallpaper_astro_monochrome">monochrome</string>
     <string name="wallpaper_dither_photo">dither photo</string>
     <string name="wallpaper_ripples">ripples</string>
+    <string name="wallpaper_touch_grass">touch grass</string>
+    <string name="wallpaper_touch_grass_credit">Touch grass · inspired by Dylearn\'s 3D Pixel Art Grass demo (github.com/DylearnDev)</string>
     <string name="wallpaper_doom_fire">doom fire</string>
     <string name="wallpaper_shoreline">shoreline</string>
     <string name="wallpaper_shore_text_label">Text</string>

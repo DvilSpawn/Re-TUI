@@ -33,6 +33,14 @@ commercial GPL forks. See [the dated permission record](nagomi.md) for its adapt
 code/artwork scope and upstream credit. The separate upstream project retains its
 PolyForm Noncommercial license; this record does not change that license.
 
+## Touch grass wallpaper
+
+The touch grass wallpaper (`wallpaper/pixel/TouchGrassView.kt`) is project-authored code with no copied code or
+artwork. Its approach is inspired by Dylearn's Stylised 3D Pixel Grass demo
+(https://github.com/DylearnDev/Dylearn-3D-Pixel-Art-Grass-Demo; code MIT, art CC BY 4.0): wind from two
+multiplied scrolling noise fields, a stepped frame rate, and grass bending away from a character. The picker shows
+the credit under the scene.
+
 ## Separate unresolved or conditional boundaries
 
 - CraftPix clouds follow-up: completed at the maintainer's direction on
