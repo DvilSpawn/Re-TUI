@@ -29,7 +29,9 @@ object MediaLibrary {
     private const val MAX_ITEMS = 20_000
     private const val MAX_DEPTH = 12
 
-    private val AUDIO = setOf("mp3", "m4a", "aac", "flac", "ogg", "oga", "opus", "wav", "wma", "mka", "amr", "3ga")
+    // Audio the player can play. Every music source uses this list. WMA is left out: the player has no decoder for it.
+    internal val AUDIO = setOf("mp3", "m4a", "aac", "flac", "ogg", "oga", "opus", "wav", "mka", "amr", "3ga")
+    private val UNPLAYABLE_AUDIO = setOf("wma")
     private val VIDEO = setOf("mp4", "m4v", "mkv", "webm", "mov", "3gp", "avi", "ts", "m2ts", "wmv", "flv")
 
     @Volatile private var cached: List<Item>? = null
@@ -140,7 +142,7 @@ object MediaLibrary {
                 }
                 val ext = name.substringAfterLast('.', "").lowercase(Locale.ROOT)
                 val video = mime.startsWith("video/") || ext in VIDEO
-                val audio = mime.startsWith("audio/") || ext in AUDIO
+                val audio = (mime.startsWith("audio/") || ext in AUDIO) && ext !in UNPLAYABLE_AUDIO
                 if (!audio && !video) continue
                 here += Item(DocumentsContract.buildDocumentUriUsingTree(tree, id).toString(),
                     name.substringBeforeLast('.'), folder, video)

@@ -476,6 +476,7 @@ class MusicManager2(var mContext: Context, private val loadLocalLibrary: Boolean
     }
 
     companion object {
-        val MUSIC_EXTENSIONS: Array<String?> = arrayOf<String?>(".mp3", ".wav", ".ogg", ".flac")
+        // The same formats as folders added with media -add.
+        val MUSIC_EXTENSIONS: Array<String?> = ohi.andre.consolelauncher.managers.media.MediaLibrary.AUDIO.map { ".$it" }.toTypedArray()
     }
 }
