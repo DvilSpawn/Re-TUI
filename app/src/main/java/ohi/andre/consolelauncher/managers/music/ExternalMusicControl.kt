@@ -54,6 +54,19 @@ object ExternalMusicControl {
         audio.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, action.keyCode))
     }
 
+    /**
+     * Opens the preferred music app, or else the app whose session is playing (or last held one). False when there is
+     * neither, or the app has no launcher entry.
+     */
+    @JvmStatic
+    fun open(context: Context): Boolean {
+        val preferred = MusicSettings.preferredPackage()?.takeUnless { TextUtils.isEmpty(it) }
+        val pkg = preferred ?: pickController(context, null)?.packageName ?: return false
+        val launch = context.packageManager.getLaunchIntentForPackage(pkg) ?: return false
+        context.startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        return true
+    }
+
     /** Needs notification access; without it there are no sessions to pick from and send falls back to key events. */
     private fun pickController(context: Context, preferred: String?): MediaController? {
         val sessions = try {

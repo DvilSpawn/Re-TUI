@@ -11,6 +11,7 @@ import ohi.andre.consolelauncher.R
 import ohi.andre.consolelauncher.commands.main.MainPack
 import ohi.andre.consolelauncher.managers.mediaplayer.MediaPlayerActivity
 import ohi.andre.consolelauncher.managers.modules.ModuleManager
+import ohi.andre.consolelauncher.managers.music.ExternalMusicControl
 import ohi.andre.consolelauncher.managers.music.MusicService
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.musicWidgetBorderColor
 import ohi.andre.consolelauncher.managers.settings.AppearanceSettings.musicWidgetTextColor
@@ -305,12 +306,10 @@ internal class MusicModule(
             prevBtn.setOnClickListener(View.OnClickListener { v: View? ->
                 if (MusicService.SOURCE_PODCAST == activeMusicSource) {
                     mainPack.podcastManager.previous()
-                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack.player != null) mainPack.player!!.playPrev()
+                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource && mainPack.player != null) {
+                    mainPack.player!!.playPrev()
                 } else {
-                    val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
-                    intent.putExtra(MusicService.EXTRA_CONTROL_CMD, MusicService.CONTROL_PREV_INT)
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+                    ExternalMusicControl.send(context, ExternalMusicControl.Action.PREVIOUS)
                 }
             })
         }
@@ -319,12 +318,10 @@ internal class MusicModule(
             nextBtn.setOnClickListener(View.OnClickListener { v: View? ->
                 if (MusicService.SOURCE_PODCAST == activeMusicSource) {
                     mainPack.podcastManager.next()
-                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack.player != null) mainPack.player!!.playNext()
+                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource && mainPack.player != null) {
+                    mainPack.player!!.playNext()
                 } else {
-                    val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
-                    intent.putExtra(MusicService.EXTRA_CONTROL_CMD, MusicService.CONTROL_NEXT_INT)
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+                    ExternalMusicControl.send(context, ExternalMusicControl.Action.NEXT)
                 }
             })
         }
@@ -333,18 +330,12 @@ internal class MusicModule(
             playPauseBtn.setOnClickListener(View.OnClickListener { v: View? ->
                 if (MusicService.SOURCE_PODCAST == activeMusicSource) {
                     mainPack.podcastManager.toggle()
-                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource) {
-                    if (mainPack.player != null) {
-                        if (mainPack.player!!.isPlaying()) mainPack.player!!.pause()
-                        else mainPack.player!!.play()
-                    }
+                } else if (MusicService.SOURCE_INTERNAL == activeMusicSource && mainPack.player != null) {
+                    if (mainPack.player!!.isPlaying()) mainPack.player!!.pause()
+                    else mainPack.player!!.play()
                 } else {
-                    val intent = Intent(MusicService.ACTION_MUSIC_CONTROL)
-                    intent.putExtra(
-                        MusicService.EXTRA_CONTROL_CMD,
-                        MusicService.CONTROL_PLAY_PAUSE_INT
-                    )
-                    LocalBroadcastManager.getInstance(context).sendBroadcast(intent)
+                    // Same path as the music command: the preferred app's session first, then media buttons.
+                    ExternalMusicControl.send(context, ExternalMusicControl.Action.PLAY_PAUSE)
                 }
             })
         }
