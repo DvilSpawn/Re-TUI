@@ -372,7 +372,12 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 
 ## V.6 · Build 805
 
-- In Terminal mode, the dimmed, blurred backdrop behind search now reaches under the navigation bar too, as it already did under the status bar.</string>
+- In Terminal mode, the dimmed, blurred backdrop behind search now reaches under the navigation bar too, as it already did under the status bar.
+
+## V.6 · Build 806
+
+- Mono in landscape no longer leaves a double-width gap beside the camera cutout, and on wide screens its left half is no longer cut off. Dot keeps its halves clear of the cutout too.
+- On phones held sideways, Mono shows each page in one frame: the status strip across the top, the page's panels in a left and a right half, the soft keys under one half and the command line under the other. The `&lt;&lt;` key swaps their sides. Tablets, foldables and the Duo keep the two-screen split.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -3963,7 +3968,7 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
-- Build 805: in Terminal mode the search backdrop reaches under the navigation bar. Build 804: backups work again, Mono and Dot use both screens on foldables and the Duo, and Settings show the current mode's settings first. Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
+- Build 806: Mono on a phone held sideways shows each page in one frame, split into a left and right half, and fits beside the camera cutout. Build 805: in Terminal mode the search backdrop reaches under the navigation bar. Build 804: backups work again, Mono and Dot use both screens on foldables and the Duo, and Settings show the current mode's settings first. Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
 - eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.
 - Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.
 - Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.

@@ -79,6 +79,16 @@ class MonoKit(val context: Context, val ink: Int, val paper: Int, val face: Type
         else GradientDrawable().apply { setColor(fill); setStroke(line, ink) }
 
     /**
+     * Frames a strip whose children fill it to its edges (the command line, the soft keys): the outline is laid over
+     * them, so a child's own background cannot hide a cut corner of the frame.
+     */
+    fun boxOver(view: View) {
+        if (!cyberdeck) { view.background = box(); return }
+        view.setBackgroundColor(paper)
+        view.foreground = TerminalBorderDrawable(paper, ink, line, 0f, false, 0f, 0f, cyberdeck = true, cyberdeckNotch = false, overlay = true)
+    }
+
+    /**
      * Frames a whole panel. In cyberdeck mode the frame is laid over the panel, so pictures and filled buttons
      * that reach its edges are cut to the notched shape as well.
      */
@@ -300,7 +310,13 @@ private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
     }
     private val timer = kit.text("", MonoKit.SMALL_SP).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; visibility = View.GONE }
     private val alarm = kit.text("", MonoKit.SMALL_SP, kit.dim).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; visibility = View.GONE }
-    private val meters = android.widget.FrameLayout(kit.context)
+    // Only meters that fit whole are shown; storage goes first, then memory, then the day.
+    private val meters = object : android.widget.FrameLayout(kit.context) {
+        override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+            super.onSizeChanged(w, h, oldw, oldh)
+            post { fitMeters(w, h) }
+        }
+    }
     private var compact = false
     private val day = Row("DAY")
     private val battery = Row("BAT")
@@ -329,7 +345,7 @@ private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
             orientation = LinearLayout.VERTICAL
             setPadding(dp(8), dp(4), dp(8), dp(6))
             // The time, then what is running or set, then the meters; the room left over sits above the meters.
-            // The time takes most of the room; meters that do not fit in the rest are cut off from the bottom.
+            // The time takes most of the room; the meters show as many whole rows as fit in the rest.
             addView(time, LinearLayout.LayoutParams(-1, 0, 3f))
             addView(timer)
             addView(alarm)
@@ -340,6 +356,15 @@ private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
                 }, android.widget.FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
             }, LinearLayout.LayoutParams(-1, 0, 2f))
         }, LinearLayout.LayoutParams(-1, 0, 1f))
+    }
+
+    private fun fitMeters(w: Int, h: Int) {
+        val first = day.view
+        first.measure(View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        val row = first.measuredHeight + dp(4)
+        val shown = if (row <= 0) 4 else (h / row).coerceIn(0, 4)
+        val kept = listOf(battery, day, memory, disk).take(shown)
+        listOf(day, battery, disk, memory).forEach { it.view.visibility = if (it in kept) View.VISIBLE else View.GONE }
     }
 
     /** A label, ten cells and the value. */

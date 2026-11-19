@@ -71,24 +71,29 @@ internal class DotHomeMode(private val host: HomeModeHost) : HomeMode {
             root.addView(view, FrameLayout.LayoutParams(-1, -1))
         }
         val dotSide: String
+        // The root is already padded by the cutout and system bars at its sides; panes are measured inside them.
+        val (insetLeft, insetRight) = DualScreen.sideInsets(root)
         when (layout) {
             DualScreen.Layout.Phone -> { host.applyDisplayMargins(); show(); return }
             is DualScreen.Layout.OneSide -> {
                 dotSide = layout.side
-                if (layout.side == DualScreen.LEFT) DualScreen.rootPadRight = width - layout.split.start
-                else DualScreen.rootPadLeft = layout.split.end
+                if (layout.side == DualScreen.LEFT) DualScreen.rootPadRight = (width - insetRight - layout.split.start).coerceAtLeast(0)
+                else DualScreen.rootPadLeft = (layout.split.end - insetLeft).coerceAtLeast(0)
             }
             is DualScreen.Layout.Both -> {
                 dotSide = DualScreen.other(layout.inputSide)
-                if (layout.inputSide == DualScreen.RIGHT) DualScreen.rootPadLeft = layout.split.end
-                else DualScreen.rootPadRight = width - layout.split.start
+                if (layout.inputSide == DualScreen.RIGHT) DualScreen.rootPadLeft = (layout.split.end - insetLeft).coerceAtLeast(0)
+                else DualScreen.rootPadRight = (width - insetRight - layout.split.start).coerceAtLeast(0)
                 // The dot leaves the launcher layout for its own screen, beside it.
                 val content = root.parent as? FrameLayout
                 if (content != null) {
                     root.removeView(view)
-                    val pane = if (dotSide == DualScreen.LEFT) layout.split.start else width - layout.split.end
-                    content.addView(view, FrameLayout.LayoutParams(pane, -1,
-                        android.view.Gravity.TOP or if (dotSide == DualScreen.LEFT) android.view.Gravity.START else android.view.Gravity.END))
+                    val left = dotSide == DualScreen.LEFT
+                    val pane = if (left) layout.split.start - insetLeft else width - insetRight - layout.split.end
+                    content.addView(view, FrameLayout.LayoutParams(pane.coerceAtLeast(0), -1,
+                        android.view.Gravity.TOP or if (left) android.view.Gravity.START else android.view.Gravity.END).apply {
+                        if (left) leftMargin = insetLeft else rightMargin = insetRight
+                    })
                 }
             }
         }

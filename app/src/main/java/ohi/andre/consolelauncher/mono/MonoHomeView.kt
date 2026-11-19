@@ -128,7 +128,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         addView(ScrollView(context).apply { isVerticalScrollBarEnabled = false; addView(outputLines) },
             LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(6) })
     }
-    private val bottomBar = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL; background = kit.box(); setPadding(kit.line, kit.line, kit.line, kit.line) }
+    private val bottomBar = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL; kit.boxOver(this); setPadding(kit.line, kit.line, kit.line, kit.line) }
     private val statusTime = kit.text("")
     private val statusSignal = kit.icon(MonoKit.Icons.SIGNAL, android.content.res.ColorStateList.valueOf(ink)).apply { isDuplicateParentStateEnabled = false }
     private val statusBattery = BatteryGlyph()
@@ -186,9 +186,96 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
     /** Moves the command line, or with `duo` on the whole home, to the other screen. Only shown when split. */
     private val swapKey = kit.text(">>").apply {
         gravity = Gravity.CENTER
-        setPadding(dp(8), 0, dp(8), 0)
-        kit.pressable(this, framed = true)
-        setOnClickListener { DualScreen.swap(this@MonoHomeView, layoutNow) }
+        setPadding(dp(10), 0, dp(10), 0)
+        // Part of the command line's frame: flush with its right edge, set off by a rule on its left.
+        kit.pressable(this, framed = false)
+        foreground = android.graphics.drawable.LayerDrawable(arrayOf(android.graphics.drawable.ColorDrawable(ink))).apply {
+            setLayerGravity(0, Gravity.START or Gravity.FILL_VERTICAL)
+            setLayerWidth(0, kit.line)
+        }
+        setOnClickListener {
+            // A phone held sideways swaps the command line and the soft keys; split screens swap screens.
+            if (layoutNow == DualScreen.Layout.Phone) {
+                ohi.andre.consolelauncher.UIManager.saveInputSide(context, DualScreen.other(ohi.andre.consolelauncher.UIManager.savedInputSide(context)))
+                post { arrange() }
+            } else DualScreen.swap(this@MonoHomeView, layoutNow)
+        }
+    }
+    /** Slimmer chrome for a phone held sideways. */
+    private var compactChrome = false
+    /** Where each page's left and right panels sit in the two sections, on a phone held sideways. */
+    private val leftSlot = View(context)
+    private val rightSlot = View(context)
+    private val rightTop = View(context)
+    private val rightDots = View(context)
+    private val leftDots = View(context)
+    /** Each page's two halves, so the gap between them can follow the gap between the sections. */
+    private val pageHalves = ArrayList<LinearLayout>()
+    private var sidewaysHost: SidewaysHost? = null
+
+    /**
+     * A phone held sideways: two framed sections, the status strip and soft keys in one and the command line in the
+     * other, with each page's panels laid across both. The pages stay one view so a swipe moves both halves.
+     */
+    private inner class SidewaysHost(val row: LinearLayout) : FrameLayout(context) {
+        init {
+            addView(row, LayoutParams(-1, -1))
+            addView(panelArea, LayoutParams(0, 0))
+            addView(answers, LayoutParams(0, 0))
+            addView(dots, LayoutParams(0, 0))
+        }
+
+        private fun bounds(view: View): android.graphics.Rect {
+            val rect = android.graphics.Rect(0, 0, view.width, view.height)
+            if (view.isAttachedToWindow && view.parent != null) offsetDescendantRectToMyCoords(view, rect)
+            return rect
+        }
+
+        /** Where the pages and the answers go, from the last layout of the two sections. */
+        private val pagesRect = android.graphics.Rect()
+        private val answersRect = android.graphics.Rect()
+        private val dotsRect = android.graphics.Rect()
+
+        private fun exactly(view: View, rect: android.graphics.Rect) = view.measure(
+            MeasureSpec.makeMeasureSpec(rect.width().coerceAtLeast(0), MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(rect.height().coerceAtLeast(0), MeasureSpec.EXACTLY))
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            // Only the sections size this view; the pages and answers are measured at their known places, never at
+            // zero, or every pass would resize the panels and they would never settle.
+            row.measure(widthMeasureSpec, heightMeasureSpec)
+            setMeasuredDimension(row.measuredWidth, row.measuredHeight)
+            exactly(panelArea, pagesRect)
+            exactly(answers, answersRect)
+            exactly(dots, dotsRect)
+        }
+
+        override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+            row.layout(0, 0, r - l, b - t)
+            val left = bounds(leftSlot)
+            val right = bounds(rightSlot)
+            val (pagesLeft, pagesRight) = if (left.left <= right.left) left to right else right to left
+            val gap = (pagesRight.left - pagesLeft.right).coerceAtLeast(0)
+            var again = false
+            pageHalves.forEach { halves ->
+                val second = halves.getChildAt(1)?.layoutParams as? LinearLayout.LayoutParams ?: return@forEach
+                if (second.marginStart != gap) { second.marginStart = gap; again = true }
+            }
+            val pages = android.graphics.Rect(pagesLeft.left, minOf(left.top, right.top), pagesRight.right, maxOf(left.bottom, right.bottom))
+            // Answers and suggestions open over the command line's section.
+            val answersAt = bounds(rightSlot)
+            // The page marks sit in their band, centred on the whole frame for symmetry.
+            val band = bounds(leftDots)
+            val dotsAt = android.graphics.Rect(0, band.top, r - l, band.bottom)
+            if (pages != pagesRect || answersAt != answersRect || dotsAt != dotsRect) {
+                pagesRect.set(pages); answersRect.set(answersAt); dotsRect.set(dotsAt)
+                exactly(panelArea, pagesRect); exactly(answers, answersRect); exactly(dots, dotsRect)
+            }
+            dots.layout(dotsRect.left, dotsRect.top, dotsRect.right, dotsRect.bottom)
+            panelArea.layout(pagesRect.left, pagesRect.top, pagesRect.right, pagesRect.bottom)
+            answers.layout(answersRect.left, answersRect.top, answersRect.right, answersRect.bottom)
+            if (again) post { requestLayout() }
+        }
     }
     private val mainBezel = bezel()
     private val pagesBezel = bezel()
@@ -223,8 +310,8 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             // The keyboard lifts the command line; the panels give up the room under the suggestions.
-            view.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime.bottom))
-            post { arrange() }
+            windowInsets = intArrayOf(bars.left, bars.top, bars.right, maxOf(bars.bottom, ime.bottom))
+            applyInsetPadding()
             // Putting the keyboard away with nothing typed means done searching: close the suggestions too.
             val imeShown = ime.bottom > 0
             if (keyboardShown && !imeShown && input.text.isNullOrEmpty()) post { closeInput() }
@@ -255,12 +342,12 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         commandLine.apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            background = kit.box()
-            setPadding(kit.line, kit.line, dp(10), kit.line)
+            kit.boxOver(this)
+            setPadding(kit.line, kit.line, kit.line, kit.line)
             addView(prefix, LinearLayout.LayoutParams(-2, -1))
-            addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(10) })
+            addView(input, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(10); marginEnd = dp(10) })
             addView(submit)
-            addView(swapKey, LinearLayout.LayoutParams(-2, -1).apply { marginStart = dp(8) })
+            addView(swapKey, LinearLayout.LayoutParams(-2, -1))
             setOnClickListener { input.requestFocus(); showKeyboard() }
         }
 
@@ -304,7 +391,32 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
     }
     private fun columnOf(bezel: FrameLayout) = (bezel.getChildAt(0) as FrameLayout).getChildAt(0) as LinearLayout
 
-    override fun onAttachedToWindow() { super.onAttachedToWindow(); DualScreen.listen(onScreensChanged) }
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        DualScreen.listen(onScreensChanged)
+        (parent as? View)?.addOnLayoutChangeListener(onParentLayout)
+    }
+
+    /** The system bars, cutout and keyboard around the window, as left, top, right, bottom. */
+    private var windowInsets = IntArray(4)
+    private val onParentLayout = View.OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> applyInsetPadding() }
+
+    /**
+     * Pads by the insets the parent has not already taken. The launcher's root pads its sides and bottom for the
+     * system bars and cutout itself, so padding by the full insets again doubled them: in landscape the camera
+     * cutout's band came out twice as wide.
+     */
+    private fun applyInsetPadding() {
+        val host = parent as? View
+        val pad = intArrayOf(
+            (windowInsets[0] - (host?.paddingLeft ?: 0)).coerceAtLeast(0),
+            (windowInsets[1] - (host?.paddingTop ?: 0)).coerceAtLeast(0),
+            (windowInsets[2] - (host?.paddingRight ?: 0)).coerceAtLeast(0),
+            (windowInsets[3] - (host?.paddingBottom ?: 0)).coerceAtLeast(0))
+        if (pad[0] == paddingLeft && pad[1] == paddingTop && pad[2] == paddingRight && pad[3] == paddingBottom) return
+        setPadding(pad[0], pad[1], pad[2], pad[3])
+        post { arrange() }
+    }
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         post { arrange() }
@@ -315,20 +427,32 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
      * screen and the command line with its answers and suggestions the other; with `duo left`/`duo right` the
      * whole phone layout moves to that screen. The swap key flips either.
      */
+    /** Whether the pages were built in halves, for a phone held sideways. */
+    private var builtSplitPages = false
+
     private fun arrange() {
+        if (started && pager != null && DualScreen.splitsPages(this) != builtSplitPages) { stop(); start() }
         val layout = DualScreen.layout(this)
-        val key = listOf(layout, width, paddingLeft, paddingRight)
+        val sideways = builtSplitPages
+        val inputLeft = ohi.andre.consolelauncher.UIManager.savedInputSide(context) == DualScreen.LEFT
+        val key = listOf(layout, width, paddingLeft, paddingRight, sideways, inputLeft)
         if (key == arrangedAs) return
         arrangedAs = key
         layoutNow = layout
-        val pieces = listOf(statusStrip, statusRule, panelsFrame, panelArea, answers, dots, commandLine, bottomBar)
+        val pieces = listOf(statusStrip, statusRule, panelsFrame, panelArea, answers, dots, commandLine, bottomBar,
+            leftSlot, rightSlot, rightTop, rightDots, leftDots)
         pieces.forEach { (it.parent as? ViewGroup)?.removeView(it) }
+        sidewaysHost?.let { (it.parent as? ViewGroup)?.removeView(it); it.row.removeAllViews() }
+        sidewaysHost = null
+        compactChrome = sideways
+        showDots()
         listOf(mainBezel, pagesBezel, inputBezel).forEach { columnOf(it).removeAllViews(); (it.parent as? ViewGroup)?.removeView(it) }
         val margin = dp(6)
         // Pane edges in this view's content area, which starts after the system bar padding.
         fun pane(left: Int, right: Int, bezel: FrameLayout) {
-            val from = left - paddingLeft + margin
-            val to = right - paddingLeft - margin
+            // Panes stay inside the padding, which keeps them off the camera cutout and system bars.
+            val from = maxOf(left, paddingLeft) - paddingLeft + margin
+            val to = minOf(right, width - paddingRight) - paddingLeft - margin
             addView(bezel, 0, LayoutParams(maxOf(0, to - from), -1).apply { setMargins(from, margin, 0, margin) })
         }
         fun phoneColumn(column: LinearLayout) {
@@ -341,11 +465,42 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
             column.addView(commandLine, LinearLayout.LayoutParams(-1, dp(42)).apply { topMargin = dp(8) })
             column.addView(bottomBar, LinearLayout.LayoutParams(-1, dp(50)).apply { topMargin = dp(8) })
         }
+        /**
+         * A phone held sideways: one frame, as in portrait, holding two sections side by side (see [SidewaysHost]).
+         * With no frame edge between them, panels slide across the middle cleanly while swiping between pages.
+         */
+        fun sidewaysSections() {
+            // The status strip runs across the whole frame, over both sections.
+            val frame = columnOf(mainBezel)
+            frame.addView(statusStrip, LinearLayout.LayoutParams(-1, dp(28)))
+            frame.addView(statusRule, LinearLayout.LayoutParams(-1, kit.line))
+            val keys = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+            keys.addView(leftSlot, LinearLayout.LayoutParams(-1, 0, 1f).apply { topMargin = dp(8) })
+            // A band for the page marks, which the host centres across the whole frame; the soft keys match the
+            // command line's height.
+            keys.addView(leftDots, LinearLayout.LayoutParams(-1, dp(5)).apply { topMargin = dp(3) })
+            keys.addView(bottomBar, LinearLayout.LayoutParams(-1, dp(42)).apply { topMargin = dp(3) })
+            val line = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
+            line.addView(rightSlot, LinearLayout.LayoutParams(-1, 0, 1f).apply { topMargin = dp(8) })
+            line.addView(rightDots, LinearLayout.LayoutParams(-1, dp(5)).apply { topMargin = dp(3) })
+            line.addView(commandLine, LinearLayout.LayoutParams(-1, dp(42)).apply { topMargin = dp(3) })
+            val row = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+            row.addView(if (inputLeft) line else keys, LinearLayout.LayoutParams(0, -1, 1f))
+            row.addView(if (inputLeft) keys else line, LinearLayout.LayoutParams(0, -1, 1f).apply { marginStart = dp(8) })
+            val host = SidewaysHost(row)
+            sidewaysHost = host
+            frame.addView(host, LinearLayout.LayoutParams(-1, 0, 1f))
+            addView(mainBezel, 0, LayoutParams(-1, -1).apply { setMargins(margin, margin, margin, margin) })
+        }
         when (layout) {
             DualScreen.Layout.Phone -> {
-                swapKey.visibility = GONE
-                phoneColumn(columnOf(mainBezel))
-                addView(mainBezel, 0, LayoutParams(-1, -1).apply { setMargins(margin, margin, margin, margin) })
+                swapKey.visibility = if (sideways) VISIBLE else GONE
+                swapKey.text = if (inputLeft) ">>" else "<<"
+                if (sideways) sidewaysSections()
+                else {
+                    phoneColumn(columnOf(mainBezel))
+                    addView(mainBezel, 0, LayoutParams(-1, -1).apply { setMargins(margin, margin, margin, margin) })
+                }
             }
             is DualScreen.Layout.OneSide -> {
                 swapKey.visibility = VISIBLE
@@ -418,9 +573,10 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         pages = MonoLayout.parse(LauncherSettings.get(Behavior.mono_layout))
         val paged = LauncherSettings.get(Behavior.mono_layout_style)?.trim()?.lowercase(java.util.Locale.ROOT) != "scroll"
         var tile = 0
-        /** Puts [items] of [page] on [grid], [rowOffset] rows down. */
-        fun fill(grid: GridBox, page: Int, items: List<MonoLayout.Item>, rowOffset: Int) {
-            MonoLayout.place(items).forEachIndexed { index, spot ->
+        /** Puts [items] of [page] on [grid], [rowOffset] rows down; [indices] are their places in the page. */
+        fun fill(grid: GridBox, page: Int, items: List<MonoLayout.Item>, rowOffset: Int, indices: List<Int> = items.indices.toList()) {
+            MonoLayout.place(items).forEachIndexed { at, spot ->
+                val index = indices[at]
                 val item = spot.item
                 val panel = if (item.kind == MonoLayout.Kind.TERM)
                     MonoTermPanel(kit, panelHost, terms, item, tile++, termEvents).also { termSlots[it] = page to index }
@@ -436,14 +592,33 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
             if (gap.row + 2 <= height) grid.put(addSlot(page, gap = true), gap.column, rowOffset + gap.row, 2, 2)
             else if (below) grid.putSlot(addSlot(page))
         }
+        builtSplitPages = paged && DualScreen.splitsPages(this)
+        pageHalves.clear()
         if (paged) {
             val pagerView = Pager()
             pages.forEachIndexed { page, items ->
-                val grid = GridBox(fill = true)
-                fill(grid, page, items, 0)
-                grid.rows = MonoLayout.height(items)
-                slot(grid, page, items, 0, grid.rows < MonoLayout.PAGE_ROWS)
-                pagerView.addView(grid)
+                if (builtSplitPages) {
+                    // A phone held sideways: the page's panels in two halves side by side, in their saved order.
+                    val (leftAt, rightAt) = MonoLayout.halves(items)
+                    val halves = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+                    pageHalves += halves
+                    for ((n, at) in listOf(leftAt, rightAt).withIndex()) {
+                        val part = at.map { items[it] }
+                        val grid = GridBox(fill = true, pageRows = MonoLayout.HALF_ROWS)
+                        fill(grid, page, part, 0, at)
+                        grid.rows = MonoLayout.height(part)
+                        // The add slot goes in the right half, where a page has room left.
+                        if (n == 1) slot(grid, page, part, 0, grid.rows < MonoLayout.HALF_ROWS)
+                        halves.addView(grid, LinearLayout.LayoutParams(0, -1, 1f).apply { if (n == 1) marginStart = dp(8) })
+                    }
+                    pagerView.addView(halves)
+                } else {
+                    val grid = GridBox(fill = true)
+                    fill(grid, page, items, 0)
+                    grid.rows = MonoLayout.height(items)
+                    slot(grid, page, items, 0, grid.rows < MonoLayout.PAGE_ROWS)
+                    pagerView.addView(grid)
+                }
             }
             pager = pagerView
             panelArea.addView(pagerView, LayoutParams(-1, -1))
@@ -541,6 +716,9 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         dots.visibility = if (pagerView == null) GONE else VISIBLE
         if (pagerView == null) return
         val size = dp(9)
+        // Sideways on a phone, the page marks are short dashes in a slim row.
+        val markWidth = if (compactChrome) dp(10) else size
+        val markHeight = if (compactChrome) maxOf(1, dp(2)) else size
         pages.indices.forEach { page ->
             dots.addView(View(context).apply {
                 background = GradientDrawable().apply {
@@ -549,7 +727,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
                 }
                 setOnClickListener { pagerView.go(page) }
                 setOnLongClickListener { dots.performLongClick() }
-            }, LinearLayout.LayoutParams(size, size).apply { setMargins(dp(5), 0, dp(5), 0) })
+            }, LinearLayout.LayoutParams(markWidth, markHeight).apply { setMargins(dp(if (compactChrome) 2 else 5), 0, dp(if (compactChrome) 2 else 5), 0) })
         }
     }
 
@@ -572,7 +750,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
      * [MonoLayout.PAGE_ROWS] grid rows: filling, they share the height given (more rows squeeze to fit) and the add
      * slot takes what is left; scrolling, a grid row is as tall as on a page of [viewport].
      */
-    private inner class GridBox(private val fill: Boolean) : android.view.ViewGroup(context) {
+    private inner class GridBox(private val fill: Boolean, private val pageRows: Int = MonoLayout.PAGE_ROWS) : android.view.ViewGroup(context) {
         var viewport = 0
         /** Grid rows the panels take. */
         var rows = 0
@@ -596,7 +774,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
         override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
             val width = MeasureSpec.getSize(widthMeasureSpec)
             val height = if (fill) MeasureSpec.getSize(heightMeasureSpec) else viewport.takeIf { it > 0 } ?: resources.displayMetrics.heightPixels / 2
-            unit = (height + gap).toFloat() / (if (fill) maxOf(MonoLayout.PAGE_ROWS, rows) else MonoLayout.PAGE_ROWS)
+            unit = (height + gap).toFloat() / (if (fill) maxOf(pageRows, rows) else pageRows)
             cell = (width + gap).toFloat() / MonoLayout.COLUMNS
             var bottom = if (rows > 0) slotTop() - gap else 0
             for (i in 0 until childCount) {
@@ -998,6 +1176,7 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
 
     override fun onDetachedFromWindow() {
         DualScreen.unlisten(onScreensChanged)
+        (parent as? View)?.removeOnLayoutChangeListener(onParentLayout)
         stop()
         handler.removeCallbacksAndMessages(null)
         super.onDetachedFromWindow()

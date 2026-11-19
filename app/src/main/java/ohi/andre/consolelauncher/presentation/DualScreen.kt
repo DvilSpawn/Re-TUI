@@ -92,6 +92,20 @@ object DualScreen {
 
     fun other(side: String) = if (side == LEFT) RIGHT else LEFT
 
+    /** Below this smallest width a screen is a phone, as Android's own layout guidance has it. */
+    private const val TABLET_SMALLEST_DP = 600
+
+    /** A phone-sized screen with no hinge: Mono and Dot keep one screen on it, even held sideways. */
+    fun isPhone(view: View): Boolean = hinge == null && view.resources.configuration.smallestScreenWidthDp < TABLET_SMALLEST_DP
+
+    /** A phone held sideways: Mono shows each page's panels in two halves side by side. */
+    fun splitsPages(view: View): Boolean {
+        if (!isPhone(view)) return false
+        val width = view.width.takeIf { it > 0 } ?: view.resources.displayMetrics.widthPixels
+        val height = view.height.takeIf { it > 0 } ?: view.resources.displayMetrics.heightPixels
+        return height > 0 && width >= height * WIDE_ASPECT
+    }
+
     /** The two panes of [view], or null when it should keep the phone layout. */
     fun split(view: View): Split? {
         val width = view.width
@@ -108,9 +122,29 @@ object DualScreen {
             }
         }
         if (LauncherSettings.getInt(Behavior.orientation) == 1) return null
+        // A phone held sideways stays one screen; Mono splits its pages instead ([splitsPages]).
+        if (isPhone(view)) return null
         // Classic's wide-window rule, read from the view itself: the configuration can lag a resize.
         if (view.height <= 0 || width < view.height * WIDE_ASPECT) return null
-        return Split(width / 2 - gutter / 2, width / 2 + (gutter + 1) / 2)
+        // No hinge: the middle of what is usable, past the camera cutout and system bars at the sides.
+        val (insetLeft, insetRight) = sideInsets(view)
+        val middle = (insetLeft + width - insetRight) / 2
+        return Split(middle - gutter / 2, middle + (gutter + 1) / 2)
+    }
+
+    /**
+     * How far the camera cutout and system bars reach into [view] at its left and right, which no pane should run
+     * under. Measured against where the view sits, so a view already inset by its parent gets only what is left.
+     */
+    fun sideInsets(view: View): Pair<Int, Int> {
+        val insets = androidx.core.view.ViewCompat.getRootWindowInsets(view)
+            ?.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or androidx.core.view.WindowInsetsCompat.Type.displayCutout())
+            ?: return 0 to 0
+        val at = IntArray(2).also(view::getLocationInWindow)
+        val windowWidth = view.rootView.width.takeIf { it > 0 } ?: return insets.left to insets.right
+        val left = (insets.left - at[0]).coerceAtLeast(0)
+        val right = (insets.right - (windowWidth - at[0] - view.width)).coerceAtLeast(0)
+        return left to right
     }
 
     private fun gutter(view: View): Int {

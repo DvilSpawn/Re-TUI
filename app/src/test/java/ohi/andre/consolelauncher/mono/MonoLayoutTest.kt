@@ -125,4 +125,16 @@ class MonoLayoutTest {
         val raw = "scene,clock,apps,media,quick,tasks|term:4x4@2,read,term:2x2"
         assertEquals(raw, MonoLayout.write(MonoLayout.parse(raw)))
     }
+
+    @Test fun sidewaysPhoneSplitsEachPageInOrder() {
+        // The user's page 1: scene, clock and media fill the left half's four rows; the rest go right.
+        val page = MonoLayout.parse("scene,clock,media,quick,apps,tasks")[0]
+        assertEquals(listOf(0, 1, 2) to listOf(3, 4, 5), MonoLayout.halves(page))
+        // A 4x4 terminal takes a half to itself.
+        val terms = MonoLayout.parse("term:4x4@0,term:4x4@27")[0]
+        assertEquals(listOf(0) to listOf(1), MonoLayout.halves(terms))
+        // A page that fits in one half leaves the right half empty.
+        assertEquals(listOf(0, 1) to emptyList<Int>(), MonoLayout.halves(MonoLayout.parse("scene,clock")[0]))
+        assertEquals(emptyList<Int>() to emptyList<Int>(), MonoLayout.halves(emptyList()))
+    }
 }

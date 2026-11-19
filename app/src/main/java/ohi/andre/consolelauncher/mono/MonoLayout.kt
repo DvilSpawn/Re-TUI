@@ -100,6 +100,20 @@ object MonoLayout {
     /** Grid rows [items] take. */
     fun height(items: List<Item>): Int = place(items).maxOfOrNull { it.row + it.item.rows } ?: 0
 
+    /** A page shown side by side on a phone held sideways: each half holds this many grid rows. */
+    const val HALF_ROWS = PAGE_ROWS / 2
+
+    /**
+     * Splits a page into two halves for a phone held sideways, keeping the saved order: panels fill the left half
+     * until the next one would not fit in [HALF_ROWS] rows, and the rest go to the right. No panel is taller than a
+     * half, so every panel fits whole in one. Returns the panels' indices in [items] for each half.
+     */
+    fun halves(items: List<Item>): Pair<List<Int>, List<Int>> {
+        var split = 0
+        while (split < items.size && height(items.subList(0, split + 1)) <= HALF_ROWS) split++
+        return (0 until split).toList() to (split until items.size).toList()
+    }
+
     /** Panels not shown yet, which the add slot offers; terminals can always be added. */
     fun missing(pages: List<List<Item>>): List<Kind> {
         val shown = pages.flatten().map { it.kind }.toSet()
