@@ -15,6 +15,7 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
     private var home: TerminalHomeView? = null
     private var dim: View? = null
     private var searchOpen = false
+    private var rootClippedPadding: Boolean? = null
 
     override val usesSearchLayout get() = true
     override val managesOwnKeyboard get() = true
@@ -69,6 +70,7 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         home?.releaseInput()
         host.configureSearchLayout(closeDrawers = true)
         dim?.visibility = if (show) View.VISIBLE else View.GONE
+        bleedDimUnderNavigation()
         if (android.os.Build.VERSION.SDK_INT >= 31) {
             home?.setRenderEffect(if (show) android.graphics.RenderEffect.createBlurEffect(18f, 18f, android.graphics.Shader.TileMode.CLAMP) else null)
         }
@@ -110,7 +112,25 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         host.root?.findViewById<View>(R.id.input_group)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
     }
 
+    /**
+     * The launcher root keeps its content above the navigation bar with bottom padding, which stopped the search
+     * veil there while it already ran under the status bar. The veil reaches down under the navigation bar too;
+     * nothing else in the layout moves.
+     */
+    private fun bleedDimUnderNavigation() {
+        val root = host.root ?: return
+        val veil = dim ?: return
+        if (rootClippedPadding == null) rootClippedPadding = root.clipToPadding
+        root.clipToPadding = false
+        val params = veil.layoutParams as? FrameLayout.LayoutParams ?: return
+        if (params.bottomMargin != -root.paddingBottom) {
+            params.bottomMargin = -root.paddingBottom
+            veil.layoutParams = params
+        }
+    }
+
     override fun onDisplayMargins(topMm: IntArray, bottomMm: IntArray, metrics: DisplayMetrics?, imeOffset: Int, searchInset: Int, systemTop: Int) {
+        bleedDimUnderNavigation()
         val bottomChrome = host.inputBar?.height ?: 0
         val bottomClearance = bottomChrome + searchInset + Tuils.mmToPx(metrics, bottomMm[3])
         home?.setSearchBarClearance(bottomClearance, bottomChrome)
@@ -130,6 +150,7 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
     }
 
     override fun dispose() {
+        rootClippedPadding?.let { host.root?.clipToPadding = it }
         home?.pause()
         home = null
     }
