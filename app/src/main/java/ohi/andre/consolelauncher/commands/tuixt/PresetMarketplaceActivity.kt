@@ -66,11 +66,13 @@ class PresetMarketplaceActivity : LocalizedActivity() {
     private class ShareState {
         var screenshot: ByteArray? = null
         var wallpaper: ByteArray? = null
+        var ascii: ByteArray? = null
         var behaviour: Set<String>? = null
         lateinit var preview: ImageView
         lateinit var captureButton: Button
         lateinit var wallpaperBox: CheckBox
         lateinit var wallpaperNote: TextView
+        lateinit var asciiBox: CheckBox
     }
 
     override fun onCreate(state: Bundle?) {
@@ -331,6 +333,9 @@ class PresetMarketplaceActivity : LocalizedActivity() {
         state.wallpaperNote = small(getString(R.string.share_wallpaper_unreadable)).apply { visibility = View.GONE }
         list.addView(state.wallpaperNote)
         list.addView(button(getString(R.string.share_choose_wallpaper)) { pickImage(PICK_WALLPAPER) })
+        // Off until ticked: the art can hold text the user may not mean to publish.
+        state.asciiBox = checkBox(getString(R.string.share_ascii_none), false).apply { isEnabled = false }
+        list.addView(state.asciiBox)
 
         list.addView(section(getString(R.string.share_screenshot)))
         val shotRow = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
@@ -361,10 +366,11 @@ class PresetMarketplaceActivity : LocalizedActivity() {
             val labels = if (behaviour.isChecked) state.behaviour else null
             val withLayout = layout.isChecked
             val wallpaper = if (state.wallpaperBox.isChecked) state.wallpaper else null
+            val ascii = if (state.asciiBox.isChecked) state.ascii else null
             val title = name.text.toString().trim()
             val submission = { preset: ByteArray -> CommunityPresets.Submission(title, description.text.toString().trim(),
                 tags.text.toString().trim(), submitter.text.toString().trim(), font.text.toString().trim().takeUnless { it == "https://" }.orEmpty(),
-                preset, shot, wallpaper) }
+                preset, shot, wallpaper, ascii) }
             send.isEnabled = false; cancel.isEnabled = false; status.setText(R.string.share_sending)
             val gen = generation
             worker.execute {
@@ -372,7 +378,7 @@ class PresetMarketplaceActivity : LocalizedActivity() {
                 runOnUiThread {
                     if (closed || gen != generation) return@runOnUiThread
                     send.isEnabled = true; cancel.isEnabled = true
-                    result.onSuccess { showSent(title, withLayout, labels != null, shot.size, wallpaper?.size) }
+                    result.onSuccess { showSent(title, withLayout, labels != null, shot.size, wallpaper?.size, ascii?.size) }
                         .onFailure { status.text = getString(R.string.share_failed, it.message.orEmpty()) }
                 }
             }
@@ -388,10 +394,17 @@ class PresetMarketplaceActivity : LocalizedActivity() {
                 if (current != null) { state.wallpaper = current; state.wallpaperBox.isEnabled = true; state.wallpaperBox.isChecked = true }
                 else state.wallpaperNote.visibility = View.VISIBLE
             }
+            val art = runCatching { CommunityPresets.localAscii(this) }.getOrNull()
+            runOnUiThread {
+                if (closed || share !== state || art == null) return@runOnUiThread
+                state.ascii = art
+                state.asciiBox.text = getString(R.string.share_ascii, Formatter.formatShortFileSize(this, art.size.toLong()))
+                state.asciiBox.isEnabled = true
+            }
         }
     }
 
-    private fun showSent(name: String, layout: Boolean, behaviour: Boolean, screenshot: Int, wallpaper: Int?) {
+    private fun showSent(name: String, layout: Boolean, behaviour: Boolean, screenshot: Int, wallpaper: Int?, ascii: Int?) {
         reset(Screen.SHARE)
         share = null
         list.addView(label(getString(R.string.share_title)).apply { TuixtTheme.styleHeader(this@PresetMarketplaceActivity, this) })
@@ -402,6 +415,7 @@ class PresetMarketplaceActivity : LocalizedActivity() {
         log.addView(small(getString(R.string.share_log_exported, parts)).apply { setTextColor(TuixtTheme.textColor()) })
         log.addView(small(getString(R.string.share_log_screenshot, Formatter.formatShortFileSize(this, screenshot.toLong()))).apply { setTextColor(TuixtTheme.textColor()) })
         wallpaper?.let { log.addView(small(getString(R.string.share_log_wallpaper, Formatter.formatShortFileSize(this, it.toLong()))).apply { setTextColor(TuixtTheme.textColor()) }) }
+        ascii?.let { log.addView(small(getString(R.string.share_log_ascii, Formatter.formatShortFileSize(this, it.toLong()))).apply { setTextColor(TuixtTheme.textColor()) }) }
         log.addView(small(getString(R.string.share_log_uploaded)).apply { setTextColor(TuixtTheme.textColor()) })
         list.addView(log, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(10) })
         list.addView(label(getString(R.string.share_sent, name)).apply { setTextColor(TuixtTheme.accentColor()) })

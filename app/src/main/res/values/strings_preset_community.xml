@@ -40,6 +40,8 @@
     <string name="share_behaviour">Behaviour settings… (you pick which)</string>
     <string name="share_wallpaper">Wallpaper image</string>
     <string name="share_choose_wallpaper">Choose wallpaper image</string>
+    <string name="share_ascii">ASCII art (ascii.txt, %1$s)</string>
+    <string name="share_ascii_none">ASCII art (no ascii.txt to share)</string>
     <string name="share_wallpaper_unreadable">Your current wallpaper can\'t be read here. Choose an image to include one.</string>
     <string name="share_screenshot">SCREENSHOT</string>
     <string name="share_capture">Capture home screen</string>
@@ -55,6 +57,7 @@
     <string name="share_log_exported">✓ exported %1$s</string>
     <string name="share_log_screenshot">✓ attached screenshot (%1$s)</string>
     <string name="share_log_wallpaper">✓ attached wallpaper (%1$s)</string>
+    <string name="share_log_ascii">✓ attached ASCII art (%1$s)</string>
     <string name="share_log_uploaded">✓ uploaded</string>
     <string name="share_sent">%1$s is waiting for review. It shows up under Community once approved. Nothing changed on your phone.</string>
     <string name="share_back_to_community">Back to Community</string>
