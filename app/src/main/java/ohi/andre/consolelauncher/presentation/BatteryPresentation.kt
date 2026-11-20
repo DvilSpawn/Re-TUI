@@ -28,6 +28,8 @@ internal object BatteryPresentation {
                 append(symbol.repeat(length - full))
                 setSpan(ForegroundColorSpan(values.color(Theme.battery_text_low)), emptyStart, this.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 append("] ${p.toInt()}%")
+                // battery_size applies to the bar as well as to battery_format text.
+                setSpan(sizeSpan(context, size, values), 0, this.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
         val separator = values.raw(Behavior.optional_values_separator).orEmpty().ifEmpty { Behavior.optional_values_separator.defaultValue().orEmpty() }
@@ -44,8 +46,12 @@ internal object BatteryPresentation {
         }
         return android.text.SpannableString(text).apply {
             setSpan(ForegroundColorSpan(values.color(role)), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            val pixels = ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(size.toFloat(), values.number(Ui.font_size_offset).toInt()) * context.resources.displayMetrics.scaledDensity
-            setSpan(android.text.style.AbsoluteSizeSpan(pixels.toInt()), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(sizeSpan(context, size, values), 0, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
+    }
+
+    private fun sizeSpan(context: Context, size: Int, values: HomeAppearance): android.text.style.AbsoluteSizeSpan {
+        val pixels = ohi.andre.consolelauncher.tuils.LauncherFontScale.scaledSp(size.toFloat(), values.number(Ui.font_size_offset).toInt()) * context.resources.displayMetrics.scaledDensity
+        return android.text.style.AbsoluteSizeSpan(pixels.toInt())
     }
 }
