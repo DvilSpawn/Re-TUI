@@ -8,8 +8,13 @@ Build 807 lets you share your ASCII art with a community preset and fixes the mu
 
 ## Fixes
 
+- In Mono's scroll layout, the Apps, Books and other list panels scroll again. A drag inside a panel scrolls the panel, and once it reaches the end the page carries on.
 - With the built-in player off, the Music widget's previous, play/pause and next buttons now control your other music app, the same way the `music` commands do. `preferred_music_app` picks which one.
 - With the built-in player off, `music -open` opens `preferred_music_app`, or the app that is playing, instead of saying music is off.
 - The Mono clock no longer jumps when you press home or swipe home while already on the home screen.
 - `battery_size` now also sizes the battery progress bar. Before, the settings preview showed the new size but the home screen did not.
 - `songs_folder` now plays the same formats as media folders: mp3, m4a, aac, flac, ogg, oga, opus, wav, mka, amr and 3ga. WMA is left out, as Android cannot play it.
+
+## Removed
+
+- `weather_key`. Weather comes from met.no and needs no key, so the setting did nothing. It is removed from your settings when you update, and presets that include it still import.

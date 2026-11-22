@@ -382,10 +382,12 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 ## V.6 · Build 807
 
 - Sharing a preset from Community can include your `ascii.txt` as its ASCII art. It is off until you tick it.
+- In Mono's scroll layout, panels such as Apps and Books scroll again, then hand on to the page.
 - With the built-in player off, the Music widget buttons control your other music app, and `music -open` opens it.
 - The Mono clock no longer jumps when you go home while already on the home screen.
 - `battery_size` now also sizes the battery progress bar.
-- `songs_folder` plays the same formats as media folders, such as m4a, aac and opus.</string>
+- `songs_folder` plays the same formats as media folders, such as m4a, aac and opus.
+- `weather_key` is gone; weather never needed it.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
