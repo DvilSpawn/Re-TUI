@@ -79,6 +79,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     private var originalRawText: String? = null
     private var asciiSettingsMode = false
     private var monoSettingsMode = false
+    /** The short settings list of Terminal mode; it shares mono's curated-list screen ([monoSettingsMode] is set too). */
+    private var terminalSettingsMode = false
     private var appearancePreview: SettingsAppearancePreview? = null
     private var previewKeyboardVisible = false
     private var previewPanelViews: Pair<LinearLayout, TextView>? = null
@@ -92,7 +94,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
 
         val intent = getIntent()
         asciiSettingsMode = MODE_ASCII_SETTINGS == intent.getStringExtra(MODE)
-        monoSettingsMode = MODE_MONO_SETTINGS == intent.getStringExtra(MODE)
+        terminalSettingsMode = MODE_TERMINAL_SETTINGS == intent.getStringExtra(MODE)
+        monoSettingsMode = MODE_MONO_SETTINGS == intent.getStringExtra(MODE) || terminalSettingsMode
         val onlySection = intent.getStringExtra(ONLY_SECTION)
         val excludeSections = intent.getStringArrayListExtra(EXCLUDE_SECTION) ?: listOfNotNull(intent.getStringExtra(EXCLUDE_SECTION))
         val path = intent.getStringExtra(PATH)
@@ -139,6 +142,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         header.setText(
             when {
                 asciiSettingsMode -> getString(R.string.editor_tuixtactivity_ascii_settings_4a299)
+                terminalSettingsMode -> getString(R.string.term_settings_title)
                 monoSettingsMode -> getString(R.string.mono_settings_title)
                 onlySection != null -> getString(R.string.editor_tuixtactivity_behavior_70e30, onlySection)
                 else -> getString(R.string.editor_tuixtactivity_themer_93fef, file!!.getName())
@@ -168,6 +172,10 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
                 setPadding(0, 0, 0, dp(this@TuixtActivity, 10f))
                 addAsciiAction(this, getString(R.string.mono_settings_all)) {
                     startActivity(ThemerActivity.launchIntent(this@TuixtActivity, null))
+                }
+                // Terminal mode's fetch shows ascii.txt; change the art from here.
+                if (terminalSettingsMode) addAsciiAction(this, getString(R.string.term_settings_ascii)) {
+                    startActivity(android.content.Intent(this@TuixtActivity, TuixtActivity::class.java).putExtra(MODE, MODE_ASCII_SETTINGS))
                 }
             })
         }
@@ -278,7 +286,11 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         }
 
         if (asciiSettingsMode || monoSettingsMode) {
-            originalRows = if (monoSettingsMode) buildMonoSettingsRows() else buildAsciiSettingsRows()
+            originalRows = when {
+                terminalSettingsMode -> buildTerminalSettingsRows()
+                monoSettingsMode -> buildMonoSettingsRows()
+                else -> buildAsciiSettingsRows()
+            }
             adapter = TuixtAdapter(originalRows!!.toMutableList(), null)
             recyclerView!!.setAdapter(adapter)
             adapter?.restoreDraftState(savedInstanceState?.getBundle("appearance_draft"))
@@ -510,6 +522,25 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             R.string.mono_settings_preset to listOf(Behavior.mono_preset, Behavior.mono_ink_color, Behavior.mono_paper_color),
             R.string.mono_settings_home to listOf(Behavior.mono_layout_style, Behavior.mono_layout),
             R.string.mono_settings_screen to listOf(Behavior.enable_crt_filter, Ui.enable_crt_vignette),
+            R.string.mono_settings_weather to listOf(Ui.show_weather, Behavior.weather_location,
+                Behavior.weather_temperature_measure, Behavior.weather_update_time),
+        )) {
+            val section = getString(title)
+            addSection(rows, section)
+            settings.forEach { rows.add(TuixtAdapter.SettingsRow.setting(it, section)) }
+        }
+        return rows
+    }
+
+    /** Only what changes the terminal pane: its fetch, the colours it is drawn in, the sessions and the weather. */
+    private fun buildTerminalSettingsRows(): MutableList<TuixtAdapter.SettingsRow> {
+        val rows: MutableList<TuixtAdapter.SettingsRow> = ArrayList()
+        for ((title, settings) in listOf(
+            R.string.mono_settings_mode to listOf<XMLPrefsSave>(Behavior.launcher_mode),
+            R.string.term_settings_fetch to listOf(Ui.username, Ui.deviceName, Theme.ascii_text_color),
+            R.string.term_settings_colours to listOf(Theme.input_text_color, Theme.device_text_color, Theme.output_text_color,
+                Theme.wallpaper_overlay_color),
+            R.string.term_settings_terminals to listOf(Theme.workspace_output_text_color, Theme.workspace_output_background_color),
             R.string.mono_settings_weather to listOf(Ui.show_weather, Behavior.weather_location,
                 Behavior.weather_temperature_measure, Behavior.weather_update_time),
         )) {
@@ -1053,8 +1084,15 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         const val MODE: String = "mode"
         const val MODE_ASCII_SETTINGS: String = "ascii_settings"
         const val MODE_MONO_SETTINGS: String = "mono_settings"
+        const val MODE_TERMINAL_SETTINGS: String = "terminal_settings"
         private const val VIEW_PREFS = "settings_view"
         private const val KEY_ALL_MODES = "all_modes"
+
+        /** The settings that matter in terminal mode, opened from the search bar's settings tab. */
+        fun terminalSettingsIntent(context: android.content.Context): android.content.Intent =
+            android.content.Intent(context, TuixtActivity::class.java)
+                .putExtra(MODE, MODE_TERMINAL_SETTINGS)
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
 
         /** The settings that matter in mono mode, opened from the mono home's soft keys. */
         fun monoSettingsIntent(context: android.content.Context): android.content.Intent =

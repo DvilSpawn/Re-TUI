@@ -13,4 +13,9 @@
     <string name="term_fetch_charging">charging</string>
     <string name="term_now_alarm">Alarm</string>
     <string name="term_now_time">Date/Time</string>
+    <string name="term_settings_title">Terminal settings</string>
+    <string name="term_settings_fetch">Fetch</string>
+    <string name="term_settings_colours">Colours</string>
+    <string name="term_settings_terminals">Terminals</string>
+    <string name="term_settings_ascii">ASCII art</string>
 </resources>

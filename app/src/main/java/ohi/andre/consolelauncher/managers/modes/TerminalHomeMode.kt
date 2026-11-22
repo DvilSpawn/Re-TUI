@@ -40,7 +40,9 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
             setSearchOpen(false); home.showAddTerminal()
         }
         host.root?.findViewById<View>(R.id.terminal_home_settings_tab)?.setOnClickListener {
-            setSearchOpen(false); host.launchSettings()
+            // Like mono's soft key: the settings that matter here, with all of them one tap away.
+            setSearchOpen(false)
+            host.context.startActivity(ohi.andre.consolelauncher.commands.tuixt.TuixtActivity.terminalSettingsIntent(host.context))
         }
         host.inputBar?.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
             if (bottom - top != oldBottom - oldTop) host.applyDisplayMargins()
