@@ -433,6 +433,8 @@ object BackupManager {
         val manifest: String
     ) : AutoCloseable {
         val name: String get() = manifestValue(manifest, "presetName").ifBlank { "Imported preset" }
+        /** Whether the package names itself; shareable exports do not. */
+        val hasOwnName: Boolean get() = manifestValue(manifest, "presetName").isNotBlank()
         val sections: String get() = manifestValue(manifest, "sections")
         val producerVersion: String get() = manifestValue(manifest, "appVersion")
         val schema: String get() = manifestValue(manifest, "schema")
