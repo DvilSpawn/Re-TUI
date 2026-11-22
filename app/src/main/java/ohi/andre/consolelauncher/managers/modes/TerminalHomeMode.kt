@@ -77,6 +77,15 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
 
     override fun onStart() = setSearchOpen(false)
 
+    /**
+     * Search can close and the keyboard go away while another app is in front, when the pane does not lay out; it then
+     * came back still keeping the results' and keyboard's room blank. Work the room out again once it has laid out.
+     */
+    private fun settleMargins() {
+        val view = home ?: return
+        view.post { host.applyDisplayMargins() }
+    }
+
     override fun handleBack(): Boolean {
         if (searchOpen) setSearchOpen(false) else home?.releaseInput()
         return true
@@ -178,6 +187,10 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
     override fun onResume() {
         fetch?.refresh()
         home?.resume()
+        // Coming back to Home starts with the search closed and the bar empty, as in Mono (onStart is not called).
+        host.root?.findViewById<android.widget.EditText>(R.id.input_view)?.text?.clear()
+        setSearchOpen(false)
+        settleMargins()
     }
 
     override fun dispose() {
