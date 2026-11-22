@@ -36,6 +36,13 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         tray.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
             if (bottom - top != oldBottom - oldTop) host.applyDisplayMargins()
         }
+        // Shared layout code (theme redraws, the home snapshot, suggestion refreshes) can show the results area again;
+        // in Terminal mode it only belongs on screen while searching, or the pane keeps its room blank.
+        host.root?.findViewById<View>(R.id.search_mode_results_scroll)?.let { results ->
+            results.viewTreeObserver.addOnGlobalLayoutListener {
+                if (!searchOpen && results.visibility == View.VISIBLE) results.visibility = View.GONE
+            }
+        }
         host.root?.findViewById<View>(R.id.terminal_home_add_tab)?.setOnClickListener {
             setSearchOpen(false); home.showAddTerminal()
         }
