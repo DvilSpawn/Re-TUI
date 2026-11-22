@@ -4655,7 +4655,7 @@ pomodoro Read manual
 
 Start focus session for this goal; optional Dystopia can restrict early exit.</string>
     <string name="offline_help_article_timer_stopwatch_focus_title">Start a timer, stopwatch or focus session</string>
-    <string name="offline_help_article_weather_setup_body">Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed: weather_key is unused and -set_key is unsupported.
+    <string name="offline_help_article_weather_setup_body">Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed.
 
 -enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.
 
@@ -5374,7 +5374,6 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_unlock_time_divider_description">The divider between the last unlock times</string>
     <string name="setting_behavior_unlock_time_order_description">1 = up-down. 2 = down-up</string>
     <string name="setting_behavior_weather_format_description">The format used to show the weather. Placeholders: %name (place), %main or %description (conditions), %temp, %temp_min and %temp_max (next 24 hours), %rain (next hour), %humidity, %speed (wind), %deg (wind direction), %pressure, %clouds</string>
-    <string name="setting_behavior_weather_key_description">Legacy OpenWeather setting. It is no longer used.</string>
     <string name="setting_behavior_weather_location_description">Place name or fixed coordinates separated by a comma (lat,lon). Weather never requests device location.</string>
     <string name="setting_behavior_weather_temperature_measure_description">metric = Celsius; imperial = Fahrenheit; standard = Kelvin</string>
     <string name="setting_behavior_weather_update_time_description">The weather update time in seconds</string>

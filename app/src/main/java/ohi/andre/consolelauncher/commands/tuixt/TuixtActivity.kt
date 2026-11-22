@@ -511,7 +511,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             R.string.mono_settings_home to listOf(Behavior.mono_layout_style, Behavior.mono_layout),
             R.string.mono_settings_screen to listOf(Behavior.enable_crt_filter, Ui.enable_crt_vignette),
             R.string.mono_settings_weather to listOf(Ui.show_weather, Behavior.weather_location,
-                Behavior.weather_temperature_measure, Behavior.weather_update_time, Behavior.weather_key),
+                Behavior.weather_temperature_measure, Behavior.weather_update_time),
         )) {
             val section = getString(title)
             addSection(rows, section)

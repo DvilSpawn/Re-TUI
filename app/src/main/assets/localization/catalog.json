@@ -14184,7 +14184,7 @@
   "offline_help_article_weather_setup_body": {
     "formatted": false,
     "forms": {
-      "other": "Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed: weather_key is unused and -set_key is unsupported.\n\n-enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.\n\nThe weather-specific tutorial option opens an online page, unlike the launcher's offline tutorial.\n\n## Examples\n\n```\ntuiweather -set_location London\n```\n\nSave a place name and request weather; may contact a geocoder/weather service.\n\n```\ntuiweather -update\n```\n\nRequest a manual weather refresh.\n\n```\ntuiweather -enable\n```\n\nShow weather; changes setting and reloads launcher.\n\n## What the weather line shows\n\nweather_format sets the line. Placeholders: %name (the place), %main or %description (conditions), %temp, %temp_min and %temp_max (lowest and highest over the next 24 hours), %rain (expected in the next hour, mm or inches), %humidity, %speed and %deg (wind), %pressure and %clouds. A placeholder the forecast lacks stays empty."
+      "other": "Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed.\n\n-enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.\n\nThe weather-specific tutorial option opens an online page, unlike the launcher's offline tutorial.\n\n## Examples\n\n```\ntuiweather -set_location London\n```\n\nSave a place name and request weather; may contact a geocoder/weather service.\n\n```\ntuiweather -update\n```\n\nRequest a manual weather refresh.\n\n```\ntuiweather -enable\n```\n\nShow weather; changes setting and reloads launcher.\n\n## What the weather line shows\n\nweather_format sets the line. Placeholders: %name (the place), %main or %description (conditions), %temp, %temp_min and %temp_max (lowest and highest over the next 24 hours), %rain (expected in the next hour, mm or inches), %humidity, %speed and %deg (wind), %pressure and %clouds. A placeholder the forecast lacks stays empty."
     },
     "type": "string"
   },
@@ -18551,13 +18551,6 @@
     "formatted": false,
     "forms": {
       "other": "The format used to show the weather. Placeholders: %name (place), %main or %description (conditions), %temp, %temp_min and %temp_max (next 24 hours), %rain (next hour), %humidity, %speed (wind), %deg (wind direction), %pressure, %clouds"
-    },
-    "type": "string"
-  },
-  "setting_behavior_weather_key_description": {
-    "formatted": false,
-    "forms": {
-      "other": "Legacy OpenWeather setting. It is no longer used."
     },
     "type": "string"
   },

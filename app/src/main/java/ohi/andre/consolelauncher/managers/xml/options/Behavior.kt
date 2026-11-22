@@ -1174,19 +1174,6 @@ enum class Behavior : XMLPrefsSave {
             return XMLPrefsSave.COLOR
         }
     },
-    weather_key {
-        override fun defaultValue(): String? {
-            return "1f798f99228596c20ccfda51b9771a86"
-        }
-
-        override fun infoRes(): Int {
-            return R.string.setting_behavior_weather_key_description
-        }
-
-        override fun type(): String? {
-            return XMLPrefsSave.TEXT
-        }
-    },
     weather_temperature_measure {
         override fun defaultValue(): String? {
             return "metric"

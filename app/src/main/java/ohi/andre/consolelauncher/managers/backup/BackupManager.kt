@@ -610,8 +610,10 @@ object BackupManager {
         val known = ohi.andre.consolelauncher.managers.xml.options.Behavior.entries
             .mapNotNull { it.label() }
             .toSet()
-        require(fields.all { it in known }) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unknown_b_d886f) }
-        return fields
+        // Presets made before a setting was retired may still name it; accept them and drop the name.
+        val retired = XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.delete().orEmpty().filterNotNull().toSet()
+        require(fields.all { it in known || it in retired }) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unknown_b_d886f) }
+        return fields - retired
     }
 
     @Throws(java.lang.Exception::class)

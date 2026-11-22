@@ -47,7 +47,7 @@ object SettingModes {
             Behavior.ascii_effect_speed, Ui.module_dock_spacing_dp, Ui.status_lines_margins, SurfaceBorderOption.unified_status_border,
             Ui.enable_battery_status).forEach { put(it, CLASSIC) }
         // Weather shows in Classic's status, Mono's weather panel and Dot's temperature ring.
-        listOf(Behavior.weather_location, Behavior.weather_key, Behavior.weather_temperature_measure,
+        listOf(Behavior.weather_location, Behavior.weather_temperature_measure,
             Behavior.weather_update_time, Behavior.show_weather_updates, Behavior.weather_format)
             .forEach { put(it, setOf(LauncherMode.CLASSIC, LauncherMode.MONO, LauncherMode.DOT)) }
         put(Ui.show_weather, setOf(LauncherMode.CLASSIC, LauncherMode.MONO))

@@ -38,7 +38,6 @@ class PresetManagerTest {
         assertFalse(xml.contains("<home_path "))
         assertFalse(xml.contains("<songs_folder "))
         assertFalse(xml.contains("<tui_notification_click_cmd "))
-        assertFalse(xml.contains("<weather_key "))
         assertFalse(xml.contains("<weather_location "))
         assertFalse(xml.contains("<weather_format "))
         assertFalse(xml.contains("<status_time_format "))

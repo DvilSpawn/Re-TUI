@@ -174,8 +174,6 @@
     <string name="setting_behavior_tui_notification_time_text_color_description" formatted="false">"The time color inside the Re:T-UI notification"</string>
     <!-- Behavior.kt: tui_notification_input_text_color -->
     <string name="setting_behavior_tui_notification_input_text_color_description" formatted="false">"The input color inside the Re:T-UI notification"</string>
-    <!-- Behavior.kt: weather_key -->
-    <string name="setting_behavior_weather_key_description" formatted="false">"Legacy OpenWeather setting. It is no longer used."</string>
     <!-- Behavior.kt: weather_temperature_measure -->
     <string name="setting_behavior_weather_temperature_measure_description" formatted="false">"metric = Celsius; imperial = Fahrenheit; standard = Kelvin"</string>
     <!-- Behavior.kt: weather_location -->

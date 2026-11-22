@@ -1455,7 +1455,9 @@ object XMLPrefsManager {
                     "tui_notification_time_color",
                     "tui_notification_input_color",
                     "external_storage_path",
-                    "file_backend"
+                    "file_backend",
+                    // OpenWeather key; weather comes from met.no and needs none.
+                    "weather_key"
                 )
             }
         },
