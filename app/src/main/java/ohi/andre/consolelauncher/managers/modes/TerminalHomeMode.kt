@@ -154,6 +154,9 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         home?.refreshAppearance()
         fetch?.refresh()
         stylePrompt()
+        // A theme change redraws the home through the shared search layout, which opens the results area full height;
+        // put Terminal's tray back (results only while searching) so the pane does not keep that room blank.
+        host.tray?.let(::layoutSearchTray)
     }
 
     override fun onDataChanged() {
