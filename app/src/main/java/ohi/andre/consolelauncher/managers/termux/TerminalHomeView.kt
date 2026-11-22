@@ -30,6 +30,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     private val layout = TerminalHomeLayout()
     private val main = Handler(Looper.getMainLooper())
     private val board = FrameLayout(context)
+    /** One terminal pane: the header (the launcher's fetch) on top, then the sessions stacked full width. */
+    private val column = LinearLayout(context).apply { orientation = VERTICAL }
     private val scroll = ScrollView(context)
     private val status = TextView(context)
     private val runtimes = linkedMapOf<String, TileRuntime>()
@@ -48,7 +50,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             revealListener = null
             val r = active
             if (keyboardShown && revealPending && r != null) {
-                scroll.scrollTo(0, r.panel.top)
+                scroll.scrollTo(0, board.top + r.panel.top)
                 revealPending = false
             }
         }
@@ -140,7 +142,17 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         status.setTextColor(fg); status.setPadding(dp(10), 0, dp(10), dp(6)); status.setText(R.string.terminal_home_hint)
         status.setOnClickListener { pause(); resume() }
         addView(status)
-        scroll.addView(board); addView(scroll, LayoutParams(-1, 0, 1f))
+        column.addView(board, LayoutParams(-1, -2))
+        scroll.addView(column); addView(scroll, LayoutParams(-1, 0, 1f))
+        // The hint line is gone in the one-pane look; status only shows setup and connection problems.
+        status.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            override fun afterTextChanged(s: android.text.Editable?) {
+                status.visibility = if (s.toString() == context.getString(R.string.terminal_home_hint)) GONE else VISIBLE
+            }
+        })
+        status.visibility = GONE
         board.addView(editor, FrameLayout.LayoutParams(-1, -1))
         input.setSingleLine(true); input.imeOptions = android.view.inputmethod.EditorInfo.IME_ACTION_GO or android.view.inputmethod.EditorInfo.IME_FLAG_NO_FULLSCREEN
         input.background = null; input.hint = ""; input.alpha = 0f; input.minHeight = 1; input.setPadding(0, 0, 0, 0)
@@ -350,7 +362,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         }
         runtimes.values.forEach { r ->
             val visible = !r.ended && r.target != null && r.grid.width > 0 &&
-                (r === active || r.panel.bottom + r.panel.translationY > scroll.scrollY && r.panel.top + r.panel.translationY < scroll.scrollY + scroll.height)
+                (r === active || board.top + r.panel.bottom > scroll.scrollY && board.top + r.panel.top < scroll.scrollY + scroll.height)
             if (!visible) { if (r.attached) detach(r) }
             else if (!r.attached) attach(r, client)
             else {
@@ -363,14 +375,18 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             }
         }
     }
-    fun setSearchBarClearance(bottom: Int, chromeHeight: Int = bottom) {
+    fun setSearchBarClearance(bottom: Int, chromeHeight: Int = bottom, push: Boolean = false) {
         if (bottomChromeHeight != chromeHeight) {
             bottomChromeHeight = chromeHeight
             invalidate()
         }
-        scroll.clipToPadding = false
+        // The pane runs on under the bar for its soft edge, but never under open search results.
+        scroll.clipToPadding = push
         if (scroll.paddingBottom != bottom) {
+            // Room taken at the bottom (search results opening) pushes the pane up rather than covering it.
+            val grew = bottom - scroll.paddingBottom
             scroll.setPadding(0, 0, 0, bottom)
+            if (push && grew > 0) scroll.post { scroll.scrollBy(0, grew) }
             invalidate()
         }
     }
@@ -468,18 +484,10 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     }
 
     private fun styleTile(r: TileRuntime) {
-        r.heading.text = r.title; r.heading.setTextColor(fg); r.heading.typeface = Tuils.getTypeface(context)
-        r.heading.setPadding(dp(6), 0, dp(6), 0)
-        r.panel.background = android.graphics.drawable.GradientDrawable().apply {
-            setColor(bg); cornerRadius = dp(6).toFloat()
-        }
-        val styledFrame = TerminalBorderRuntime.panelDrawable(context, Color.TRANSPARENT, accent,
-            1.2f, AppearanceSettings.outputCornerRadius(), AppearanceSettings.dashedBorders(), target = FrameTarget.OVERLAYS)
-        r.panel.foreground = if (AppearanceSettings.cyberdeckMode() || AppearanceSettings.dashedBorders() ||
-            TerminalBorderRuntime.customFrameActive(context, FrameTarget.OVERLAYS)) styledFrame
-        else android.graphics.drawable.GradientDrawable().apply {
-            setColor(Color.TRANSPARENT); setStroke(dp(1), accent); cornerRadius = dp(6).toFloat()
-        }
+        r.heading.text = r.title; r.heading.setTextColor(editAccent); r.heading.typeface = Tuils.getTypeface(context)
+        r.heading.setPadding(dp(4), 0, dp(4), 0); r.heading.gravity = Gravity.CENTER_VERTICAL
+        // One pane: no tile background or frame, the session sits straight on the pane.
+        r.panel.background = null; r.panel.foreground = null
         r.grid.updateThemeColors(fg, bg, accent)
         r.grid.setTerminalTypeface(Tuils.getTypeface(context)); r.grid.setTerminalTextSizeSp(LauncherFontScale.terminalTextSizeSp())
     }
@@ -487,7 +495,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     private fun render(r: TileRuntime) {
         runtimes[r.tile.id] = r
         styleTile(r)
-        r.panel.addView(r.heading, LayoutParams(-1, dp(30))); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
+        r.panel.addView(r.heading, LayoutParams(-1, dp(26))); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
         fun bindGesture(view: View, editOnLongPress: Boolean, tap: () -> Unit) {
             val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDown(e: MotionEvent) = true
@@ -514,11 +522,10 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     }
     private fun edit(r: TileRuntime) {
         releaseInput()
-        AlertDialog.Builder(context).setTitle(r.title).setItems(arrayOf(context.getString(R.string.terminal_home_move_resize), context.getString(R.string.terminal_home_reconnect), context.getString(R.string.terminal_home_remove))) { _, index ->
+        AlertDialog.Builder(context).setTitle(r.title).setItems(arrayOf(context.getString(R.string.terminal_home_reconnect), context.getString(R.string.terminal_home_remove))) { _, index ->
             when (index) {
-                0 -> arrange(r)
-                1 -> reconnect(r)
-                2 -> { if (active === r) releaseInput(); detach(r); if (creating == r.tile.id) creating = null; runtimes.remove(r.tile.id); layout.tiles.remove(r.tile); board.removeView(r.panel); editing = null; save(); placeTiles(); scheduleSync() }
+                0 -> reconnect(r)
+                1 -> { if (active === r) releaseInput(); detach(r); if (creating == r.tile.id) creating = null; runtimes.remove(r.tile.id); layout.tiles.remove(r.tile); board.removeView(r.panel); editing = null; save(); placeTiles(); scheduleSync() }
             }
         }.setNegativeButton(android.R.string.cancel) { _, _ -> editing = null }.show()
     }
@@ -684,34 +691,29 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     }
     private fun cellWidth() = (board.width.coerceAtLeast(dp(300)) / 6f)
     private fun cellHeight() = dp(65).toFloat()
+    /** Sessions stacked full width in their saved order, each keeping its height; the pane scrolls through them. */
     private fun placeTiles() {
-        val cw = cellWidth(); val ch = cellHeight()
-        val contentBottom = ((layout.tiles.maxOfOrNull { it.y + it.height } ?: 6) * ch).roundToInt()
-        // Stop at the real content edge so the last pane rests above the keyboard controls.
-        val boardHeight = maxOf(scroll.height, contentBottom, (editor.previewBottom * ch).roundToInt())
-        // ScrollView measures its child with unspecified height; layoutParams alone cannot add empty scroll space.
+        val ch = cellHeight(); val gap = dp(10)
+        var top = 0
+        layout.tiles.sortedWith(compareBy({ it.y }, { it.x })).forEach { tile ->
+            val r = runtimes[tile.id] ?: return@forEach
+            val height = (tile.height * ch).roundToInt()
+            r.panel.translationX = 0f; r.panel.translationY = 0f; r.previewX = 0f; r.previewY = 0f
+            r.panel.layoutParams = FrameLayout.LayoutParams(-1, height).apply { leftMargin = 0; topMargin = top }
+            top += height + gap
+        }
+        val boardHeight = (top - gap).coerceAtLeast(0)
         if (board.minimumHeight != boardHeight) board.minimumHeight = boardHeight
         if (board.layoutParams?.height != boardHeight) {
-            board.layoutParams = (board.layoutParams ?: FrameLayout.LayoutParams(-1, -1)).apply { height = boardHeight }
+            board.layoutParams = (board.layoutParams as? LinearLayout.LayoutParams ?: LinearLayout.LayoutParams(-1, boardHeight)).apply { height = boardHeight }
         }
-        editor.layoutParams = FrameLayout.LayoutParams(board.width.coerceAtLeast(dp(300)), boardHeight)
-        editor.bringToFront(); editor.invalidate()
-        if (android.os.Build.VERSION.SDK_INT >= 29) editor.systemGestureExclusionRects = runtimes[editing]?.let { r ->
-            listOf(android.graphics.Rect(0,r.panel.top+r.panel.height/2-dp(80),dp(48),r.panel.top+r.panel.height/2+dp(80)),
-                android.graphics.Rect(board.width-dp(48),r.panel.top+r.panel.height/2-dp(80),board.width,r.panel.top+r.panel.height/2+dp(80)))
-        } ?: emptyList()
-        runtimes.values.forEach { r ->
-            val preview = editor.previewTile(r.tile.id)?.takeIf { r.tile.id != editing }
-            val px = ((preview?.x ?: r.tile.x) - r.tile.x) * cw
-            val py = ((preview?.y ?: r.tile.y) - r.tile.y) * ch
-            if (px != r.previewX || py != r.previewY) {
-                r.previewX = px; r.previewY = py
-                r.panel.animate().translationX(px).translationY(py).setDuration(120).start()
-            }
-            r.panel.layoutParams = FrameLayout.LayoutParams((r.tile.width * cw).roundToInt() - dp(8), (r.tile.height * ch).roundToInt() - dp(8)).apply {
-                leftMargin = (r.tile.x * cw).roundToInt() + dp(4); topMargin = (r.tile.y * ch).roundToInt() + dp(4)
-            }
-        }
+        editor.visibility = GONE
+    }
+
+    /** The launcher's own header (its fetch) at the top of the pane, above the sessions. */
+    fun setHeader(view: View) {
+        (view.parent as? ViewGroup)?.removeView(view)
+        column.addView(view, 0, LayoutParams(-1, -2))
     }
     private fun save() {
         val array = JSONArray()
