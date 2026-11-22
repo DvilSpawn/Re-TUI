@@ -539,7 +539,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             R.string.mono_settings_mode to listOf<XMLPrefsSave>(Behavior.launcher_mode),
             R.string.term_settings_fetch to listOf(Ui.username, Ui.deviceName, Theme.ascii_text_color),
             R.string.term_settings_colours to listOf(Theme.input_text_color, Theme.device_text_color, Theme.output_text_color,
-                Theme.wallpaper_overlay_color),
+                Theme.terminal_overlay_color),
             R.string.term_settings_terminals to listOf(Theme.workspace_output_text_color, Theme.workspace_output_background_color),
             R.string.mono_settings_weather to listOf(Ui.show_weather, Behavior.weather_location,
                 Behavior.weather_temperature_measure, Behavior.weather_update_time),

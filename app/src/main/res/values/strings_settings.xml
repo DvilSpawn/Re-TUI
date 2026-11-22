@@ -426,6 +426,7 @@
     <string name="setting_theme_wallpaper_overlay_color_description" formatted="false">"Overlay color applied over the system wallpaper"</string>
     <!-- Theme.kt: settings_wallpaper_overlay_color -->
     <string name="setting_theme_settings_wallpaper_overlay_color_description" formatted="false">"Overlay color applied over the wallpaper behind Settings"</string>
+    <string name="setting_theme_terminal_overlay_color_description" formatted="false">"Overlay color over the wallpaper in Terminal mode, in place of wallpaper_overlay_color. auto uses wallpaper_overlay_color."</string>
     <!-- Theme.kt: input_text_color -->
     <string name="setting_theme_input_text_color_description" formatted="false">"Command input text color"</string>
     <!-- Theme.kt: output_text_color -->

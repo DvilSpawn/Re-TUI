@@ -35,6 +35,7 @@ object SettingModes {
         listOf(Behavior.mono_preset, Behavior.mono_ink_color, Behavior.mono_paper_color, Behavior.mono_layout,
             Behavior.mono_layout_style).forEach { put(it, setOf(LauncherMode.MONO)) }
         put(Behavior.dot_apps, setOf(LauncherMode.DOT))
+        put(Theme.terminal_overlay_color, setOf(LauncherMode.TERMINAL))
         // The homes that split on wide screens and around a hinge.
         listOf(Behavior.duo_mode, Ui.landscape_fold_gutter_mm).forEach { put(it, SPLITTING) }
         listOf(Behavior.duo_swap_top_panes, Ui.split_duo_launcher, Ui.show_ascii_landscape, Ui.display_margin_landscape_mm)
