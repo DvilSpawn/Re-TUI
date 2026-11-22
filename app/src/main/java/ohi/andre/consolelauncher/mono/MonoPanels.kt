@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.R
@@ -253,7 +252,8 @@ abstract class MonoPanel(protected val kit: MonoKit, protected val host: MonoPan
         return frame to body
     }
 
-    protected fun scrolling(content: View) = ScrollView(kit.context).apply {
+    // Nested, so in scroll-mode homes a drag inside a panel scrolls the panel first and then hands on to the page.
+    protected fun scrolling(content: View) = androidx.core.widget.NestedScrollView(kit.context).apply {
         isVerticalScrollBarEnabled = false
         addView(content)
     }

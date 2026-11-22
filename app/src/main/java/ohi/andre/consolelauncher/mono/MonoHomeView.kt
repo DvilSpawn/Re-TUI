@@ -631,7 +631,8 @@ class MonoHomeView(context: Context, private val source: Source) : FrameLayout(c
                 if (page == pages.lastIndex) slot(all, page, items, all.rows, true)
                 all.rows += MonoLayout.height(items)
             }
-            panelArea.addView(ScrollView(context).apply {
+            // Nested, so a panel that scrolls (apps, books, lists) takes the drag first and passes the rest to the page.
+            panelArea.addView(androidx.core.widget.NestedScrollView(context).apply {
                 isVerticalScrollBarEnabled = false
                 addView(all)
                 addOnLayoutChangeListener { _, _, t, _, b, _, _, _, _ -> if (all.viewport != b - t) { all.viewport = b - t; all.requestLayout() } }
