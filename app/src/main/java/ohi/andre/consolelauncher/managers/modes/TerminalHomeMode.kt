@@ -114,7 +114,18 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         }
     }
 
+    /** The search bar's prompt as a powerline pill, matching the session titles; Terminal mode only. */
+    private fun stylePrompt() {
+        val prefix = host.root?.findViewById<android.widget.TextView>(R.id.prefix_view) ?: return
+        ohi.andre.consolelauncher.managers.termux.PowerlinePill.style(prefix,
+            ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.input_text_color),
+            notched = false)
+        prefix.gravity = android.view.Gravity.CENTER_VERTICAL
+        (prefix.layoutParams as? ViewGroup.MarginLayoutParams)?.let { if (it.marginEnd < Tuils.dpToPx(host.context, 6)) { it.marginEnd = Tuils.dpToPx(host.context, 6); prefix.layoutParams = it } }
+    }
+
     override fun finishSearchLayout() {
+        stylePrompt()
         val terminalFocused = !searchOpen && host.keyboardUp && home?.hasTerminalFocus == true
         host.root?.findViewById<View>(R.id.search_mode_tabs)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
         host.root?.findViewById<View>(R.id.input_group)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
@@ -131,6 +142,7 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
     override fun onAppearanceChanged() {
         home?.refreshAppearance()
         fetch?.refresh()
+        stylePrompt()
     }
 
     override fun onDataChanged() {

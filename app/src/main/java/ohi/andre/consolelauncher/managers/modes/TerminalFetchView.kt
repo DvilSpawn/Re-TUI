@@ -80,7 +80,14 @@ internal class TerminalFetchView(context: Context, private val apps: () -> Int, 
             R.string.term_fetch_storage to storage(),
             R.string.term_fetch_apps to apps().toString(),
             R.string.term_fetch_font to font
-        ).forEach { (label, text) -> details.addView(row(context.getString(label), text)) }
+        ).map { (label, text) -> context.getString(label) to text }.chunked(2).forEach { pair ->
+            // Two pairs to a line, so the fetch leaves the terminals more of the pane.
+            details.addView(LinearLayout(context).apply {
+                orientation = HORIZONTAL
+                pair.forEach { (label, text) -> addView(row(label, text, width = 7), LayoutParams(0, -2, 1f)) }
+                if (pair.size == 1) addView(View(context), LayoutParams(0, 0, 1f))
+            })
+        }
 
         swatches.removeAllViews()
         listOf(

@@ -72,6 +72,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     private inner class TileRuntime(val tile: TerminalHomeLayout.Tile, val title: String, var command: String, var target: String?) {
         val panel = LinearLayout(context).apply { orientation = VERTICAL }
         val heading = TextView(context)
+        /** The tmux window, as the second pill after the title (`Shell ▶ @3 ▶`). */
+        val window = TextView(context)
         val grid = TerminalGridView(context)
         val channel = nextChannel++
         var attached = false
@@ -322,7 +324,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         fun valid() = running && connection === client && r.epoch == epoch
         client.attach(r.channel, target, cols(r), rows(r), { bytes ->
             if (valid()) {
-                terminal.append(bytes); r.heading.text = r.title
+                terminal.append(bytes); r.heading.text = r.title; showWindow(r)
                 if (!r.renderPending) {
                     r.renderPending = true
                     r.grid.postOnAnimation {
@@ -484,8 +486,12 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     }
 
     private fun styleTile(r: TileRuntime) {
-        r.heading.text = r.title; r.heading.setTextColor(editAccent); r.heading.typeface = Tuils.getTypeface(context)
-        r.heading.setPadding(dp(4), 0, dp(4), 0); r.heading.gravity = Gravity.CENTER_VERTICAL
+        r.heading.text = r.title; r.heading.typeface = Tuils.getTypeface(context)
+        r.heading.gravity = Gravity.CENTER_VERTICAL; r.heading.maxLines = 1
+        PowerlinePill.style(r.heading, ThemeColorResolver.color(Theme.input_text_color), notched = false)
+        r.window.typeface = Tuils.getTypeface(context); r.window.gravity = Gravity.CENTER_VERTICAL; r.window.maxLines = 1
+        PowerlinePill.style(r.window, ThemeColorResolver.color(Theme.device_text_color), notched = true)
+        showWindow(r)
         // One pane: no tile background or frame, the session sits straight on the pane.
         r.panel.background = null; r.panel.foreground = null
         r.grid.updateThemeColors(fg, bg, accent)
@@ -495,7 +501,12 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     private fun render(r: TileRuntime) {
         runtimes[r.tile.id] = r
         styleTile(r)
-        r.panel.addView(r.heading, LayoutParams(-1, dp(26))); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
+        r.panel.addView(LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            addView(r.heading, LayoutParams(-2, -1))
+            // The notch tucks under the title's chevron, as in a powerline prompt.
+            addView(r.window, LayoutParams(-2, -1).apply { marginStart = -dp(5) })
+        }, LayoutParams(-1, dp(24)).apply { bottomMargin = dp(4) }); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
         fun bindGesture(view: View, editOnLongPress: Boolean, tap: () -> Unit) {
             val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDown(e: MotionEvent) = true
@@ -708,6 +719,11 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             board.layoutParams = (board.layoutParams as? LinearLayout.LayoutParams ?: LinearLayout.LayoutParams(-1, boardHeight)).apply { height = boardHeight }
         }
         editor.visibility = GONE
+    }
+
+    private fun showWindow(r: TileRuntime) {
+        r.window.text = r.target.orEmpty()
+        r.window.visibility = if (r.target.isNullOrEmpty()) GONE else VISIBLE
     }
 
     /** The launcher's own header (its fetch) at the top of the pane, above the sessions. */
