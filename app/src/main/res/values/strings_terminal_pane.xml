@@ -11,5 +11,6 @@
     <string name="term_fetch_apps">Apps</string>
     <string name="term_fetch_font">Font</string>
     <string name="term_fetch_charging">charging</string>
-    <string name="term_now_alarm">alarm</string>
+    <string name="term_now_alarm">Alarm</string>
+    <string name="term_now_time">Date/Time</string>
 </resources>

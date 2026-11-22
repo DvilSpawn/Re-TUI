@@ -155,7 +155,9 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         val now = java.util.Date()
         val twentyFour = android.text.format.DateFormat.is24HourFormat(context)
         val lines = ArrayList<Pair<String, String>>()
-        lines += java.text.SimpleDateFormat(if (twentyFour) "HH:mm" else "h:mm a", java.util.Locale.getDefault()).format(now) to
+        // One row, labelled like the fetch details, so the time reads in the value colour with the date.
+        lines += context.getString(R.string.term_now_time) to
+            java.text.SimpleDateFormat(if (twentyFour) "HH:mm" else "h:mm a", java.util.Locale.getDefault()).format(now) + " · " +
             java.text.SimpleDateFormat("EEE d MMM yyyy", java.util.Locale.getDefault()).format(now)
         val weather = listOfNotNull(host.weatherDetails?.trim()?.takeIf { it.isNotEmpty() },
             host.weatherCondition?.trim()?.takeIf { it.isNotEmpty() }).joinToString(" · ")
