@@ -438,12 +438,15 @@ object BackupManager {
         val schema: String get() = manifestValue(manifest, "schema")
         val behaviorLabels: Set<String>? get() = if (schema == "3") behaviorFields(manifest) else null
 
-        fun save(): String {
+        /** Saves the preset as [preferredName] when given (the marketplace's listing name), else the package's own name. */
+        fun save(preferredName: String? = null): String {
             // Re-extract and validate the private snapshot, never the original provider URI.
             File(staging, "package.retui").inputStream().use { input ->
                 inspectPreset(input, staging.parentFile!!).use { checked ->
                     FileOperationCancellation.beginCommit()
-                    return PresetManager.importExtractedFolder(checked.name, checked.folder, checked.behaviorLabels)
+                    // Shareable exports carry no presetName, so without the listing's name every download was "Imported preset".
+                    val name = preferredName?.trim()?.takeIf { it.isNotEmpty() } ?: checked.name
+                    return PresetManager.importExtractedFolder(name, checked.folder, checked.behaviorLabels)
                 }
             }
         }

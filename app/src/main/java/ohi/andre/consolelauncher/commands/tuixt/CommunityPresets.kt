@@ -120,7 +120,7 @@ object CommunityPresets {
         Tuils.init(context)
         return BackupManager.inspectPreset(bytes.inputStream(), File(context.cacheDir, "preset-community")).use { staged ->
             if (cancelled()) throw CancellationException()
-            val name = staged.save()
+            val name = staged.save(item.name)
             if (wallpaper != null) PresetManager.saveWallpaper(name, wallpaper)
             name
         }
