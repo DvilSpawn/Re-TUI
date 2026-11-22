@@ -488,6 +488,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     private fun styleTile(r: TileRuntime) {
         r.heading.text = r.title; r.heading.typeface = Tuils.getTypeface(context)
         r.heading.gravity = Gravity.CENTER_VERTICAL; r.heading.maxLines = 1
+        // The pills hug their text: no font padding and only a sliver above and below.
+        for (pill in listOf(r.heading, r.window)) { pill.includeFontPadding = false; pill.setPadding(0, dp(2), 0, dp(2)) }
         PowerlinePill.style(r.heading, ThemeColorResolver.color(Theme.input_text_color), notched = false)
         r.window.typeface = Tuils.getTypeface(context); r.window.gravity = Gravity.CENTER_VERTICAL; r.window.maxLines = 1
         PowerlinePill.style(r.window, ThemeColorResolver.color(Theme.device_text_color), notched = true)
@@ -503,10 +505,10 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         styleTile(r)
         r.panel.addView(LinearLayout(context).apply {
             orientation = HORIZONTAL
-            addView(r.heading, LayoutParams(-2, -1))
+            addView(r.heading, LayoutParams(-2, -2))
             // The notch tucks under the title's chevron, as in a powerline prompt.
-            addView(r.window, LayoutParams(-2, -1).apply { marginStart = -dp(5) })
-        }, LayoutParams(-1, dp(24)).apply { bottomMargin = dp(4) }); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
+            addView(r.window, LayoutParams(-2, -2).apply { marginStart = -dp(5) })
+        }, LayoutParams(-1, -2).apply { bottomMargin = dp(4) }); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
         fun bindGesture(view: View, editOnLongPress: Boolean, tap: () -> Unit) {
             val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDown(e: MotionEvent) = true
