@@ -156,7 +156,7 @@
     <string name="mono_term_title">Term</string>
     <string name="mono_term_tap">tap to type</string>
     <string name="mono_term_typing">typing</string>
-    <string name="mono_term_done">done ×</string>
+    <string name="mono_term_done">done</string>
     <string name="mono_term_pick">pick a window</string>
     <string name="mono_term_window">window</string>
     <string name="mono_pages_title">pages</string>
