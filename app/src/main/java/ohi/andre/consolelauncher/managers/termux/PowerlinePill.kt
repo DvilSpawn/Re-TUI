@@ -13,7 +13,7 @@ import android.widget.TextView
  * A powerline segment: a filled band with a chevron on its right; a segment that follows another has the matching
  * notch on its left, so a row of them reads as one prompt (`~/path ▶ branch ▶`).
  */
-class PowerlinePill(color: Int, private val tip: Float, private val notched: Boolean) : Drawable() {
+class PowerlinePill(color: Int, private val tip: Float, private val notched: Boolean, private val chevron: Boolean = true) : Drawable() {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { this.color = color }
     private val path = Path()
 
@@ -23,9 +23,14 @@ class PowerlinePill(color: Int, private val tip: Float, private val notched: Boo
         val mid = (t + bottom) / 2f
         path.reset()
         path.moveTo(l, t)
-        path.lineTo(r - tip, t)
-        path.lineTo(r, mid)
-        path.lineTo(r - tip, bottom)
+        if (chevron) {
+            path.lineTo(r - tip, t)
+            path.lineTo(r, mid)
+            path.lineTo(r - tip, bottom)
+        } else {
+            path.lineTo(r, t)
+            path.lineTo(r, bottom)
+        }
         path.lineTo(l, bottom)
         if (notched) path.lineTo(l + tip, mid)
         path.close()
@@ -47,6 +52,14 @@ class PowerlinePill(color: Int, private val tip: Float, private val notched: Boo
             view.setShadowLayer(0f, 0f, 0f, 0)
             val side = (8 * density).toInt()
             view.setPadding(side + if (notched) tip.toInt() else 0, view.paddingTop, side + tip.toInt(), view.paddingBottom)
+        }
+
+        /** A flat band in [color] for a button (no chevron, it ends a row rather than leading on). */
+        fun fill(view: TextView, color: Int) {
+            val side = (8 * view.resources.displayMetrics.density).toInt()
+            view.background = PowerlinePill(color or 0xFF000000.toInt(), 0f, notched = false, chevron = false)
+            view.setTextColor(if (luminance(color) > 0.5f) 0xFF15090C.toInt() else Color.WHITE)
+            view.setPadding(side, view.paddingTop, side, view.paddingBottom)
         }
 
         private fun luminance(color: Int) =

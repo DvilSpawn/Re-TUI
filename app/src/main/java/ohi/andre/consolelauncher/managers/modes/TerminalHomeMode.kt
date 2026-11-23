@@ -136,7 +136,7 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
     private fun stylePrompt() {
         val prefix = host.root?.findViewById<android.widget.TextView>(R.id.prefix_view) ?: return
         ohi.andre.consolelauncher.managers.termux.PowerlinePill.style(prefix,
-            ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.input_text_color),
+            ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.terminal_pill_color),
             notched = false)
         prefix.gravity = android.view.Gravity.CENTER_VERTICAL
         (prefix.layoutParams as? ViewGroup.MarginLayoutParams)?.let { if (it.marginEnd < Tuils.dpToPx(host.context, 6)) { it.marginEnd = Tuils.dpToPx(host.context, 6); prefix.layoutParams = it } }

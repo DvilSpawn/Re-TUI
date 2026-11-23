@@ -33,6 +33,10 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     /** One terminal pane: the header (the launcher's fetch) on top, then the sessions stacked full width. */
     private val column = LinearLayout(context).apply { orientation = VERTICAL }
     private val scroll = ScrollView(context)
+    /** The focused session, lifted out of the pane to fill it while typing, as Mono lifts its terminals. */
+    private val lift = FrameLayout(context).apply { visibility = GONE }
+    private var lifted: TileRuntime? = null
+    private var liftedFromY = 0
     private val status = TextView(context)
     private val runtimes = linkedMapOf<String, TileRuntime>()
     private var label: String? = null
@@ -74,6 +78,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         val heading = TextView(context)
         /** The tmux window, as the second pill after the title (`Shell ▶ @3 ▶`). */
         val window = TextView(context)
+        /** Top right while lifted: back to the pane. */
+        val done = TextView(context).apply { visibility = GONE }
         val grid = TerminalGridView(context)
         val channel = nextChannel++
         var attached = false
@@ -146,6 +152,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         addView(status)
         column.addView(board, LayoutParams(-1, -2))
         scroll.addView(column); addView(scroll, LayoutParams(-1, 0, 1f))
+        addView(lift, LayoutParams(-1, 0, 1f))
         // The hint line is gone in the one-pane look; status only shows setup and connection problems.
         status.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
@@ -229,6 +236,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         revealPending = false; cancelReveal()
         editor.finishGesture(); editor.visibility = GONE
         status.setText(R.string.terminal_home_hint)
+        drop()
         active = null; editing = null; input.clearFocus(); input.visibility = GONE
         modifiers.clear(); refreshKeys(); onTerminalFocusChanged?.invoke(false)
         scheduleSync()
@@ -241,9 +249,33 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         if (active !== r) { modifiers.clear(); refreshKeys() }
         editing = null; active = r; onTerminalFocusChanged?.invoke(true); input.visibility = VISIBLE; input.showSoftInputOnFocus = true; input.requestFocus()
         RetuiThemeBridge.sendToKeyboard(context, input, "retui_home:${r.target}", "termux")
+        liftUp(r)
         scheduleSync()
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).showSoftInput(input, InputMethodManager.SHOW_IMPLICIT)
-        placeTiles(); scheduleReveal()
+    }
+    /** Moves [r]'s own panel over the pane; nothing is rebuilt, and the grid's resize gives tmux the bigger size. */
+    private fun liftUp(r: TileRuntime) {
+        if (lifted === r) return
+        drop()
+        revealPending = false; cancelReveal()
+        liftedFromY = scroll.scrollY
+        board.removeView(r.panel)
+        lift.addView(r.panel, FrameLayout.LayoutParams(-1, -1))
+        lifted = r; r.done.visibility = VISIBLE
+        scroll.visibility = GONE; lift.visibility = VISIBLE
+    }
+    /** Puts the lifted panel back in its place in the pane. */
+    private fun drop() {
+        val r = lifted ?: return
+        lifted = null; r.done.visibility = GONE
+        lift.removeView(r.panel)
+        board.addView(r.panel)
+        lift.visibility = GONE; scroll.visibility = VISIBLE
+        placeTiles()
+        // Back where it was: the pane comes back at the same place, not wherever the keyboard's resize left it.
+        val y = liftedFromY
+        androidx.core.view.OneShotPreDrawListener.add(scroll) { scroll.scrollTo(0, y) }
+        scroll.postDelayed({ if (lifted == null) scroll.scrollTo(0, y) }, 350)
     }
     fun resume() {
         if (running) return
@@ -285,19 +317,16 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
                         r.target = it; r.ended = false
                     }
                 }
-                updateWindows(windows)
+                updateWindows(windows, fresh = true)
                 status.setText(R.string.terminal_home_hint); save(); scheduleSync()
             }
             override fun onWindows(windows: List<Pair<String, String>>) {
                 if (valid()) { updateWindows(windows); scheduleSync() }
             }
+            // The session's shell exited (typed exit, or its command finished): it leaves the pane, as a closed tab would.
             override fun onTargetGone(target: String) {
                 if (!valid()) return
-                runtimes.values.filter { it.target == target }.forEach {
-                    detach(it); it.ended = true; it.heading.setText(R.string.terminal_home_exited)
-                    if (it === active) releaseInput()
-                }
-                save(); scheduleSync()
+                runtimes.values.filter { it.target == target }.forEach(::remove)
             }
             override fun onError(message: String) {
                 if (!valid()) return
@@ -340,9 +369,16 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             }
         })
     }
-    private fun updateWindows(alive: List<Pair<String, String>>) {
+    /**
+     * A session whose window was alive on this connection and is now gone has exited: it leaves the pane. One missing
+     * from a fresh connection's first list (Termux restarted, the phone rebooted) may only need a new shell: it stays,
+     * marked ended, to tap and reconnect.
+     */
+    private fun updateWindows(alive: List<Pair<String, String>>, fresh: Boolean = false) {
+        val before = if (fresh) emptyList() else windows
         windows = alive
         runtimes.values.filter { it.target != null && alive.none { w -> w.first == it.target } }.forEach {
+            if (before.any { w -> w.first == it.target }) { remove(it); return@forEach }
             it.ended = true; it.heading.setText(R.string.terminal_home_exited)
             if (it === active) releaseInput()
         }
@@ -388,6 +424,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             // Room taken at the bottom (search results opening) pushes the pane up rather than covering it.
             val grew = bottom - scroll.paddingBottom
             scroll.setPadding(0, 0, 0, bottom)
+            lift.setPadding(0, 0, 0, bottom)
             if (push && grew > 0) scroll.post { scroll.scrollBy(0, grew) }
             invalidate()
         }
@@ -440,7 +477,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
     }
     fun showAddTerminal() {
         releaseInput()
-        val names = arrayOf(context.getString(R.string.terminal_home_shell), "Clock", "Weather", "Dashboard", context.getString(R.string.terminal_home_custom), context.getString(R.string.terminal_home_existing), context.getString(R.string.terminal_home_setup_button), "Re:TUI Fetch")
+        val names = arrayOf(context.getString(R.string.terminal_home_shell), "Clock", "Weather", "Dashboard", context.getString(R.string.terminal_home_custom), context.getString(R.string.terminal_home_existing), context.getString(R.string.terminal_home_setup_button))
         AlertDialog.Builder(context).setTitle(R.string.terminal_home_add).setItems(names) { _, which ->
             when (which) {
                 0 -> add("Shell", "", null)
@@ -458,7 +495,6 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
                     AlertDialog.Builder(context).setTitle(R.string.terminal_home_custom).setView(command).setNegativeButton(android.R.string.cancel, null)
                         .setPositiveButton(android.R.string.ok) { _, _ -> if (command.text.isNotBlank()) add("Terminal", command.text.toString(), null) }.show()
                 }
-                7 -> add("Re:TUI Fetch", widgetCommand("fetch", ""), null)
                 6 -> TermuxWorkspaceActivity.open(context)
                 5 -> {
                     val available = windows.filter { w -> runtimes.values.none { it.target == w.first } }
@@ -477,7 +513,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         render(TileRuntime(tile, title, command, target)); placeTiles(); save(); connectTiles()
     }
     fun refreshAppearance() {
-        setBackgroundColor(bg)
+        // One pane: the wallpaper and the Terminal overlay show through; only the sessions draw their own background.
+        background = null
         status.setTextColor(fg)
         runtimes.values.forEach(::styleTile)
         refreshKeys()
@@ -490,9 +527,12 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         r.heading.gravity = Gravity.CENTER_VERTICAL; r.heading.maxLines = 1
         // The pills hug their text: no font padding and only a sliver above and below.
         for (pill in listOf(r.heading, r.window)) { pill.includeFontPadding = false; pill.setPadding(0, dp(2), 0, dp(2)) }
-        PowerlinePill.style(r.heading, ThemeColorResolver.color(Theme.input_text_color), notched = false)
+        PowerlinePill.style(r.heading, ThemeColorResolver.color(Theme.terminal_pill_color), notched = false)
         r.window.typeface = Tuils.getTypeface(context); r.window.gravity = Gravity.CENTER_VERTICAL; r.window.maxLines = 1
-        PowerlinePill.style(r.window, ThemeColorResolver.color(Theme.device_text_color), notched = true)
+        PowerlinePill.style(r.window, ThemeColorResolver.color(Theme.terminal_pill2_color), notched = true)
+        r.done.setText(R.string.mono_term_done); r.done.typeface = Tuils.getTypeface(context); r.done.gravity = Gravity.CENTER_VERTICAL
+        r.done.includeFontPadding = false; r.done.setPadding(0, dp(2), 0, dp(2))
+        PowerlinePill.fill(r.done, ThemeColorResolver.color(Theme.terminal_pill_color))
         showWindow(r)
         // One pane: no tile background or frame, the session sits straight on the pane.
         r.panel.background = null; r.panel.foreground = null
@@ -508,6 +548,8 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
             addView(r.heading, LayoutParams(-2, -2))
             // The notch tucks under the title's chevron, as in a powerline prompt.
             addView(r.window, LayoutParams(-2, -2).apply { marginStart = -dp(5) })
+            addView(View(context), LayoutParams(0, 0, 1f))
+            addView(r.done, LayoutParams(-2, -2))
         }, LayoutParams(-1, -2).apply { bottomMargin = dp(4) }); r.panel.addView(r.grid, LayoutParams(-1, 0, 1f))
         fun bindGesture(view: View, editOnLongPress: Boolean, tap: () -> Unit) {
             val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
@@ -524,6 +566,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         // A long press on the terminal selects text; the tile menu stays on its heading.
         bindGesture(r.heading, true) { if (r.ended || connection == null) reconnect(r) }
         bindGesture(r.grid, false) { activate(r) }
+        r.done.setOnClickListener { releaseInput() }
         r.grid.onPasteText = { text -> r.terminal?.paste(text) }
         r.grid.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
             val geometry = cols(r) to rows(r)
@@ -538,9 +581,16 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         AlertDialog.Builder(context).setTitle(r.title).setItems(arrayOf(context.getString(R.string.terminal_home_reconnect), context.getString(R.string.terminal_home_remove))) { _, index ->
             when (index) {
                 0 -> reconnect(r)
-                1 -> { if (active === r) releaseInput(); detach(r); if (creating == r.tile.id) creating = null; runtimes.remove(r.tile.id); layout.tiles.remove(r.tile); board.removeView(r.panel); editing = null; save(); placeTiles(); scheduleSync() }
+                1 -> remove(r)
             }
         }.setNegativeButton(android.R.string.cancel) { _, _ -> editing = null }.show()
+    }
+    /** Takes a session off the pane for good. */
+    private fun remove(r: TileRuntime) {
+        if (active === r || lifted === r) releaseInput()
+        detach(r); if (creating == r.tile.id) creating = null
+        runtimes.remove(r.tile.id); layout.tiles.remove(r.tile); board.removeView(r.panel)
+        editing = null; save(); placeTiles(); scheduleSync()
     }
     private fun reconnect(r: TileRuntime) {
         editing = null
@@ -711,6 +761,7 @@ class TerminalHomeView(context: Context) : LinearLayout(context) {
         layout.tiles.sortedWith(compareBy({ it.y }, { it.x })).forEach { tile ->
             val r = runtimes[tile.id] ?: return@forEach
             val height = (tile.height * ch).roundToInt()
+            if (r === lifted) { top += height + gap; return@forEach }
             r.panel.translationX = 0f; r.panel.translationY = 0f; r.previewX = 0f; r.previewY = 0f
             r.panel.layoutParams = FrameLayout.LayoutParams(-1, height).apply { leftMargin = 0; topMargin = top }
             top += height + gap

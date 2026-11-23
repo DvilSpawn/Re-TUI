@@ -114,6 +114,8 @@ object ThemeColorResolver {
         return when (role) {
             Theme.accent_color -> c(Theme.terminal_border_color)
             Theme.terminal_overlay_color -> c(Theme.wallpaper_overlay_color)
+            Theme.terminal_pill_color -> c(Theme.input_text_color)
+            Theme.terminal_pill2_color -> c(Theme.device_text_color)
             Theme.muted_text_color -> c(Theme.session_info_text_color)
             Theme.success_text_color -> parse(Theme.battery_text_high.defaultValue())!!
             Theme.warning_text_color -> parse(Theme.battery_text_medium.defaultValue())!!
