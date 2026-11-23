@@ -769,7 +769,7 @@ class UIManager(
         override val weatherSymbol: String? get() = lastWeatherSymbol
         override val notifications: List<NotificationService.Notification> get() = currentOverlayNotifications
         override val music: ohi.andre.consolelauncher.managers.modes.HomeModeHost.Music?
-            get() = musicModule.song?.takeIf { it.isNotBlank() }?.let { ohi.andre.consolelauncher.managers.modes.HomeModeHost.Music(it, musicModule.singer, musicModule.playing) }
+            get() = musicModule.song?.takeIf { it.isNotBlank() }?.let { ohi.andre.consolelauncher.managers.modes.HomeModeHost.Music(it, musicModule.singer, musicModule.playing) { musicModule.progress() } }
         override fun onMain(action: () -> Unit) = runOnMainThread(action)
         override fun executeResolved(command: String?, resolved: Any?) { mExecuter.execute(command, resolved) }
         override fun executeSearchCommand(command: String) = executeFromSearch(command)

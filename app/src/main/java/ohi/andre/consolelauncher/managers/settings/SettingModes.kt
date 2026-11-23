@@ -35,6 +35,8 @@ object SettingModes {
         listOf(Behavior.mono_preset, Behavior.mono_ink_color, Behavior.mono_paper_color, Behavior.mono_layout,
             Behavior.mono_layout_style).forEach { put(it, setOf(LauncherMode.MONO)) }
         put(Behavior.dot_apps, setOf(LauncherMode.DOT))
+        listOf(Behavior.dot_blink, Behavior.dot_ripples, Behavior.dot_rings, Behavior.dot_notifications, Behavior.dot_hint,
+            Theme.dot_ink_color).forEach { put(it, setOf(LauncherMode.DOT)) }
         put(Theme.terminal_overlay_color, setOf(LauncherMode.TERMINAL))
         put(Theme.terminal_pill_color, setOf(LauncherMode.TERMINAL))
         put(Theme.terminal_pill2_color, setOf(LauncherMode.TERMINAL))

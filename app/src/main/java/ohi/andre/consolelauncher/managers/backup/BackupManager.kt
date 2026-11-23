@@ -140,6 +140,7 @@ object BackupManager {
         "irc_pane",
         "terminal_home",
         "terminal_windows",
+        "dot_home",
         "retui_workspace_surface",
         "apps_last_launch",
         "retui_preset_wallpaper",

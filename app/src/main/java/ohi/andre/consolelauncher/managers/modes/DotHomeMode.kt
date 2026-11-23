@@ -13,6 +13,7 @@ import ohi.andre.consolelauncher.presentation.DualScreen
 internal class DotHomeMode(private val host: HomeModeHost) : HomeMode {
     private var dot: DotHomeView? = null
     private var commandAt = NEVER
+    private var quiet = false
     private var swapKey: android.widget.TextView? = null
     private var layoutNow: DualScreen.Layout = DualScreen.Layout.Phone
     private var arrangedAs: Any? = null
@@ -127,13 +128,33 @@ internal class DotHomeMode(private val host: HomeModeHost) : HomeMode {
             }
         }
         view.temperature = { host.weatherDetails?.substringBefore(" · ")?.trim()?.takeIf { it.contains('°') || it.endsWith(" K") } }
+        view.notified = { host.notifications.mapNotNull { it.pkg }.distinct().size }
+        view.music = { host.music?.let { DotHomeView.Playing(it.title, it.artist, it.playing, it.progress()) } }
+        // Quietly: the music command's answer must not pull the dot behind the output tray.
+        view.onPlayPause = { quiet = true; try { host.executeSearchCommand("music -play") } finally { quiet = false } }
+        view.onSettings = { runCatching { host.context.startActivity(ohi.andre.consolelauncher.commands.tuixt.TuixtActivity.dotSettingsIntent(host.context)) } }
+        view.hintWanted = {
+            when (ohi.andre.consolelauncher.managers.settings.LauncherSettings.get(ohi.andre.consolelauncher.managers.xml.options.Behavior.dot_hint)?.trim()?.lowercase(Locale.ROOT)) {
+                "on" -> true
+                "off" -> false
+                else -> searches() < HINT_SEARCHES
+            }
+        }
         // Search floats over the dot, as it does from the sidebar, so the screen stays black behind it.
         view.onSearch = search@{
+            prefs().edit().putInt(KEY_SEARCHES, searches() + 1).apply()
             if (layoutNow is DualScreen.Layout.Both) { host.activateInput(); host.raiseKeyboard(); return@search }
             runCatching { host.context.startActivity(Intent(host.context, GlobalSearchActivity::class.java)) }
                 .onFailure { hide(keyboard = true) }
         }
     }
+
+    private fun prefs() = host.context.getSharedPreferences("dot_home", android.content.Context.MODE_PRIVATE)
+    private fun searches() = prefs().getInt(KEY_SEARCHES, 0)
+
+    override fun onDataChanged() { host.onMain { dot?.invalidate() } }
+
+    override fun onAppearanceChanged() { dot?.loadSettings() }
 
     private fun show() {
         val view = dot ?: return
@@ -163,6 +184,7 @@ internal class DotHomeMode(private val host: HomeModeHost) : HomeMode {
     override fun onHome() = show()
 
     override fun beforeSearchCommand(command: String) {
+        if (quiet) return
         commandAt = SystemClock.elapsedRealtime()
     }
 
@@ -177,5 +199,8 @@ internal class DotHomeMode(private val host: HomeModeHost) : HomeMode {
         const val NEVER = -1L
         const val ANSWER_WINDOW_MS = 10_000L
         const val BEHIND_OUTPUT = -1f
+        const val KEY_SEARCHES = "searches"
+        /** dot_hint auto: the hint goes once the dot has been double-tapped this many times. */
+        const val HINT_SEARCHES = 3
     }
 }

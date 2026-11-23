@@ -98,7 +98,7 @@ internal interface HomeModeHost {
     /** Runs a command as if it were typed in the launcher's search. */
     fun executeSearchCommand(command: String)
 
-    class Music(val title: String, val artist: String?, val playing: Boolean)
+    class Music(val title: String, val artist: String?, val playing: Boolean, val progress: () -> Float? = { null })
 }
 
 /** The built-in modes, one instance each, for a single launcher layout. */

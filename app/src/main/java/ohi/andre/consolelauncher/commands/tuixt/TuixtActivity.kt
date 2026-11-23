@@ -81,6 +81,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
     private var monoSettingsMode = false
     /** The short settings list of Terminal mode; it shares mono's curated-list screen ([monoSettingsMode] is set too). */
     private var terminalSettingsMode = false
+    /** Dot mode's short list, on the same curated screen. */
+    private var dotSettingsMode = false
     private var appearancePreview: SettingsAppearancePreview? = null
     private var previewKeyboardVisible = false
     private var previewPanelViews: Pair<LinearLayout, TextView>? = null
@@ -95,7 +97,8 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         val intent = getIntent()
         asciiSettingsMode = MODE_ASCII_SETTINGS == intent.getStringExtra(MODE)
         terminalSettingsMode = MODE_TERMINAL_SETTINGS == intent.getStringExtra(MODE)
-        monoSettingsMode = MODE_MONO_SETTINGS == intent.getStringExtra(MODE) || terminalSettingsMode
+        dotSettingsMode = MODE_DOT_SETTINGS == intent.getStringExtra(MODE)
+        monoSettingsMode = MODE_MONO_SETTINGS == intent.getStringExtra(MODE) || terminalSettingsMode || dotSettingsMode
         val onlySection = intent.getStringExtra(ONLY_SECTION)
         val excludeSections = intent.getStringArrayListExtra(EXCLUDE_SECTION) ?: listOfNotNull(intent.getStringExtra(EXCLUDE_SECTION))
         val path = intent.getStringExtra(PATH)
@@ -143,6 +146,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             when {
                 asciiSettingsMode -> getString(R.string.editor_tuixtactivity_ascii_settings_4a299)
                 terminalSettingsMode -> getString(R.string.term_settings_title)
+                dotSettingsMode -> getString(R.string.dot_settings_title)
                 monoSettingsMode -> getString(R.string.mono_settings_title)
                 onlySection != null -> getString(R.string.editor_tuixtactivity_behavior_70e30, onlySection)
                 else -> getString(R.string.editor_tuixtactivity_themer_93fef, file!!.getName())
@@ -288,6 +292,7 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         if (asciiSettingsMode || monoSettingsMode) {
             originalRows = when {
                 terminalSettingsMode -> buildTerminalSettingsRows()
+                dotSettingsMode -> buildDotSettingsRows()
                 monoSettingsMode -> buildMonoSettingsRows()
                 else -> buildAsciiSettingsRows()
             }
@@ -522,6 +527,24 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
             R.string.mono_settings_preset to listOf(Behavior.mono_preset, Behavior.mono_ink_color, Behavior.mono_paper_color),
             R.string.mono_settings_home to listOf(Behavior.mono_layout_style, Behavior.mono_layout),
             R.string.mono_settings_screen to listOf(Behavior.enable_crt_filter, Ui.enable_crt_vignette),
+            R.string.mono_settings_weather to listOf(Ui.show_weather, Behavior.weather_location,
+                Behavior.weather_temperature_measure, Behavior.weather_update_time),
+        )) {
+            val section = getString(title)
+            addSection(rows, section)
+            settings.forEach { rows.add(TuixtAdapter.SettingsRow.setting(it, section)) }
+        }
+        return rows
+    }
+
+    /** Only what changes the dot home. */
+    private fun buildDotSettingsRows(): MutableList<TuixtAdapter.SettingsRow> {
+        val rows: MutableList<TuixtAdapter.SettingsRow> = ArrayList()
+        for ((title, settings) in listOf(
+            R.string.mono_settings_mode to listOf<XMLPrefsSave>(Behavior.launcher_mode),
+            R.string.dot_settings_apps to listOf(Behavior.dot_apps),
+            R.string.dot_settings_dot to listOf(Theme.dot_ink_color, Behavior.dot_blink, Behavior.dot_ripples),
+            R.string.dot_settings_rings to listOf(Behavior.dot_rings, Behavior.dot_notifications, Behavior.dot_hint),
             R.string.mono_settings_weather to listOf(Ui.show_weather, Behavior.weather_location,
                 Behavior.weather_temperature_measure, Behavior.weather_update_time),
         )) {
@@ -1085,6 +1108,13 @@ class TuixtActivity : ohi.andre.consolelauncher.localization.LocalizedActivity()
         const val MODE_ASCII_SETTINGS: String = "ascii_settings"
         const val MODE_MONO_SETTINGS: String = "mono_settings"
         const val MODE_TERMINAL_SETTINGS: String = "terminal_settings"
+        const val MODE_DOT_SETTINGS: String = "dot_settings"
+
+        /** The settings that matter in dot mode, opened by holding the black around the dot. */
+        fun dotSettingsIntent(context: android.content.Context): android.content.Intent =
+            android.content.Intent(context, TuixtActivity::class.java)
+                .putExtra(MODE, MODE_DOT_SETTINGS)
+                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
         private const val VIEW_PREFS = "settings_view"
         private const val KEY_ALL_MODES = "all_modes"
 

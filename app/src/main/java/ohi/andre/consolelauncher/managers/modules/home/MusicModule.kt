@@ -38,6 +38,9 @@ internal class MusicModule(
     private var lastMusicPlaying = false
     private var lastMusicAppPackage: String? = null
     private var activeMusicSource: String? = "internal"
+    private var lastDuration = 0
+    private var lastPosition = 0
+    private var lastPositionAt = 0L
 
     // Ticker must not removeCallbacks+repost on every MUSIC_CHANGED, that cancels the 1s delay.
     private var musicTickerScheduled = false
@@ -49,6 +52,13 @@ internal class MusicModule(
     val song: String? get() = lastMusicSong ?: playingNow()?.getTitle()
     val singer: String? get() = lastMusicSinger ?: playingNow()?.getSinger()
     val playing: Boolean get() = lastMusicPlaying || (lastMusicSong == null && playingNow() != null)
+
+    /** How far through the track, 0..1, run on from the last report while playing; null when the player gave no length. */
+    fun progress(): Float? {
+        if (lastDuration <= 0) return null
+        val ran = if (lastMusicPlaying) android.os.SystemClock.elapsedRealtime() - lastPositionAt else 0L
+        return ((lastPosition + ran).toFloat() / lastDuration).coerceIn(0f, 1f)
+    }
 
     override val id = ModuleManager.MUSIC
 
@@ -159,6 +169,9 @@ internal class MusicModule(
             lastMusicSong = song
             lastMusicSinger = singer
             lastMusicPlaying = isPlaying
+            lastDuration = intent.getIntExtra(MusicService.SONG_DURATION, 0)
+            lastPosition = intent.getIntExtra(MusicService.SONG_POSITION, 0)
+            lastPositionAt = android.os.SystemClock.elapsedRealtime()
             lastMusicAppPackage =
                 if (MusicService.SOURCE_EXTERNAL == activeMusicSource
                     && isPreferred
