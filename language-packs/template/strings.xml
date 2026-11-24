@@ -387,6 +387,7 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 - Dot mode: while music plays the dot is a play button with ripples pulsing out; pips orbit it for apps with notifications; the rings add the date and next alarm; hold the black for Dot settings.
 - Presets downloaded from Community or the website keep their name.
 - Sharing a preset from Community can include your `ascii.txt` as its ASCII art. It is off until you tick it.
+- The Re-T-UI folder shows up in your phone's Files app and file pickers, so you can open your settings, presets and `ascii.txt` in any editor, without root.
 - In Mono's scroll layout, panels such as Apps and Books scroll again, then hand on to the page.
 - With the built-in player off, the Music widget buttons control your other music app, and `music -open` opens it.
 - The Mono clock no longer jumps when you go home while already on the home screen.

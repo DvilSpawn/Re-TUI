@@ -28,6 +28,10 @@ Build 807 redraws Terminal mode as one terminal pane, gives Dot mode music, noti
 
 - When you share a preset from Community, you can include your `ascii.txt` as the preset's ASCII art. It is off until you tick it, because the art can hold text you may not mean to publish. On the website, the preset form takes a link to the art instead.
 
+### Your files
+
+- The Re-T-UI folder now shows up in your phone's Files app, and in any app's file picker, as Re:T-UI. Open your settings XML, presets and `ascii.txt` in any text editor and save them back, without root. Before, Play Store installs kept the folder where other apps could not reach it. Run `restart` after editing so the launcher picks up the changes.
+
 ## Fixes
 
 - Presets downloaded from Community or the website keep their name instead of showing up as an imported preset.
