@@ -30,10 +30,12 @@ Build 807 redraws Terminal mode as one terminal pane, gives Dot mode music, noti
 
 ### Your files
 
-- The Re-T-UI folder now shows up in your phone's Files app, and in any app's file picker, as Re:T-UI. Open your settings XML, presets and `ascii.txt` in any text editor and save them back, without root. Before, Play Store installs kept the folder where other apps could not reach it. Run `restart` after editing so the launcher picks up the changes.
+- The Re-T-UI folder now shows up in your phone's Files app, and in any app's file picker, as Re:T-UI. Open your settings XML, presets and `ascii.txt` in any text editor and save them back, without root. Before, Play Store installs kept the folder where other apps could not reach it.
+- Changes you save to your settings files in another app take effect when you come back to the launcher, without `restart`. Only what changed refreshes: a new colour repaints in place and your terminal sessions keep running. A value that isn't valid is skipped and a message names it. Edits to `alias.txt`, `ascii.txt`, `apps.xml` and `notifications.xml` are picked up too.
 
 ## Fixes
 
+- In Terminal mode, the fetch's app count no longer shows 0 after the launcher starts, and it follows installs and uninstalls.
 - Presets downloaded from Community or the website keep their name instead of showing up as an imported preset.
 - In Mono, the lifted terminal's done is a filled button, without the ×.
 - In Mono's scroll layout, the Apps, Books and other list panels scroll again. A drag inside a panel scrolls the panel, and once it reaches the end the page carries on.

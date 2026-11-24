@@ -387,7 +387,8 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 - Dot mode: while music plays the dot is a play button with ripples pulsing out; pips orbit it for apps with notifications; the rings add the date and next alarm; hold the black for Dot settings.
 - Presets downloaded from Community or the website keep their name.
 - Sharing a preset from Community can include your `ascii.txt` as its ASCII art. It is off until you tick it.
-- The Re-T-UI folder shows up in your phone's Files app and file pickers, so you can open your settings, presets and `ascii.txt` in any editor, without root.
+- The Re-T-UI folder shows up in your phone's Files app and file pickers, so you can open your settings, presets and `ascii.txt` in any editor, without root. What you save there applies when you come back, refreshing only what changed.
+- Terminal mode's fetch counts your apps right after the launcher starts.
 - In Mono's scroll layout, panels such as Apps and Books scroll again, then hand on to the page.
 - With the built-in player off, the Music widget buttons control your other music app, and `music -open` opens it.
 - The Mono clock no longer jumps when you go home while already on the home screen.
@@ -5824,6 +5825,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_editor_invalid_status_index">Enter a row position between 1 and 2147483637. Decimals can share a row.</string>
     <string name="settings_editor_invalid_time">Enter a time as hh.mm, from 0.00 to 23.59.</string>
     <string name="settings_editor_invalid_value">This value is not allowed.</string>
+    <string name="settings_file_edit_rejected">%1$s: kept the old value for %2$s, the new one is not valid.</string>
     <string name="settings_file_operation_cancelled">File operation cancelled.</string>
     <string name="settings_file_operation_cancelling">Cancelling…</string>
     <string name="settings_file_operation_finishing">Finishing restore…</string>
