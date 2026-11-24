@@ -15,6 +15,13 @@ enum class Theme(
     background_color("#00000000", R.string.setting_theme_background_color_description),
     wallpaper_overlay_color("#00000000", R.string.setting_theme_wallpaper_overlay_color_description),
     settings_wallpaper_overlay_color("#66000000", R.string.setting_theme_settings_wallpaper_overlay_color_description),
+    /** Terminal mode's own overlay, in place of [wallpaper_overlay_color]; auto keeps that one. */
+    terminal_overlay_color(R.string.setting_theme_terminal_overlay_color_description),
+    /** Terminal mode's powerline pills: level 1 leads (session title, the prompt, done), level 2 follows it (the window). */
+    terminal_pill_color(R.string.setting_theme_terminal_pill_color_description),
+    terminal_pill2_color(R.string.setting_theme_terminal_pill2_color_description),
+    /** Dot mode's ink; auto keeps the pixel look's own pick (the accent, or the output text when that is too dark). */
+    dot_ink_color(R.string.setting_theme_dot_ink_color_description),
 
     input_text_color("#ff00ff00", R.string.setting_theme_input_text_color_description),
     output_text_color("#ffffffff", R.string.setting_theme_output_text_color_description),

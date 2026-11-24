@@ -13,9 +13,8 @@ import ohi.andre.consolelauncher.tuils.Tuils
 /** Terminal mode: a live terminal as the home, with the search bar layout opening over it on demand. */
 internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
     private var home: TerminalHomeView? = null
-    private var dim: View? = null
+    private var fetch: TerminalFetchView? = null
     private var searchOpen = false
-    private var rootClippedPadding: Boolean? = null
 
     override val usesSearchLayout get() = true
     override val managesOwnKeyboard get() = true
@@ -29,16 +28,28 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         val home = TerminalHomeView(host.context)
         this.home = home
         parent.addView(home, parent.indexOfChild(tray), FrameLayout.LayoutParams(-1, -1))
-        dim = View(host.context).apply {
-            setBackgroundColor(0x99000000.toInt())
-            setOnClickListener { setSearchOpen(false) }
-            visibility = View.GONE
-        }.also { parent.addView(it, parent.indexOfChild(tray), FrameLayout.LayoutParams(-1, -1)) }
+        // The pane opens with the launcher's own fetch; the sessions follow below it.
+        val fetch = TerminalFetchView(host.context, apps = { runCatching { host.pack.appsManager.shownApps().size }.getOrDefault(0) }, now = ::nowLines)
+        this.fetch = fetch
+        home.setHeader(fetch)
+        // Search results open above the bar and grow the tray; the pane gives up that room instead of being dimmed.
+        tray.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
+            if (bottom - top != oldBottom - oldTop) host.applyDisplayMargins()
+        }
+        // Shared layout code (theme redraws, the home snapshot, suggestion refreshes) can show the results area again;
+        // in Terminal mode it only belongs on screen while searching, or the pane keeps its room blank.
+        host.root?.findViewById<View>(R.id.search_mode_results_scroll)?.let { results ->
+            results.viewTreeObserver.addOnGlobalLayoutListener {
+                if (!searchOpen && results.visibility == View.VISIBLE) results.visibility = View.GONE
+            }
+        }
         host.root?.findViewById<View>(R.id.terminal_home_add_tab)?.setOnClickListener {
             setSearchOpen(false); home.showAddTerminal()
         }
         host.root?.findViewById<View>(R.id.terminal_home_settings_tab)?.setOnClickListener {
-            setSearchOpen(false); host.launchSettings()
+            // Like mono's soft key: the settings that matter here, with all of them one tap away.
+            setSearchOpen(false)
+            host.context.startActivity(ohi.andre.consolelauncher.commands.tuixt.TuixtActivity.terminalSettingsIntent(host.context))
         }
         host.inputBar?.addOnLayoutChangeListener { _, _, top, _, bottom, _, oldTop, _, oldBottom ->
             if (bottom - top != oldBottom - oldTop) host.applyDisplayMargins()
@@ -69,16 +80,20 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         searchOpen = show
         home?.releaseInput()
         host.configureSearchLayout(closeDrawers = true)
-        dim?.visibility = if (show) View.VISIBLE else View.GONE
-        bleedDimUnderNavigation()
-        if (android.os.Build.VERSION.SDK_INT >= 31) {
-            home?.setRenderEffect(if (show) android.graphics.RenderEffect.createBlurEffect(18f, 18f, android.graphics.Shader.TileMode.CLAMP) else null)
-        }
         home?.importantForAccessibility = if (show) View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS else View.IMPORTANT_FOR_ACCESSIBILITY_AUTO
         if (show) { host.activateInput(); host.refreshSuggestions() } else host.dropKeyboard()
     }
 
     override fun onStart() = setSearchOpen(false)
+
+    /**
+     * Search can close and the keyboard go away while another app is in front, when the pane does not lay out; it then
+     * came back still keeping the results' and keyboard's room blank. Work the room out again once it has laid out.
+     */
+    private fun settleMargins() {
+        val view = home ?: return
+        view.post { host.applyDisplayMargins() }
+    }
 
     override fun handleBack(): Boolean {
         if (searchOpen) setSearchOpen(false) else home?.releaseInput()
@@ -99,46 +114,86 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
 
     override fun layoutSearchTray(tray: View) {
         tray.visibility = View.VISIBLE
-        host.root?.findViewById<View>(R.id.search_mode_results_scroll)?.visibility = if (searchOpen) View.VISIBLE else View.GONE
+        // The results sit above the bar at their own height, so the tray only grows by what they need.
+        host.root?.findViewById<View>(R.id.search_mode_results_scroll)?.let { results ->
+            results.visibility = if (searchOpen) View.VISIBLE else View.GONE
+            (results.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
+                if (params.height != ViewGroup.LayoutParams.WRAP_CONTENT || params.weight != 0f) {
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT; params.weight = 0f
+                    results.layoutParams = params
+                }
+            }
+        }
         (tray.layoutParams as? FrameLayout.LayoutParams)?.let { params ->
-            params.height = if (searchOpen) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT
-            tray.layoutParams = params
+            if (params.height != ViewGroup.LayoutParams.WRAP_CONTENT) {
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                tray.layoutParams = params
+            }
         }
     }
 
+    /** The search bar's prompt as a powerline pill, matching the session titles; Terminal mode only. */
+    private fun stylePrompt() {
+        val prefix = host.root?.findViewById<android.widget.TextView>(R.id.prefix_view) ?: return
+        ohi.andre.consolelauncher.managers.termux.PowerlinePill.style(prefix,
+            ohi.andre.consolelauncher.managers.settings.ThemeColorResolver.color(ohi.andre.consolelauncher.managers.xml.options.Theme.terminal_pill_color),
+            notched = false)
+        prefix.gravity = android.view.Gravity.CENTER_VERTICAL
+        (prefix.layoutParams as? ViewGroup.MarginLayoutParams)?.let { if (it.marginEnd < Tuils.dpToPx(host.context, 6)) { it.marginEnd = Tuils.dpToPx(host.context, 6); prefix.layoutParams = it } }
+    }
+
     override fun finishSearchLayout() {
+        stylePrompt()
         val terminalFocused = !searchOpen && host.keyboardUp && home?.hasTerminalFocus == true
         host.root?.findViewById<View>(R.id.search_mode_tabs)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
         host.root?.findViewById<View>(R.id.input_group)?.visibility = if (terminalFocused) View.GONE else View.VISIBLE
     }
 
-    /**
-     * The launcher root keeps its content above the navigation bar with bottom padding, which stopped the search
-     * veil there while it already ran under the status bar. The veil reaches down under the navigation bar too;
-     * nothing else in the layout moves.
-     */
-    private fun bleedDimUnderNavigation() {
-        val root = host.root ?: return
-        val veil = dim ?: return
-        if (rootClippedPadding == null) rootClippedPadding = root.clipToPadding
-        root.clipToPadding = false
-        val params = veil.layoutParams as? FrameLayout.LayoutParams ?: return
-        if (params.bottomMargin != -root.paddingBottom) {
-            params.bottomMargin = -root.paddingBottom
-            veil.layoutParams = params
-        }
-    }
-
     override fun onDisplayMargins(topMm: IntArray, bottomMm: IntArray, metrics: DisplayMetrics?, imeOffset: Int, searchInset: Int, systemTop: Int) {
-        bleedDimUnderNavigation()
-        val bottomChrome = host.inputBar?.height ?: 0
+        // The whole tray (bar plus any results above it) is room the pane gives up.
+        val bottomChrome = host.tray?.height ?: host.inputBar?.height ?: 0
         val bottomClearance = bottomChrome + searchInset + Tuils.mmToPx(metrics, bottomMm[3])
-        home?.setSearchBarClearance(bottomClearance, bottomChrome)
+        home?.setSearchBarClearance(bottomClearance, bottomChrome, push = searchOpen)
         host.applySectionMargins(home, topMm, metrics, imeOffset, systemTop)
     }
 
     override fun onAppearanceChanged() {
         home?.refreshAppearance()
+        fetch?.refresh()
+        stylePrompt()
+        // A theme change redraws the home through the shared search layout, which opens the results area full height;
+        // put Terminal's tray back (results only while searching) so the pane does not keep that room blank.
+        host.tray?.let(::layoutSearchTray)
+    }
+
+    override fun onAppsChanged() {
+        fetch?.refreshApps()
+    }
+
+    override fun onDataChanged() {
+        fetch?.let { view -> host.onMain { view.refreshLive() } }
+    }
+
+    /** The live lines under the fetch: the time and date, the weather, what's playing, the next alarm. */
+    private fun nowLines(): List<Pair<String, String>> {
+        val context = host.context
+        val now = java.util.Date()
+        val twentyFour = android.text.format.DateFormat.is24HourFormat(context)
+        val lines = ArrayList<Pair<String, String>>()
+        // One row, labelled like the fetch details, so the time reads in the value colour with the date.
+        lines += context.getString(R.string.term_now_time) to
+            java.text.SimpleDateFormat(if (twentyFour) "HH:mm" else "h:mm a", java.util.Locale.getDefault()).format(now) + " · " +
+            java.text.SimpleDateFormat("EEE d MMM yyyy", java.util.Locale.getDefault()).format(now)
+        val weather = listOfNotNull(host.weatherDetails?.trim()?.takeIf { it.isNotEmpty() },
+            host.weatherCondition?.trim()?.takeIf { it.isNotEmpty() }).joinToString(" · ")
+        if (weather.isNotEmpty()) lines += (host.weatherSymbol?.takeIf { it.isNotBlank() } ?: "~") to weather
+        host.music?.let { music -> lines += (if (music.playing) "▶" else "❚❚") to listOfNotNull(music.title, music.artist).joinToString(" · ") }
+        runCatching { (context.getSystemService(android.content.Context.ALARM_SERVICE) as android.app.AlarmManager).nextAlarmClock?.triggerTime }
+            .getOrNull()?.let { at ->
+                lines += context.getString(R.string.term_now_alarm) to
+                    java.text.SimpleDateFormat(if (twentyFour) "EEE HH:mm" else "EEE h:mm a", java.util.Locale.getDefault()).format(java.util.Date(at))
+            }
+        return lines
     }
 
     override fun onPause() {
@@ -146,11 +201,15 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
     }
 
     override fun onResume() {
+        fetch?.refresh()
         home?.resume()
+        // Coming back to Home starts with the search closed and the bar empty, as in Mono (onStart is not called).
+        host.root?.findViewById<android.widget.EditText>(R.id.input_view)?.text?.clear()
+        setSearchOpen(false)
+        settleMargins()
     }
 
     override fun dispose() {
-        rootClippedPadding?.let { host.root?.clipToPadding = it }
         home?.pause()
         home = null
     }

@@ -1,4 +1,5 @@
 <resources>
     <string name="settings_load_failed">Your settings could not be loaded. Your files have been preserved.\n\n%1$s</string>
     <string name="settings_load_retry">Retry loading settings</string>
+    <string name="settings_file_edit_rejected">%1$s: kept the old value for %2$s, the new one is not valid.</string>
 </resources>

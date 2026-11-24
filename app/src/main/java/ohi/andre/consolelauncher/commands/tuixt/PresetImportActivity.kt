@@ -27,6 +27,8 @@ import java.util.concurrent.Executors
 class PresetImportActivity : LocalizedComponentActivity() {
     private val worker = Executors.newSingleThreadExecutor()
     private var staged: BackupManager.StagedPreset? = null
+    /** The picked file's name, for packages that carry no name of their own (shareable exports). */
+    private var fileName: String? = null
     @Volatile private var leaving = false
     private var saving = false
     private var pendingIntent: Intent? = null
@@ -154,6 +156,11 @@ class PresetImportActivity : LocalizedComponentActivity() {
                     uri.query == null && uri.fragment == null
                 require(provider?.applicationInfo?.uid != applicationInfo.uid || cachedShare) { "Choose the exported preset from a document provider" }
                 val source = requireNotNull(contentResolver.openInputStream(uri)) { "Unable to read preset URI" }
+                fileName = runCatching {
+                    contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->
+                        if (c.moveToFirst()) c.getString(0) else null
+                    }
+                }.getOrNull()?.let(::presetNameFromFile)
                 val result = BackupManager.inspectPreset(source, File(cacheDir, "preset-import"))
                 if (leaving || request != inspection) { result.close(); return@execute }
                 staged = result
@@ -161,7 +168,7 @@ class PresetImportActivity : LocalizedComponentActivity() {
                 val behaviorPreview = if (!behavior.isFile) getString(R.string.portable_preset_no_behavior)
                     else if (result.behaviorLabels != null) PresetManager.sanitizeSelectedBehaviorXml(behavior, result.behaviorLabels!!)
                     else PresetManager.sanitizeShareableXml(behavior, XMLPrefsRoot.BEHAVIOR)
-                val text = getString(R.string.portable_preset_preview, result.name, result.sections,
+                val text = getString(R.string.portable_preset_preview, shownName(result), result.sections,
                     result.producerVersion.ifBlank { getString(R.string.portable_preset_unknown_version) }, result.schema, behaviorPreview)
                 runOnUiThread {
                     if (!leaving && request == inspection) { preview.text = text; confirm.isEnabled = true }
@@ -179,7 +186,7 @@ class PresetImportActivity : LocalizedComponentActivity() {
         worker.execute {
             try {
                 ohi.andre.consolelauncher.tuils.Tuils.init(applicationContext)
-                val saved = requireNotNull(staged).save()
+                val saved = requireNotNull(staged).let { it.save(fileName?.takeIf { _ -> !it.hasOwnName }) }
                 runOnUiThread {
                     if (!leaving) {
                         preview.text = getString(R.string.portable_preset_saved, saved)
@@ -218,8 +225,18 @@ class PresetImportActivity : LocalizedComponentActivity() {
         super.onDestroy()
     }
 
+    private fun shownName(result: BackupManager.StagedPreset) = if (result.hasOwnName) result.name else fileName ?: result.name
+
     companion object {
         private const val PICK_PRESET = 1
+
+        /** `grand-theft.retui-backup.zip` → `grand-theft`; blank or junk names give null. */
+        internal fun presetNameFromFile(file: String): String? {
+            var name = file.trim()
+            for (suffix in listOf(".zip", ".retui-backup", ".retui-preset", ".retui")) name = name.removeSuffix(suffix)
+            name = name.replace(Regex(" \\(\\d+\\)$"), "").trim()
+            return name.takeIf { it.isNotEmpty() && it.length <= 64 && it.none { c -> c.isISOControl() || c == '/' } }
+        }
         fun pickerIntent(): Intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             type = "*/*"

@@ -30,7 +30,10 @@ class music : ParamCommand() {
     private enum class Param : ohi.andre.consolelauncher.commands.main.Param {
         `open` {
             override fun exec(pack: ExecutePack): String? {
-                if ((pack as MainPack).player == null) return pack.context.getString(R.string.player_music_off)
+                if ((pack as MainPack).player == null) {
+                    // Built-in player off: open the other player instead (preferred_music_app, else the one playing).
+                    return if (ExternalMusicControl.open(pack.context)) null else pack.context.getString(R.string.player_music_off)
+                }
                 pack.context.startActivity(Intent(pack.context, MediaPlayerActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                 return null
             }

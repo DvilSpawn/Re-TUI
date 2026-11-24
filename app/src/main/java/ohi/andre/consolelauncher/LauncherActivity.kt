@@ -682,6 +682,9 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         super.onResume()
         ohi.andre.consolelauncher.sidebar.EdgeSidebar.sync(this)
         launcherResumed = true
+        // Files edited in other apps while the launcher was away apply now, refreshing only what they changed.
+        ohi.andre.consolelauncher.managers.settings.ConfigFileWatcher.start(this)
+        ohi.andre.consolelauncher.managers.settings.ConfigFileWatcher.setResumed(true)
         breathOutRoot?.setActive(hasWindowFocus())
         setWallpaperInteractionEnabled(true)
         applyFullscreen(this)
@@ -717,6 +720,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
     }
 
     override fun onPause() {
+        ohi.andre.consolelauncher.managers.settings.ConfigFileWatcher.setResumed(false)
         startupMenuRequested = false
         changelogRequested = false
         launcherResumed = false
@@ -753,6 +757,7 @@ class LauncherActivity : ohi.andre.consolelauncher.localization.LocalizedAppComp
         ohi.andre.consolelauncher.presentation.DualScreen.setDuoSide = null
         dispose()
         if (instance === this) {
+            ohi.andre.consolelauncher.managers.settings.ConfigFileWatcher.stop()
             instance = null
         }
         super.onDestroy()

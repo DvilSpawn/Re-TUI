@@ -298,6 +298,12 @@ class TuixtAdapter(
             settingHolder.input.setVisibility(View.GONE)
             settingHolder.options.setVisibility(View.VISIBLE)
             bindOptionSwitch(settingHolder, item, ohi.andre.consolelauncher.managers.settings.MonoMode.PRESETS)
+        } else if (item === Behavior.dot_blink || item === Behavior.dot_hint) {
+            settingHolder.toggle.setVisibility(View.GONE)
+            settingHolder.colorPreview.setVisibility(View.GONE)
+            settingHolder.input.setVisibility(View.GONE)
+            settingHolder.options.setVisibility(View.VISIBLE)
+            bindOptionSwitch(settingHolder, item, if (item === Behavior.dot_blink) arrayOf("blink", "steady", "breathe") else arrayOf("auto", "on", "off"))
         } else if (item === Behavior.mono_layout_style) {
             settingHolder.toggle.setVisibility(View.GONE)
             settingHolder.colorPreview.setVisibility(View.GONE)

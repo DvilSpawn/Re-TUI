@@ -26,6 +26,8 @@ object CommunityPresets {
     private const val SUBMIT = "$SITE/api/presets/submit"
     const val MAX_PRESET = 5 * 1024 * 1024
     const val MAX_IMAGE = 8 * 1024 * 1024
+    /** The site's limit for ascii.txt, the same as the launcher's default ascii_animation_max_file_kb. */
+    const val MAX_ASCII = 512 * 1024
 
     data class Item(
         val id: String, val name: String, val description: String, val tags: List<String>, val submitter: String?,
@@ -38,7 +40,7 @@ object CommunityPresets {
 
     class Submission(
         val name: String, val description: String, val tags: String, val submitter: String, val fontUrl: String,
-        val preset: ByteArray, val screenshot: ByteArray, val wallpaper: ByteArray?
+        val preset: ByteArray, val screenshot: ByteArray, val wallpaper: ByteArray?, val ascii: ByteArray? = null
     )
 
     private val uploads by lazy {
@@ -118,10 +120,20 @@ object CommunityPresets {
         Tuils.init(context)
         return BackupManager.inspectPreset(bytes.inputStream(), File(context.cacheDir, "preset-community")).use { staged ->
             if (cancelled()) throw CancellationException()
-            val name = staged.save()
+            val name = staged.save(item.name)
             if (wallpaper != null) PresetManager.saveWallpaper(name, wallpaper)
             name
         }
+    }
+
+    /** The launcher's ascii.txt when the site would take it: UTF-8 text, not blank, within [MAX_ASCII]. */
+    fun localAscii(context: Context): ByteArray? {
+        Tuils.init(context)
+        val file = File(Tuils.getFolder(), "ascii.txt")
+        if (!file.isFile || file.length() !in 1..MAX_ASCII.toLong()) return null
+        val bytes = file.readBytes()
+        val text = runCatching { Charsets.UTF_8.newDecoder().decode(java.nio.ByteBuffer.wrap(bytes)).toString() }.getOrNull() ?: return null
+        return bytes.takeIf { text.isNotBlank() && '\u0000' !in text }
     }
 
     /** Sends a setup for review; returns the site's message or throws with its reason. */
@@ -137,6 +149,7 @@ object CommunityPresets {
             .addFormDataPart("preset", "preset.retui-backup.zip", submission.preset.toRequestBody("application/zip".toMediaType()))
             .addFormDataPart("screenshot", "screenshot.jpg", submission.screenshot.toRequestBody(image))
             .apply { submission.wallpaper?.let { addFormDataPart("wallpaper", "wallpaper.jpg", it.toRequestBody(image)) } }
+            .apply { submission.ascii?.let { addFormDataPart("ascii", "ascii.txt", it.toRequestBody("text/plain; charset=utf-8".toMediaType())) } }
             .build()
         uploads.newCall(Request.Builder().url(SUBMIT).post(body).build()).execute().use { response ->
             val text = response.body?.string().orEmpty().take(64 * 1024)

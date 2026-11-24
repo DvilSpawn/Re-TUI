@@ -134,6 +134,35 @@ object LauncherSettings {
     fun applyChanges(context: Context?, changes: kotlin.collections.Map<XMLPrefsSave, String?>): Change =
         applyChangesWithFiles(context, changes, emptyMap())
 
+    /** The file this setting is saved in, relative to the Re-T-UI folder. */
+    internal fun filePath(setting: XMLPrefsSave): String? =
+        setting.parent()?.path() ?: XMLPrefsManager.XMLPrefsRoot.entries.firstOrNull { setting in it.enums }?.path
+
+    /**
+     * Takes on values that someone already saved into a settings file from outside the launcher.
+     * Unlike [applyChanges], it does not write the file back, so the editor that saved it keeps an unchanged file.
+     * Values that fail validation are left out and returned in [rejected].
+     */
+    internal fun adoptFileEdits(context: Context?, changes: kotlin.collections.Map<XMLPrefsSave, String>,
+                                rejected: MutableList<XMLPrefsSave> = ArrayList()): Change = synchronized(SettingsFiles.lock) {
+        val previous = currentSnapshot()
+        val edits = changes.filter { (setting, value) -> value != raw(setting) }
+            .filter { (setting, raw) -> (SettingsValidation.error(setting, raw) == null).also { if (!it) rejected += setting } }
+        if (edits.isEmpty()) return@synchronized Change(previous, previous, emptySet())
+        synchronized(LOCK) {
+            for ((setting, raw) in edits) {
+                XMLPrefsManager.XMLPrefsRoot.entries.first { setting in it.enums }.getValues()?.add(setting.label(), raw)
+                setting.parent()?.getValues()?.add(setting.label(), raw)
+                snapshot[key(setting)] = raw
+            }
+            snapshotLoaded = true
+            revision++
+        }
+        val change = Change(previous, currentSnapshot(), edits.keys.toSet())
+        SettingsRefreshCoordinator.request(context?.applicationContext ?: XMLPrefsManager.settingsContext, change)
+        change
+    }
+
     /** The public config -erase command deliberately stores an empty override. */
     fun erase(context: Context?, setting: XMLPrefsSave): Change =
         applyChangesWithFiles(context, mapOf(setting to ""), emptyMap(), setOf(setting))

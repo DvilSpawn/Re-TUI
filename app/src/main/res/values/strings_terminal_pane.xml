@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Terminal mode: the fetch block the launcher prints at the top of the terminal pane. -->
+    <string name="term_fetch_launcher">Launcher</string>
+    <string name="term_fetch_android">Android</string>
+    <string name="term_fetch_device">Device</string>
+    <string name="term_fetch_uptime">Uptime</string>
+    <string name="term_fetch_battery">Battery</string>
+    <string name="term_fetch_memory">Memory</string>
+    <string name="term_fetch_storage">Storage</string>
+    <string name="term_fetch_apps">Apps</string>
+    <string name="term_fetch_font">Font</string>
+    <string name="term_fetch_charging">charging</string>
+    <string name="term_now_alarm">Alarm</string>
+    <string name="term_now_time">Date/Time</string>
+    <string name="term_settings_title">Terminal settings</string>
+    <string name="term_settings_fetch">Fetch</string>
+    <string name="term_settings_colours">Colours</string>
+    <string name="term_settings_terminals">Terminals</string>
+    <string name="term_settings_ascii">ASCII art</string>
+</resources>

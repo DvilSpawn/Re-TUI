@@ -377,7 +377,24 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 ## V.6 · Build 806
 
 - Mono in landscape no longer leaves a double-width gap beside the camera cutout, and on wide screens its left half is no longer cut off. Dot keeps its halves clear of the cutout too.
-- On phones held sideways, Mono shows each page in one frame: the status strip across the top, the page's panels in a left and a right half, the soft keys under one half and the command line under the other. The `&lt;&lt;` key swaps their sides. Tablets, foldables and the Duo keep the two-screen split.</string>
+- On phones held sideways, Mono shows each page in one frame: the status strip across the top, the page's panels in a left and a right half, the soft keys under one half and the command line under the other. The `&lt;&lt;` key swaps their sides. Tablets, foldables and the Duo keep the two-screen split.
+
+## V.6 · Build 807
+
+- Terminal mode is one pane: the launcher's own fetch at the top (your ASCII art, device details, the theme's colours, and live date, weather, music and alarm lines), with your Termux sessions full width below it, titled with powerline pills.
+- Tap a session to type and it fills the pane above the keyboard. Type `exit` and it leaves the pane.
+- Terminal mode search results push the pane up instead of covering it, and Terminal mode has its own settings, wallpaper overlay (`terminal_overlay_color`) and pill colours (`terminal_pill_color`, `terminal_pill2_color`).
+- Dot mode: while music plays the dot is a play button with ripples pulsing out; pips orbit it for apps with notifications; the rings add the date and next alarm; hold the black for Dot settings.
+- Presets downloaded from Community or the website keep their name.
+- Sharing a preset from Community can include your `ascii.txt` as its ASCII art. It is off until you tick it.
+- The Re-T-UI folder shows up in your phone's Files app and file pickers, so you can open your settings, presets and `ascii.txt` in any editor, without root. What you save there applies when you come back, refreshing only what changed.
+- Terminal mode's fetch counts your apps right after the launcher starts.
+- In Mono's scroll layout, panels such as Apps and Books scroll again, then hand on to the page.
+- With the built-in player off, the Music widget buttons control your other music app, and `music -open` opens it.
+- The Mono clock no longer jumps when you go home while already on the home screen.
+- `battery_size` now also sizes the battery progress bar.
+- `songs_folder` plays the same formats as media folders, such as m4a, aac and opus.
+- `weather_key` is gone; weather never needed it. The Re:TUI Fetch terminal widget is gone too.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -786,8 +803,13 @@ Android AppWidgets: open the widgets pane from the toolbar.</string>
     </plurals>
     <string name="dialog_no_apps_found">NO APPS FOUND</string>
     <string name="dot_home_description">Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app.</string>
+    <string name="dot_home_now_playing">Now playing: %1$s</string>
     <string name="dot_home_search_hint">double-tap the dot to search</string>
     <string name="dot_home_toggle_modules">Show or hide the time, battery and temperature</string>
+    <string name="dot_settings_apps">Apps</string>
+    <string name="dot_settings_dot">Dot</string>
+    <string name="dot_settings_rings">Rings</string>
+    <string name="dot_settings_title">Dot settings</string>
     <string name="duo_status">Duo command: enabled
 Duo layout: %1$s
 Usage: %2$s</string>
@@ -2642,7 +2664,7 @@ Unable to read Android Calendar.</string>
     <string name="mono_stopwatch_paused">stopwatch %1$s · paused</string>
     <string name="mono_stopwatch_running">stopwatch %1$s</string>
     <string name="mono_tasks_title">Tasks</string>
-    <string name="mono_term_done">done ×</string>
+    <string name="mono_term_done">done</string>
     <string name="mono_term_pick">pick a window</string>
     <string name="mono_term_tap">tap to type</string>
     <string name="mono_term_title">Term</string>
@@ -3968,7 +3990,7 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
-- Build 806: Mono on a phone held sideways shows each page in one frame, split into a left and right half, and fits beside the camera cutout. Build 805: in Terminal mode the search backdrop reaches under the navigation bar. Build 804: backups work again, Mono and Dot use both screens on foldables and the Duo, and Settings show the current mode's settings first. Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
+- Build 807: Terminal mode is one pane with its own fetch and your sessions below it, Dot mode plays music with ripples and shows notification pips, shared presets can include your ASCII art, the Music widget controls your other music app when the built-in player is off, `battery_size` sizes the battery bar, and the Mono clock no longer jumps on home. Build 806: Mono on a phone held sideways shows each page in one frame, split into a left and right half, and fits beside the camera cutout. Build 805: in Terminal mode the search backdrop reaches under the navigation bar. Build 804: backups work again, Mono and Dot use both screens on foldables and the Duo, and Settings show the current mode's settings first. Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
 - eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.
 - Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.
 - Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.
@@ -4647,7 +4669,7 @@ pomodoro Read manual
 
 Start focus session for this goal; optional Dystopia can restrict early exit.</string>
     <string name="offline_help_article_timer_stopwatch_focus_title">Start a timer, stopwatch or focus session</string>
-    <string name="offline_help_article_weather_setup_body">Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed: weather_key is unused and -set_key is unsupported.
+    <string name="offline_help_article_weather_setup_body">Use tuiweather -set_location with a place name or latitude,longitude. Coordinates are used directly; Android Geocoder resolves place names and caches a match. Ambiguous names may resolve unexpectedly; empty or failed matches require correction. Setting a location requests a refresh; -update requests another. Forecasts use MET Norway/met.no, not OpenWeather. No API key is needed.
 
 -enable/-disable changes weather visibility and reloads the launcher. weather_native offers built-in controls; weather can be a scripted module depending on the registry. Forecasts require network and send configured coordinates to the service; choose precision deliberately. Geocoding may also need network. This path does not request live device GPS access; location uses a separate subsystem.
 
@@ -5271,6 +5293,11 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_click_commands_description">If true, you will be able to use a command again clicking on it</string>
     <string name="setting_behavior_device_format_description">Define the device format</string>
     <string name="setting_behavior_dot_apps_description">In Dot mode, the apps on the rings around the dot, innermost first, separated by commas (up to 5). Leave empty to use your most-used apps.</string>
+    <string name="setting_behavior_dot_blink_description">Dot mode: how the dot sits at rest. blink, steady or breathe.</string>
+    <string name="setting_behavior_dot_hint_description">Dot mode: the hint under the dot. auto hides it after a few searches; on or off.</string>
+    <string name="setting_behavior_dot_notifications_description">Dot mode: a pip orbits the dot for each app with notifications.</string>
+    <string name="setting_behavior_dot_rings_description">Dot mode: what a tap on the dot shows, comma separated: clock, battery, temperature, date, alarm.</string>
+    <string name="setting_behavior_dot_ripples_description">Dot mode: while music plays, ripples pulse out from the dot.</string>
     <string name="setting_behavior_double_tap_cmd_description">The command that will run when you touch two times the screen quickly</string>
     <string name="setting_behavior_double_tap_lock_description">If true, Re:T-UI will lock the screen on double tap</string>
     <string name="setting_behavior_duo_mode_description">If true, enables the Duo command for manually switching landscape into a single portrait-style pane on the left or right screen</string>
@@ -5366,7 +5393,6 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_behavior_unlock_time_divider_description">The divider between the last unlock times</string>
     <string name="setting_behavior_unlock_time_order_description">1 = up-down. 2 = down-up</string>
     <string name="setting_behavior_weather_format_description">The format used to show the weather. Placeholders: %name (place), %main or %description (conditions), %temp, %temp_min and %temp_max (next 24 hours), %rain (next hour), %humidity, %speed (wind), %deg (wind direction), %pressure, %clouds</string>
-    <string name="setting_behavior_weather_key_description">Legacy OpenWeather setting. It is no longer used.</string>
     <string name="setting_behavior_weather_location_description">Place name or fixed coordinates separated by a comma (lat,lon). Weather never requests device location.</string>
     <string name="setting_behavior_weather_temperature_measure_description">metric = Celsius; imperial = Fahrenheit; standard = Kelvin</string>
     <string name="setting_behavior_weather_update_time_description">The weather update time in seconds</string>
@@ -5524,6 +5550,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_theme_disabled_background_color_description">Background color for disabled controls. AUTO uses button_background_color with reduced opacity.</string>
     <string name="setting_theme_disabled_text_color_description">Text color for disabled controls. AUTO uses button_text_color with reduced opacity.</string>
     <string name="setting_theme_divider_color_description">Color of lines separating items. AUTO follows terminal_border_color.</string>
+    <string name="setting_theme_dot_ink_color_description">Dot mode: the color the dot, its rings and its words are drawn in. auto uses accent_color, or output_text_color when the accent is too dark.</string>
     <string name="setting_theme_enter_icon_color_description">Enter icon color</string>
     <string name="setting_theme_error_text_color_description">Text color for errors. AUTO uses the built-in orange (#FFFF5722), independently of battery colors.</string>
     <string name="setting_theme_field_background_color_description">Background color for text input fields. AUTO follows input_background_color.</string>
@@ -5626,6 +5653,9 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="setting_theme_terminal_border_color_description">Shared border color for terminal chrome, headers, panels, and module outlines</string>
     <string name="setting_theme_terminal_header_background_color_description">Terminal header tab background color</string>
     <string name="setting_theme_terminal_header_border_color_description">Terminal header tab border color</string>
+    <string name="setting_theme_terminal_overlay_color_description">Overlay color over the wallpaper in Terminal mode, in place of wallpaper_overlay_color. auto uses wallpaper_overlay_color.</string>
+    <string name="setting_theme_terminal_pill2_color_description">Terminal mode: color of the second pill in a header (the tmux window). auto uses device_text_color.</string>
+    <string name="setting_theme_terminal_pill_color_description">Terminal mode: color of the first pill in a header (the session title, the search prompt, done). auto uses input_text_color.</string>
     <string name="setting_theme_terminal_window_background_color_description">Terminal window background color for modules, drawers, and panels</string>
     <string name="setting_theme_time_status_background_color_description">Time status line background color</string>
     <string name="setting_theme_time_status_text_shadow_color_description">Time status line text shadow color</string>
@@ -5795,6 +5825,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_editor_invalid_status_index">Enter a row position between 1 and 2147483637. Decimals can share a row.</string>
     <string name="settings_editor_invalid_time">Enter a time as hh.mm, from 0.00 to 23.59.</string>
     <string name="settings_editor_invalid_value">This value is not allowed.</string>
+    <string name="settings_file_edit_rejected">%1$s: kept the old value for %2$s, the new one is not valid.</string>
     <string name="settings_file_operation_cancelled">File operation cancelled.</string>
     <string name="settings_file_operation_cancelling">Cancelling…</string>
     <string name="settings_file_operation_finishing">Finishing restore…</string>
@@ -5831,6 +5862,8 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="settings_preview_terminal_card">TERMINAL</string>
     <string name="settings_preview_title">Preview</string>
     <string name="settings_preview_wallpaper_full">System wallpaper is shown in the full preview.</string>
+    <string name="share_ascii">ASCII art (ascii.txt, %1$s)</string>
+    <string name="share_ascii_none">ASCII art (no ascii.txt to share)</string>
     <string name="share_back_to_community">Back to Community</string>
     <string name="share_behaviour">Behaviour settings… (you pick which)</string>
     <string name="share_capture">Capture home screen</string>
@@ -5845,6 +5878,7 @@ Disabling this option hides Re:TUI access; it does not lock Private Space. Save 
     <string name="share_image_error">Could not read that image.</string>
     <string name="share_intro">Shares your current look, not a backup. It is reviewed before anyone can download it.</string>
     <string name="share_layout">Layout</string>
+    <string name="share_log_ascii">✓ attached ASCII art (%1$s)</string>
     <string name="share_log_exported">✓ exported %1$s</string>
     <string name="share_log_screenshot">✓ attached screenshot (%1$s)</string>
     <string name="share_log_uploaded">✓ uploaded</string>
@@ -6514,6 +6548,23 @@ Updated: </string>
     <string name="tasker_theme_element">Theme element</string>
     <string name="tasker_update_module">Update module text</string>
     <string name="tasker_value">Value</string>
+    <string name="term_fetch_android">Android</string>
+    <string name="term_fetch_apps">Apps</string>
+    <string name="term_fetch_battery">Battery</string>
+    <string name="term_fetch_charging">charging</string>
+    <string name="term_fetch_device">Device</string>
+    <string name="term_fetch_font">Font</string>
+    <string name="term_fetch_launcher">Launcher</string>
+    <string name="term_fetch_memory">Memory</string>
+    <string name="term_fetch_storage">Storage</string>
+    <string name="term_fetch_uptime">Uptime</string>
+    <string name="term_now_alarm">Alarm</string>
+    <string name="term_now_time">Date/Time</string>
+    <string name="term_settings_ascii">ASCII art</string>
+    <string name="term_settings_colours">Colours</string>
+    <string name="term_settings_fetch">Fetch</string>
+    <string name="term_settings_terminals">Terminals</string>
+    <string name="term_settings_title">Terminal settings</string>
     <string name="terminal_home_add">Add terminal</string>
     <string name="terminal_home_arrange">Drag to move. Other panes move down to make room. Drag an edge handle to resize. Tap outside or Back to finish.</string>
     <string name="terminal_home_background_help">Termux is not responding. Open Termux once and allow background activity in Android settings, then tap here to reconnect.</string>

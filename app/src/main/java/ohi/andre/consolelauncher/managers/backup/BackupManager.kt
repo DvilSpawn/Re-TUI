@@ -140,6 +140,7 @@ object BackupManager {
         "irc_pane",
         "terminal_home",
         "terminal_windows",
+        "dot_home",
         "retui_workspace_surface",
         "apps_last_launch",
         "retui_preset_wallpaper",
@@ -433,17 +434,22 @@ object BackupManager {
         val manifest: String
     ) : AutoCloseable {
         val name: String get() = manifestValue(manifest, "presetName").ifBlank { "Imported preset" }
+        /** Whether the package names itself; shareable exports do not. */
+        val hasOwnName: Boolean get() = manifestValue(manifest, "presetName").isNotBlank()
         val sections: String get() = manifestValue(manifest, "sections")
         val producerVersion: String get() = manifestValue(manifest, "appVersion")
         val schema: String get() = manifestValue(manifest, "schema")
         val behaviorLabels: Set<String>? get() = if (schema == "3") behaviorFields(manifest) else null
 
-        fun save(): String {
+        /** Saves the preset as [preferredName] when given (the marketplace's listing name), else the package's own name. */
+        fun save(preferredName: String? = null): String {
             // Re-extract and validate the private snapshot, never the original provider URI.
             File(staging, "package.retui").inputStream().use { input ->
                 inspectPreset(input, staging.parentFile!!).use { checked ->
                     FileOperationCancellation.beginCommit()
-                    return PresetManager.importExtractedFolder(checked.name, checked.folder, checked.behaviorLabels)
+                    // Shareable exports carry no presetName, so without the listing's name every download was "Imported preset".
+                    val name = preferredName?.trim()?.takeIf { it.isNotEmpty() } ?: checked.name
+                    return PresetManager.importExtractedFolder(name, checked.folder, checked.behaviorLabels)
                 }
             }
         }
@@ -610,8 +616,10 @@ object BackupManager {
         val known = ohi.andre.consolelauncher.managers.xml.options.Behavior.entries
             .mapNotNull { it.label() }
             .toSet()
-        require(fields.all { it in known }) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unknown_b_d886f) }
-        return fields
+        // Presets made before a setting was retired may still name it; accept them and drop the name.
+        val retired = XMLPrefsManager.XMLPrefsRoot.BEHAVIOR.delete().orEmpty().filterNotNull().toSet()
+        require(fields.all { it in known || it in retired }) { throw LocalizedArgumentException(R.string.validation_backup_backupmanager_shareable_configuration_contains_unknown_b_d886f) }
+        return fields - retired
     }
 
     @Throws(java.lang.Exception::class)

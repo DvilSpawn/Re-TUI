@@ -227,6 +227,31 @@ enum class Behavior : XMLPrefsSave {
         override fun infoRes(): Int = R.string.setting_behavior_dot_apps_description
         override fun type(): String = XMLPrefsSave.TEXT
     },
+    dot_blink {
+        override fun defaultValue(): String = "blink"
+        override fun infoRes(): Int = R.string.setting_behavior_dot_blink_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
+    dot_ripples {
+        override fun defaultValue(): String = "true"
+        override fun infoRes(): Int = R.string.setting_behavior_dot_ripples_description
+        override fun type(): String = XMLPrefsSave.BOOLEAN
+    },
+    dot_rings {
+        override fun defaultValue(): String = "clock,battery,temperature,date,alarm"
+        override fun infoRes(): Int = R.string.setting_behavior_dot_rings_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
+    dot_notifications {
+        override fun defaultValue(): String = "true"
+        override fun infoRes(): Int = R.string.setting_behavior_dot_notifications_description
+        override fun type(): String = XMLPrefsSave.BOOLEAN
+    },
+    dot_hint {
+        override fun defaultValue(): String = "auto"
+        override fun infoRes(): Int = R.string.setting_behavior_dot_hint_description
+        override fun type(): String = XMLPrefsSave.TEXT
+    },
     search_category_tabs {
         override fun defaultValue(): String = "true"
         override fun infoRes(): Int = R.string.setting_behavior_search_category_tabs_description
@@ -1172,19 +1197,6 @@ enum class Behavior : XMLPrefsSave {
 
         override fun type(): String? {
             return XMLPrefsSave.COLOR
-        }
-    },
-    weather_key {
-        override fun defaultValue(): String? {
-            return "1f798f99228596c20ccfda51b9771a86"
-        }
-
-        override fun infoRes(): Int {
-            return R.string.setting_behavior_weather_key_description
-        }
-
-        override fun type(): String? {
-            return XMLPrefsSave.TEXT
         }
     },
     weather_temperature_measure {

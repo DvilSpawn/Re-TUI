@@ -61,6 +61,9 @@ internal interface HomeMode {
 
     /** Music or notifications changed. */
     fun onDataChanged() = Unit
+
+    /** The app list finished loading or an app was installed or removed. */
+    fun onAppsChanged() = Unit
 }
 
 /** What a mode may ask of the launcher. */
@@ -98,7 +101,7 @@ internal interface HomeModeHost {
     /** Runs a command as if it were typed in the launcher's search. */
     fun executeSearchCommand(command: String)
 
-    class Music(val title: String, val artist: String?, val playing: Boolean)
+    class Music(val title: String, val artist: String?, val playing: Boolean, val progress: () -> Float? = { null })
 }
 
 /** The built-in modes, one instance each, for a single launcher layout. */

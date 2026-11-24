@@ -84,7 +84,7 @@ object PresetMarketplace {
         }
         return BackupManager.inspectPreset(bytes.inputStream(), File(context.cacheDir, "preset-marketplace")).use { staged ->
             if (cancelled()) throw CancellationException()
-            val name = staged.save()
+            val name = staged.save(entry.name)
             prefs.edit().putString(entry.hash, name).putString(entry.hash + ".contents", fingerprint(File(PresetManager.presetsDir, name))).apply()
             name
         }

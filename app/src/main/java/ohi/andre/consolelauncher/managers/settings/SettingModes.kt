@@ -35,6 +35,11 @@ object SettingModes {
         listOf(Behavior.mono_preset, Behavior.mono_ink_color, Behavior.mono_paper_color, Behavior.mono_layout,
             Behavior.mono_layout_style).forEach { put(it, setOf(LauncherMode.MONO)) }
         put(Behavior.dot_apps, setOf(LauncherMode.DOT))
+        listOf(Behavior.dot_blink, Behavior.dot_ripples, Behavior.dot_rings, Behavior.dot_notifications, Behavior.dot_hint,
+            Theme.dot_ink_color).forEach { put(it, setOf(LauncherMode.DOT)) }
+        put(Theme.terminal_overlay_color, setOf(LauncherMode.TERMINAL))
+        put(Theme.terminal_pill_color, setOf(LauncherMode.TERMINAL))
+        put(Theme.terminal_pill2_color, setOf(LauncherMode.TERMINAL))
         // The homes that split on wide screens and around a hinge.
         listOf(Behavior.duo_mode, Ui.landscape_fold_gutter_mm).forEach { put(it, SPLITTING) }
         listOf(Behavior.duo_swap_top_panes, Ui.split_duo_launcher, Ui.show_ascii_landscape, Ui.display_margin_landscape_mm)
@@ -47,7 +52,7 @@ object SettingModes {
             Behavior.ascii_effect_speed, Ui.module_dock_spacing_dp, Ui.status_lines_margins, SurfaceBorderOption.unified_status_border,
             Ui.enable_battery_status).forEach { put(it, CLASSIC) }
         // Weather shows in Classic's status, Mono's weather panel and Dot's temperature ring.
-        listOf(Behavior.weather_location, Behavior.weather_key, Behavior.weather_temperature_measure,
+        listOf(Behavior.weather_location, Behavior.weather_temperature_measure,
             Behavior.weather_update_time, Behavior.show_weather_updates, Behavior.weather_format)
             .forEach { put(it, setOf(LauncherMode.CLASSIC, LauncherMode.MONO, LauncherMode.DOT)) }
         put(Ui.show_weather, setOf(LauncherMode.CLASSIC, LauncherMode.MONO))

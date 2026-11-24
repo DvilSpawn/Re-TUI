@@ -174,8 +174,6 @@
     <string name="setting_behavior_tui_notification_time_text_color_description" formatted="false">"The time color inside the Re:T-UI notification"</string>
     <!-- Behavior.kt: tui_notification_input_text_color -->
     <string name="setting_behavior_tui_notification_input_text_color_description" formatted="false">"The input color inside the Re:T-UI notification"</string>
-    <!-- Behavior.kt: weather_key -->
-    <string name="setting_behavior_weather_key_description" formatted="false">"Legacy OpenWeather setting. It is no longer used."</string>
     <!-- Behavior.kt: weather_temperature_measure -->
     <string name="setting_behavior_weather_temperature_measure_description" formatted="false">"metric = Celsius; imperial = Fahrenheit; standard = Kelvin"</string>
     <!-- Behavior.kt: weather_location -->
@@ -259,6 +257,11 @@
     <string name="setting_behavior_dot_apps_description">In Dot mode, the apps on the rings around the dot, innermost first, separated by commas (up to 5). Leave empty to use your most-used apps.</string>
     <string name="dot_home_description">Home. Tap for the time, battery and temperature; double-tap to search; hold and slide to a ring to open an app.</string>
     <string name="dot_home_search_hint">double-tap the dot to search</string>
+    <string name="dot_settings_title">Dot settings</string>
+    <string name="dot_settings_apps">Apps</string>
+    <string name="dot_settings_dot">Dot</string>
+    <string name="dot_settings_rings">Rings</string>
+    <string name="dot_home_now_playing">Now playing: %1$s</string>
     <string name="dot_home_toggle_modules">Show or hide the time, battery and temperature</string>
     <!-- Behavior.kt: search_only_mode -->
     <string name="setting_behavior_search_only_mode_description" formatted="false">"Legacy search mode toggle used only when launcher_mode is empty"</string>
@@ -428,6 +431,15 @@
     <string name="setting_theme_wallpaper_overlay_color_description" formatted="false">"Overlay color applied over the system wallpaper"</string>
     <!-- Theme.kt: settings_wallpaper_overlay_color -->
     <string name="setting_theme_settings_wallpaper_overlay_color_description" formatted="false">"Overlay color applied over the wallpaper behind Settings"</string>
+    <string name="setting_theme_terminal_pill_color_description" formatted="false">"Terminal mode: color of the first pill in a header (the session title, the search prompt, done). auto uses input_text_color."</string>
+    <string name="setting_theme_terminal_pill2_color_description" formatted="false">"Terminal mode: color of the second pill in a header (the tmux window). auto uses device_text_color."</string>
+    <string name="setting_theme_dot_ink_color_description" formatted="false">"Dot mode: the color the dot, its rings and its words are drawn in. auto uses accent_color, or output_text_color when the accent is too dark."</string>
+    <string name="setting_behavior_dot_blink_description" formatted="false">"Dot mode: how the dot sits at rest. blink, steady or breathe."</string>
+    <string name="setting_behavior_dot_ripples_description" formatted="false">"Dot mode: while music plays, ripples pulse out from the dot."</string>
+    <string name="setting_behavior_dot_rings_description" formatted="false">"Dot mode: what a tap on the dot shows, comma separated: clock, battery, temperature, date, alarm."</string>
+    <string name="setting_behavior_dot_notifications_description" formatted="false">"Dot mode: a pip orbits the dot for each app with notifications."</string>
+    <string name="setting_behavior_dot_hint_description" formatted="false">"Dot mode: the hint under the dot. auto hides it after a few searches; on or off."</string>
+    <string name="setting_theme_terminal_overlay_color_description" formatted="false">"Overlay color over the wallpaper in Terminal mode, in place of wallpaper_overlay_color. auto uses wallpaper_overlay_color."</string>
     <!-- Theme.kt: input_text_color -->
     <string name="setting_theme_input_text_color_description" formatted="false">"Command input text color"</string>
     <!-- Theme.kt: output_text_color -->

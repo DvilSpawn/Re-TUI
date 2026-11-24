@@ -23,7 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import ohi.andre.consolelauncher.R
@@ -253,7 +252,8 @@ abstract class MonoPanel(protected val kit: MonoKit, protected val host: MonoPan
         return frame to body
     }
 
-    protected fun scrolling(content: View) = ScrollView(kit.context).apply {
+    // Nested, so in scroll-mode homes a drag inside a panel scrolls the panel first and then hands on to the page.
+    protected fun scrolling(content: View) = androidx.core.widget.NestedScrollView(kit.context).apply {
         isVerticalScrollBarEnabled = false
         addView(content)
     }
@@ -310,11 +310,13 @@ private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
     }
     private val timer = kit.text("", MonoKit.SMALL_SP).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; visibility = View.GONE }
     private val alarm = kit.text("", MonoKit.SMALL_SP, kit.dim).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END; visibility = View.GONE }
-    // Only meters that fit whole are shown; storage goes first, then memory, then the day.
+    // Only meters that fit whole are shown; storage goes first, then memory, then the day. Picked while measuring,
+    // so a rebuilt panel (every return to the home) never draws a frame with all four rows first.
     private val meters = object : android.widget.FrameLayout(kit.context) {
-        override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-            super.onSizeChanged(w, h, oldw, oldh)
-            post { fitMeters(w, h) }
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            if (View.MeasureSpec.getMode(heightMeasureSpec) == View.MeasureSpec.EXACTLY)
+                fitMeters(View.MeasureSpec.getSize(widthMeasureSpec), View.MeasureSpec.getSize(heightMeasureSpec))
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         }
     }
     private var compact = false
@@ -364,7 +366,10 @@ private class ClockPanel(kit: MonoKit, host: MonoPanelHost) : MonoPanel(kit, hos
         val row = first.measuredHeight + dp(4)
         val shown = if (row <= 0) 4 else (h / row).coerceIn(0, 4)
         val kept = listOf(battery, day, memory, disk).take(shown)
-        listOf(day, battery, disk, memory).forEach { it.view.visibility = if (it in kept) View.VISIBLE else View.GONE }
+        listOf(day, battery, disk, memory).forEach {
+            val want = if (it in kept) View.VISIBLE else View.GONE
+            if (it.view.visibility != want) it.view.visibility = want
+        }
     }
 
     /** A label, ten cells and the value. */

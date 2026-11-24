@@ -90,7 +90,11 @@ internal object HomeChromePresentation {
 
     fun styleRoot(view: View,appearance: HomeAppearance,canApplyTheme: Boolean=true) {
         view.setTag(R.id.home_root_binding,canApplyTheme)
-        val bg=appearance.color(if(appearance.bool(Ui.system_wallpaper) && canApplyTheme) Theme.wallpaper_overlay_color else Theme.background_color)
+        // Terminal mode has its own overlay over the wallpaper (auto: the usual one).
+        val terminal=ohi.andre.consolelauncher.managers.settings.LauncherMode.normalize(appearance.raw(ohi.andre.consolelauncher.managers.xml.options.Behavior.launcher_mode)) ==
+            ohi.andre.consolelauncher.managers.settings.LauncherMode.TERMINAL
+        val bg=appearance.color(if(appearance.bool(Ui.system_wallpaper) && canApplyTheme)
+            (if(terminal) Theme.terminal_overlay_color else Theme.wallpaper_overlay_color) else Theme.background_color)
         if(appearance.bool(Behavior.enable_cyberdeck_mode)) view.background=CyberpunkBackdropDrawable(bg,
             appearance.color(Theme.terminal_border_color),appearance.color(Theme.device_text_color))
         else view.setBackgroundColor(bg)

@@ -1,5 +1,8 @@
 package ohi.andre.consolelauncher.mono
 
+import android.content.res.ColorStateList
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.StateListDrawable
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -178,11 +181,16 @@ class MonoTermPanel(
         maxLines = 1
         gravity = Gravity.CENTER_VERTICAL
         setPadding(dp(10), 0, dp(10), 0)
-        kit.pressable(this, framed = false)
+        // Filled like the tab on the left, so it reads as the one button in the header, not more of the header.
+        isClickable = true
+        background = StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), ColorDrawable(kit.paper))
+            addState(intArrayOf(), ColorDrawable(kit.ink))
+        }
+        setTextColor(ColorStateList(arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf()), intArrayOf(kit.ink, kit.paper)))
         visibility = View.GONE
         setOnClickListener { events.drop(this@MonoTermPanel) }
     }
-    private val doneRule = View(kit.context).apply { setBackgroundColor(kit.ink); visibility = View.GONE }
     private val grid = TerminalGridView(kit.context).apply {
         updateThemeColors(kit.ink, kit.paper, kit.ink)
         monochrome = true
@@ -215,7 +223,6 @@ class MonoTermPanel(
         // The window's name sits right after the tab.
         val header = frame.getChildAt(0) as LinearLayout
         header.addView(name, 1, LinearLayout.LayoutParams(-2, -2).apply { marginStart = dp(8) })
-        header.addView(doneRule, LinearLayout.LayoutParams(kit.line, -1))
         header.addView(done, LinearLayout.LayoutParams(-2, -1))
         body.addView(FrameLayout(kit.context).apply {
             addView(grid, FrameLayout.LayoutParams(-1, -1))
@@ -235,7 +242,6 @@ class MonoTermPanel(
     /** Over the home ([on]) the header offers done and a long press selects text to copy, or pastes. */
     fun lifted(on: Boolean) {
         done.visibility = if (on) View.VISIBLE else View.GONE
-        doneRule.visibility = done.visibility
         grid.selectable = on
         grid.onPasteText = if (on) { text -> terminal?.paste(text) } else null
     }

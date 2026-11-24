@@ -300,6 +300,12 @@ class BackupManagerTest {
         assertEquals(setOf("double_tap_cmd", "status_time_format"), BackupManager.behaviorFields(manifest))
     }
 
+    @Test
+    fun acceptsAndDropsRetiredBehaviorFields() {
+        val manifest = "type=retui-shareable-config\nbehaviorFields=weather_key,status_time_format\n"
+        assertEquals(setOf("status_time_format"), BackupManager.behaviorFields(manifest))
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun rejectsUnknownUserSelectedBehaviorField() {
         BackupManager.validatePackage(

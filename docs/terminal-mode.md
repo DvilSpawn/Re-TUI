@@ -88,13 +88,9 @@ release.
 ## Bundled terminal widgets
 
 Clock and Dashboard use solid Unicode block digits at 23 columns / 8 rows or
-larger, with a compact clock below that size. Re:TUI Fetch is available from +
-and uses the same script and shell creation path. It combines an ASCII skull
-with date/time and local Android, kernel, architecture, memory, storage and
-uptime information. Layout follows pane geometry; compact panes show fewer
-fields. Restricted Android data is shown as unavailable. No extra packages or
-network access are needed for Fetch. Static properties are read once; live
-system statistics refresh every 30 seconds and the clock every second.
+larger, with a compact clock below that size. The pane draws its own fetch at the top, so the
+old Re:TUI Fetch widget is no longer bundled. A session whose shell exits (typing
+`exit`, or its command finishing) is taken off the pane.
 
 Existing running widgets retain their original inline script. Re-add a Clock
 or Dashboard tile to use the updated digits; removing a tile leaves its shell
