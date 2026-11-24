@@ -3757,10 +3757,12 @@ class UIManager(
                 if (action == ACTION_UPDATE_SUGGESTIONS) {
                     refreshSuggestionsNow()
                     refreshModuleSuggestionsStrip()
+                    homeModes.active.onAppsChanged()
                 } else if (action == ACTION_UPDATE_APPS) {
                     refreshSuggestionsNow()
                     refreshModuleSuggestionsStrip()
                     appDrawerPaneManager?.refresh()
+                    homeModes.active.onAppsChanged()
                 } else if (action == ACTION_UPDATE_HINT) {
                     mTerminalAdapter!!.setDefaultHint()
                     fileConsoleController?.refreshFileConsole(false)

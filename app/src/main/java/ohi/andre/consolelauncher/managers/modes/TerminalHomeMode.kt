@@ -166,6 +166,10 @@ internal class TerminalHomeMode(private val host: HomeModeHost) : HomeMode {
         host.tray?.let(::layoutSearchTray)
     }
 
+    override fun onAppsChanged() {
+        fetch?.refreshApps()
+    }
+
     override fun onDataChanged() {
         fetch?.let { view -> host.onMain { view.refreshLive() } }
     }

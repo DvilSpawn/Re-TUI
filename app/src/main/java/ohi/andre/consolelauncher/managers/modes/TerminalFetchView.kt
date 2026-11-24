@@ -56,6 +56,8 @@ internal class TerminalFetchView(context: Context, private val apps: () -> Int, 
     private val value get() = ThemeColorResolver.color(Theme.output_text_color)
 
     /** Everything again: the art, the details and the colours (theme or settings changed, or the pane came back). */
+    private var appsValue: TextView? = null
+
     fun refresh() {
         val asciiColor = ThemeColorResolver.color(Theme.ascii_text_color)
         val file = File(Tuils.getFolder(), "ascii.txt")
@@ -65,6 +67,7 @@ internal class TerminalFetchView(context: Context, private val apps: () -> Int, 
             XMLPrefsManager.getInt(Ui.ascii_pane_height_rows), (text as? AsciiAnimationManager.AsciiFrameText)?.colors())
 
         details.removeAllViews()
+        val appsLabel = context.getString(R.string.term_fetch_apps)
         val user = XMLPrefsManager.get(Ui.username).ifBlank { "user" }
         val device = XMLPrefsManager.get(Ui.deviceName).ifBlank { Build.MODEL }
         details.addView(line("$user@$device", key))
@@ -84,7 +87,11 @@ internal class TerminalFetchView(context: Context, private val apps: () -> Int, 
             // Two pairs to a line, so the fetch leaves the terminals more of the pane.
             details.addView(LinearLayout(context).apply {
                 orientation = HORIZONTAL
-                pair.forEach { (label, text) -> addView(row(label, text, width = 7), LayoutParams(0, -2, 1f)) }
+                pair.forEach { (label, text) ->
+                    val row = row(label, text, width = 7)
+                    if (label == appsLabel) appsValue = row.getChildAt(1) as? TextView
+                    addView(row, LayoutParams(0, -2, 1f))
+                }
                 if (pair.size == 1) addView(View(context), LayoutParams(0, 0, 1f))
             })
         }
@@ -111,6 +118,11 @@ internal class TerminalFetchView(context: Context, private val apps: () -> Int, 
 
     override fun onAttachedToWindow() { super.onAttachedToWindow(); removeCallbacks(tick); post(tick) }
     override fun onDetachedFromWindow() { removeCallbacks(tick); super.onDetachedFromWindow() }
+
+    /** The app list loads after the pane is built, and changes on installs, so its count updates on its own. */
+    fun refreshApps() {
+        appsValue?.text = apps().toString()
+    }
 
     private fun row(label: String, text: String, width: Int = 9) = LinearLayout(context).apply {
         orientation = HORIZONTAL

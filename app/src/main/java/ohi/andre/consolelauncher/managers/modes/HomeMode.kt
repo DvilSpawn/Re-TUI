@@ -61,6 +61,9 @@ internal interface HomeMode {
 
     /** Music or notifications changed. */
     fun onDataChanged() = Unit
+
+    /** The app list finished loading or an app was installed or removed. */
+    fun onAppsChanged() = Unit
 }
 
 /** What a mode may ask of the launcher. */
