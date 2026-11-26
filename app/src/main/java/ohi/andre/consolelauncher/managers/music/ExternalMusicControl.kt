@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
+import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
@@ -65,6 +66,30 @@ object ExternalMusicControl {
         val launch = context.packageManager.getLaunchIntentForPackage(pkg) ?: return false
         context.startActivity(launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         return true
+    }
+
+    /** What another music app is playing; positions in ms, 0 when the app gives no length. */
+    data class NowPlaying(val title: String?, val artist: String?, val position: Long, val duration: Long)
+
+    /** The preferred app's session, else the one playing; null without notification access or a session (#36). */
+    @JvmStatic
+    fun nowPlaying(context: Context): NowPlaying? {
+        val controller = pickController(context, MusicSettings.preferredPackage()?.takeUnless { TextUtils.isEmpty(it) }) ?: return null
+        val metadata = controller.metadata
+        val state = controller.playbackState
+        // The session reports where it was at its last update; run that on while it plays.
+        val position = when {
+            state == null -> 0L
+            state.state == PlaybackState.STATE_PLAYING ->
+                state.position + ((SystemClock.elapsedRealtime() - state.lastPositionUpdateTime) * state.playbackSpeed).toLong()
+            else -> state.position
+        }
+        return NowPlaying(
+            metadata?.getString(MediaMetadata.METADATA_KEY_TITLE),
+            metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST),
+            position.coerceAtLeast(0L),
+            metadata?.getLong(MediaMetadata.METADATA_KEY_DURATION)?.coerceAtLeast(0L) ?: 0L
+        )
     }
 
     /** Needs notification access; without it there are no sessions to pick from and send falls back to key events. */
