@@ -151,7 +151,7 @@ class TimeManager private constructor(
         if (pattern.length == 0) {
             return
         }
-        segments.add(FormatSegment(SimpleDateFormat(pattern, Locale.getDefault()), explicitSize))
+        segments.add(FormatSegment(SimpleDateFormat(protectColorTags(pattern), Locale.getDefault()), explicitSize))
     }
 
     private fun buildFallbackEntry(): FormatEntry {
@@ -302,7 +302,7 @@ class TimeManager private constructor(
                 continue
             }
 
-            val value = if (segment.clockWords) clockWords(date) else segment.formatter?.format(date)
+            val value = if (segment.clockWords) clockWords(date) else segment.formatter?.format(date)?.let(::restoreColorTags)
             if (value == null) {
                 continue
             }
@@ -364,7 +364,31 @@ class TimeManager private constructor(
                 formatter.span(context, entry, if (entry?.color == null) color else TerminalManager.NO_COLOR, Date(), size)
             }.getOrDefault("")
 
-        private val COLOR_PATTERN: Pattern = Pattern.compile("#(?:\\d|[a-fA-F]){6}")
+        // The old whole-line colour; a #RRGGBB inside a [#RRGGBB] tag belongs to the tag (#26).
+        private val COLOR_PATTERN: Pattern = Pattern.compile("(?<!\\[)#(?:\\d|[a-fA-F]){6}")
+        private val COLOR_TAG = Regex("\\[(?:#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?|/)]")
+
+        /**
+         * The date formatter reads letters as codes, so the hex letters inside [#RRGGBB] tags are swapped for private-use
+         * characters before it sees the format and swapped back after ([restoreColorTags]); StatusColors then colours them.
+         */
+        internal fun protectColorTags(pattern: String): String = COLOR_TAG.replace(pattern) { tag ->
+            tag.value.map { c ->
+                when (c) {
+                    in 'A'..'F' -> (0xE00A + (c - 'A')).toChar()
+                    in 'a'..'f' -> (0xE01A + (c - 'a')).toChar()
+                    else -> c
+                }
+            }.joinToString("")
+        }
+
+        internal fun restoreColorTags(text: String): String = text.map { c ->
+            when (c.code) {
+                in 0xE00A..0xE00F -> 'A' + (c.code - 0xE00A)
+                in 0xE01A..0xE01F -> 'a' + (c.code - 0xE01A)
+                else -> c
+            }
+        }.joinToString("")
         private val CLOCK_WORDS_PATTERN: Pattern = Pattern.compile(
             Pattern.quote("{clock_words}"),
             Pattern.CASE_INSENSITIVE
