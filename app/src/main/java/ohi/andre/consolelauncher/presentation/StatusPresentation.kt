@@ -110,10 +110,11 @@ internal object StatusPresentation {
         val parts=members.mapNotNull { ordinal ->
             if(saved!=null && ordinal==2 && listOf(Behavior.status_time_format,Behavior.time_format_separator,
                     Ui.time_size,Ui.font_size_offset,Theme.time_text_color).any { appearance.changed(it,saved) }) {
+ohi.andre.consolelauncher.managers.status.StatusColors.apply(
                 ohi.andre.consolelauncher.managers.time.TimeManager.previewStatus(view.context,
                     appearance.raw(Behavior.status_time_format).orEmpty(),
                     appearance.raw(Behavior.time_format_separator).orEmpty(),
-                    appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color))
+                    appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color)))
             } else {
                 val formatted=if(saved==null) null else draftFormat(view.context,ordinal,appearance,saved)
                 (formatted ?: content.texts.getOrNull(ordinal))?.let { text ->
@@ -156,7 +157,11 @@ internal object StatusPresentation {
             appearance.number(Behavior.battery_medium).toInt(),appearance.number(Behavior.battery_low).toInt(),appearance)
     }
 
-    private fun draftFormat(context:Context,ordinal:Int,appearance:HomeAppearance,saved:HomeAppearance):CharSequence? {
+    // Home colours [#RRGGBB] tags in every row but notes and ASCII; the preview has to as well (#26).
+    private fun draftFormat(context:Context,ordinal:Int,appearance:HomeAppearance,saved:HomeAppearance):CharSequence? =
+        rawDraftFormat(context,ordinal,appearance,saved).let { if(ordinal==6) it else ohi.andre.consolelauncher.managers.status.StatusColors.apply(it) }
+
+    private fun rawDraftFormat(context:Context,ordinal:Int,appearance:HomeAppearance,saved:HomeAppearance):CharSequence? {
         if(ordinal==3) return draftBattery(context,appearance,saved)
         if(formatKeys[ordinal]?.any { appearance.changed(it,saved) }!=true) return null
         val read:(XMLPrefsSave)->String={ appearance.raw(it).orEmpty() }

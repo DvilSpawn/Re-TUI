@@ -14,4 +14,11 @@ class TimeManagerTest {
         assertEquals("Twelve Thirty", TimeManager.clockWords(12, 30))
         assertEquals("Eleven Fifty Nine", TimeManager.clockWords(23, 59))
     }
+
+    @Test
+    fun colourTagsPassThroughTheDateFormatter() {
+        val format = java.text.SimpleDateFormat(TimeManager.protectColorTags("[#FF0088]d MMM [/]'at' [#00bfff80]HH"), java.util.Locale.ROOT)
+        format.timeZone = java.util.TimeZone.getTimeZone("UTC")
+        assertEquals("[#FF0088]1 Jan [/]at [#00bfff80]00", TimeManager.restoreColorTags(format.format(java.util.Date(0))))
+    }
 }

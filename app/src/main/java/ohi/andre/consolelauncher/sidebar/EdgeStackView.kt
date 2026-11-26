@@ -49,6 +49,9 @@ class EdgeStackView(context: Context, rightEdge: Boolean) : View(context) {
     var bezelColor = Color.BLACK
     var textColor = Color.WHITE
     var accentColor = Color.WHITE
+    /** The dock is open over the sidebar tab: its pill would show through a see-through dock (#35). */
+    var docked = false
+        set(value) { if (field != value) { field = value; invalidate() } }
 
     private val density = resources.displayMetrics.density
     private fun dp(value: Float) = value * density
@@ -72,6 +75,8 @@ class EdgeStackView(context: Context, rightEdge: Boolean) : View(context) {
         is EdgeSegment.Body -> bodyHeight
     }
 
+    /** Where the sidebar tab's bar sits, measured from the screen edge. */
+    val barInset get() = slimWidth / 2
     val stackWidth get() = segments.maxOfOrNull(::widthOf) ?: 0f
     val stackHeight get() = segments.sumOf { heightOf(it).toDouble() }.toFloat()
 
@@ -163,7 +168,7 @@ class EdgeStackView(context: Context, rightEdge: Boolean) : View(context) {
         var y = top()
         segments.forEachIndexed { index, segment ->
             val h = heightOf(segment)
-            if (segment === EdgeSegment.Sidebar) {
+            if (segment === EdgeSegment.Sidebar && !docked) {
                 paint.color = accentColor; paint.alpha = 150
                 val ph = (h - dp(16f)).coerceAtLeast(dp(12f))
                 oval.set(slimWidth / 2 - slimBar / 2, y + h / 2 - ph / 2, slimWidth / 2 + slimBar / 2, y + h / 2 + ph / 2)

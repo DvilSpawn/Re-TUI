@@ -67,8 +67,8 @@ internal object UnifiedStatusPresentation {
                 val format=appearance.raw(Behavior.status_time_format).orEmpty()
                 val custom=format!=Behavior.status_time_format.defaultValue()
                 val now=java.util.Date()
-                root.findViewById<TextView>(R.id.unified_status_time)?.text=if(custom) ohi.andre.consolelauncher.managers.time.TimeManager.previewStatus(root.context,format,
-                    appearance.raw(Behavior.time_format_separator).orEmpty(),appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color))
+                root.findViewById<TextView>(R.id.unified_status_time)?.text=if(custom) ohi.andre.consolelauncher.managers.status.StatusColors.apply(ohi.andre.consolelauncher.managers.time.TimeManager.previewStatus(root.context,format,
+                    appearance.raw(Behavior.time_format_separator).orEmpty(),appearance.number(Ui.time_size,12f).toInt(),appearance.color(Theme.time_text_color)))
                     else android.text.format.DateFormat.getTimeFormat(root.context).format(now)
                 root.findViewById<TextView>(R.id.unified_status_date)?.let { date ->
                     if(!custom) date.text=android.text.format.DateFormat.getMediumDateFormat(root.context).format(now)

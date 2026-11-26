@@ -9,6 +9,12 @@ import kotlin.math.max
 import kotlin.math.min
 
 class OutlineEditText : AppCompatEditText {
+    /**
+     * The command line and search bars are never forms. importantForAutofill="no" alone isn't enough: newer Android can
+     * still ask the autofill service about "unimportant" fields, which put phone-number popups over the output.
+     */
+    override fun getAutofillType(): Int = android.view.View.AUTOFILL_TYPE_NONE
+
     private val cursorPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var idleCursorVisible = false
     private var idleCursorDrawn = true

@@ -270,7 +270,7 @@ class EdgeSidebarService : Service() {
         val (rect, shift) = screenRect(view, layout, view.stackWidth, view.stackHeight, view.rightEdge)
         view.alpha = 0f
         var drop: EdgeBlob? = null
-        return EdgeBlob(this, windows, rect, view.rightEdge, view.bezelColor, view.textColor, view.accentColor) { right, screenY ->
+        return EdgeBlob(this, windows, rect, view.rightEdge, view.bezelColor, view.textColor, view.accentColor, view.barInset) { right, screenY ->
             if (tab !== view) { drop?.dismiss(); return@EdgeBlob }
             val before = IntArray(2).also(view::getLocationOnScreen).toList()
             val gravity = Gravity.TOP or if (right) Gravity.END else Gravity.START
@@ -289,6 +289,7 @@ class EdgeSidebarService : Service() {
                 val now = IntArray(2).also(view::getLocationOnScreen).toList()
                 if (shifts && now == before && framesLeft > 0) { view.postOnAnimation { reveal(framesLeft - 1) }; return }
                 view.alpha = 1f
+                drop?.hideBar()
                 view.postOnAnimation { view.postOnAnimation { drop?.dismiss() } }
             }
             view.postOnAnimation { reveal(MOVE_WAIT_FRAMES) }
@@ -316,6 +317,8 @@ class EdgeSidebarService : Service() {
         // It starts as the resting tab's exact shape, so adding it over the tab shows no change until it grows.
         runCatching { windows.addView(view, layout) }.onSuccess {
             panel = view
+            // Once the dock has drawn over it; the dock starts with the same pill, so nothing flickers.
+            view.postOnAnimation { if (panel === view) tab?.docked = true }
             view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             view.animateTo(1f)
         }
@@ -325,7 +328,7 @@ class EdgeSidebarService : Service() {
         val view = panel ?: return
         panel = null
         view.highlighted = null
-        view.animateTo(0f) { runCatching { windows.removeView(view) } }
+        view.animateTo(0f) { tab?.docked = false; view.postOnAnimation { runCatching { windows.removeView(view) } } }
     }
 
     /** The action under a screen point; a hold that opens the dock keeps reporting to the tab, so touches are mapped from raw coordinates. */

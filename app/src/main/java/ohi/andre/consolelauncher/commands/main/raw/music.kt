@@ -119,42 +119,25 @@ class music : ParamCommand() {
         },
         info {
             override fun exec(pack: ExecutePack): String? {
-                if ((pack as MainPack).player == null) return pack.context.getString(R.string.output_musicdisabled)
+                val context = pack.context
+                val m: MusicManager2? = (pack as MainPack).player
+                val song = m?.currentSong()
+                if (m == null || song == null) {
+                    // The built-in player is off or idle: report the other music app instead (#36).
+                    val other = ExternalMusicControl.nowPlaying(context)
+                        ?: return context.getString(if (m == null) R.string.output_musicdisabled else R.string.output_songnotfound)
+                    val builder = StringBuilder(context.getString(R.string.command_music_name_b3f69)).append(other.title ?: "-")
+                    other.artist?.let { builder.append(Tuils.NEWLINE).append(it) }
+                    builder.append(Tuils.NEWLINE).append(Tuils.NEWLINE).append(progress(context, other.position.toInt(), other.duration.toInt()))
+                    return builder.toString()
+                }
 
                 val builder = StringBuilder()
-
-                val m: MusicManager2 = pack.player!!
-                val song = m.currentSong()
-                if (song == null) return pack.context.getString(R.string.output_songnotfound)
-
-                builder.append(pack.context.getString(R.string.command_music_name_b3f69)).append(song.getTitle()).append(Tuils.NEWLINE)
-                if (song.getID() == -1L) builder.append(pack.context.getString(R.string.command_music_path_e97fe)).append(song.getPath())
+                builder.append(context.getString(R.string.command_music_name_b3f69)).append(song.getTitle()).append(Tuils.NEWLINE)
+                if (song.getID() == -1L) builder.append(context.getString(R.string.command_music_path_e97fe)).append(song.getPath())
                     .append(Tuils.NEWLINE)
                 builder.append(Tuils.NEWLINE)
-
-                var curS = m.getCurrentPosition() / 1000
-                var curMin = 0
-                if (curS >= 60) {
-                    curMin = curS / 60
-                    curS = curS % 60
-                }
-
-                var s = m.getDuration() / 1000
-                var min = 0
-                if (s >= 60) {
-                    min = s / 60
-                    s = s % 60
-                }
-
-                builder.append(if (curMin > 0) curMin.toString() + "." + curS else curS.toString() + "s")
-                    .append(pack.context.getString(R.string.command_music_of_607f2))
-                    .append(if (min > 0) min.toString() + "." + s else s.toString() + "s")
-                    .append(" (").append(
-                        Tuils.percentage(
-                            m.getCurrentPosition().toDouble(),
-                            m.getDuration().toDouble()
-                        )
-                    ).append("%)")
+                builder.append(progress(context, m.getCurrentPosition(), m.getDuration()))
                 return builder.toString()
             }
         },
@@ -239,6 +222,17 @@ class music : ParamCommand() {
     companion object {
         private fun execute(pack: ExecutePack, action: ExternalMusicControl.Action) {
             ExternalMusicControl.send(pack.context, action)
+        }
+
+        /** "1.05 of 3.20 (32.8%)", or just the position when the length is unknown. */
+        private fun progress(context: android.content.Context, positionMs: Int, durationMs: Int): String {
+            fun time(ms: Int): String {
+                val total = ms / 1000
+                return if (total >= 60) (total / 60).toString() + "." + total % 60 else total.toString() + "s"
+            }
+            if (durationMs <= 0) return time(positionMs)
+            return time(positionMs) + context.getString(R.string.command_music_of_607f2) + time(durationMs) +
+                " (" + Tuils.percentage(positionMs.toDouble(), durationMs.toDouble()) + "%)"
         }
     }
 }

@@ -394,7 +394,15 @@ Cancel stops the current calculation. Back closes Help and retains your reading 
 - The Mono clock no longer jumps when you go home while already on the home screen.
 - `battery_size` now also sizes the battery progress bar.
 - `songs_folder` plays the same formats as media folders, such as m4a, aac and opus.
-- `weather_key` is gone; weather never needed it. The Re:TUI Fetch terminal widget is gone too.</string>
+- `weather_key` is gone; weather never needed it. The Re:TUI Fetch terminal widget is gone too.
+
+## V.6 · Build 808
+
+- Colour tags such as `[#FF0088]` show as colours in the Settings preview, not as text.
+- Colour tags work in `status_time_format`; before, a tag left `[]` behind.
+- A see-through edge sidebar no longer shows its pill through the open sidebar, and a dragged tab settles without a second bar beside it.
+- `music -info` shows what your other music app is playing when the built-in player is off or idle.
+- Autofill pop-ups, such as phone numbers, no longer cover the output while you type a command or search.</string>
     <string name="command_bluetooth_false_4603a">%1$s false</string>
     <string name="command_bluetooth_opening_bluetooth_settings_android_no_long_c4672">Opening Bluetooth settings. Android no longer allows third-party launchers to toggle Bluetooth directly.</string>
     <string name="command_bluetooth_true_630fa">%1$s true</string>
@@ -3990,7 +3998,7 @@ This manual is bundled with Launcher and can be read offline. IRC and network se
 
 ## Recent updates
 
-- Build 807: Terminal mode is one pane with its own fetch and your sessions below it, Dot mode plays music with ripples and shows notification pips, shared presets can include your ASCII art, the Music widget controls your other music app when the built-in player is off, `battery_size` sizes the battery bar, and the Mono clock no longer jumps on home. Build 806: Mono on a phone held sideways shows each page in one frame, split into a left and right half, and fits beside the camera cutout. Build 805: in Terminal mode the search backdrop reaches under the navigation bar. Build 804: backups work again, Mono and Dot use both screens on foldables and the Duo, and Settings show the current mode's settings first. Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
+- Build 808: colour tags show in the Settings preview and work in the time format, the edge sidebar drops cleanly, `music -info` reports your other music app, and autofill pop-ups no longer cover the command line. Build 807: Terminal mode is one pane with its own fetch and your sessions below it, Dot mode plays music with ripples and shows notification pips, shared presets can include your ASCII art, the Music widget controls your other music app when the built-in player is off, `battery_size` sizes the battery bar, and the Mono clock no longer jumps on home. Build 806: Mono on a phone held sideways shows each page in one frame, split into a left and right half, and fits beside the camera cutout. Build 805: in Terminal mode the search backdrop reaches under the navigation bar. Build 804: backups work again, Mono and Dot use both screens on foldables and the Duo, and Settings show the current mode's settings first. Build 803: switching to a moving wallpaper no longer closes the launcher, `music` commands control your other music app when the built-in player is off, and Mono panels you remove stay removed. Build 802: status formats take colour tags such as `[#FF0088]`; `home_default_module` keeps a module such as notifications open on the home; the edge sidebar has its own bezel colour, text colour and opacity; and Appearance, Behavior and the other Settings sections each have their own search box.
 - eReader: `books` reads EPUB, PDF, text, Markdown and CBZ comics on e-ink paper. Select text to copy, share, translate in your own app or pin it; turn by tap, swipe or volume keys, left to right, right to left or scrolling. Read Read books with the eReader in Tools.
 - Mono home: a handheld PDA of panels you arrange by holding one, on pages you swipe between or one page that scrolls, with terminal panels for your tmux windows. Read Arrange the Mono home in Appearance.
 - Live TV: import M3U channels in the media player's TV tab, and watch them in Mono's media panel. Read Watch live TV channels in Tools.

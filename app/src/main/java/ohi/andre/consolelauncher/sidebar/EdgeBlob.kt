@@ -37,6 +37,8 @@ class EdgeBlob(
     private val fill: Int,
     private val rim: Int,
     private val bar: Int,
+    /** How far in from the edge the resting tab draws its bar; the drop settles there so the two line up. */
+    private val restInset: Float,
     private val done: (right: Boolean, centerY: Float) -> Unit
 ) {
     private val density = context.resources.displayMetrics.density
@@ -94,7 +96,11 @@ class EdgeBlob(
      * Takes the drop off screen once the tab has taken its place: it shrinks back into the edge and fades, so the
      * round drop melts into the slim tab instead of swapping for it in one frame.
      */
+    /** The tab now shows its own bar: drop this one so the two never sit side by side (#35). */
+    fun hideBar() { if (barPaint.alpha != 0) { barPaint.alpha = 0; view.invalidate() } }
+
     fun dismiss() {
+        hideBar()
         if (dismissed) return
         dismissed = true
         if (view.width == 0) { runCatching { windows.removeView(view) }; return }
@@ -121,7 +127,7 @@ class EdgeBlob(
         // Where the finger let go decides the edge, not where the trailing drop has got to.
         targetRight = finger.x > screenWidth() / 2f
         targetY = finger.y.coerceIn(screenHeight() * 0.06f, screenHeight() * 0.94f)
-        finger.set(edgeX(targetRight) + if (targetRight) -radius * 0.55f else radius * 0.55f, targetY)
+        finger.set(edgeX(targetRight) + if (targetRight) -restInset else restInset, targetY)
     }
 
     private fun screenWidth() = view.width.takeIf { it > 0 }?.toFloat() ?: view.resources.displayMetrics.widthPixels.toFloat()
